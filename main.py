@@ -7,6 +7,7 @@ def main(conf):
 
     f = open(conf, "r")
     for line in f:
+
         print(line)
 
     f.close()
