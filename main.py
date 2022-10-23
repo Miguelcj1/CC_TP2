@@ -1,6 +1,15 @@
 import os
 import time
 
+
+def time_now():
+    final = ""
+    tstruct = time.gmtime()
+    print(tstruct)
+
+    return final
+
+
 # remove o "/" inicial de uma string.
 def pop_slash(string):
     if string[0] == "/":
@@ -93,6 +102,7 @@ def main(conf):
     print(f"Endereços de SS: {ss}")
     print(f"Endereços de DD: {dd}")
 
+    print(time.gmtime())
 
 if __name__ == '__main__':
     main("configuração")
