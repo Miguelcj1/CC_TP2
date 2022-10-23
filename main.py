@@ -42,7 +42,7 @@ def main(conf):
 
     fp.close()
     ##
-
+##
     '''
     ## Parsing do ficheiro com a lista de Servidores de Topo que devem ser contactados sempre que necessário.
     f = open(st_file_path, "r")
