@@ -54,7 +54,7 @@ def main(conf):
             pass
 
     f.close()
-    ##
+    ##dsdas
     '''
 
     ## Criação/abertura do ficheiro de log
