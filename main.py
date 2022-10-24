@@ -1,13 +1,18 @@
 import os
 import time
+from datetime import datetime
 
 
-def time_now():
-    final = ""
-    tstruct = time.gmtime()
-    print(tstruct)
+# Função que retorna a string formatada do tempo atual. Pode receber uma timestamp como argumento, caso contrário, irá ser calculado relativamente ao tempo atual.
+def get_timestamp(timestamp = time.time()):
+    # convert to datetime
+    date_time = datetime.fromtimestamp(timestamp)
 
-    return final
+    # convert timestamp to string in dd:mm:yyyy.HH:MM:SS:MS
+    str_date_time = date_time.strftime("%d:%m:%Y.%H:%M:%S:%f")
+
+    # print("Result 1:", str_date_time[:-3])
+    return str_date_time[:-3]
 
 
 # remove o "/" inicial de uma string.
