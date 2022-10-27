@@ -24,7 +24,7 @@ def co_dir(path, mode):
 
 class Configs:
 
-    # Retorna falso se houver algum problema (testing)
+    # Define as diversas variavéis analisadas no ficheiro de configuração.
     def __init__(self, conf_file):
         self.database_path = None
         self.st_file_path = None
