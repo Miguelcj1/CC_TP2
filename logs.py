@@ -68,4 +68,6 @@ class Logs:
         fp.write(string)
         fp.close()
 
+    #definir outros metodos das possiveis linhas existentes num log...
+
 
