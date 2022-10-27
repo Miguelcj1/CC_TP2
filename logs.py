@@ -45,7 +45,9 @@ class Logs:
         check_dir(file)
         self.log_file = file
 
-    # método que escreve no log a ocorrencia da receçao de uma query
+    ## talvez juntar estas 4 primeiras funcoes pq fazem o mesmo exceto nas letras do tipo de entrada.
+    ## talvez adicionar printf nestes metodos pq vai ser necessario tbm fazer print para o terminal, ou talvez guardar uma flag no objeto para ver se querem que se faça print no terminal.
+    # Escreve no log a ocorrencia da receçao de uma query
     def qr(self, timestamp, adress, dados):
         try:
             fp = open(self.log_file, "a")
@@ -56,7 +58,7 @@ class Logs:
         fp.write(string)
         fp.close()
 
-    # método que escreve no log a ocorrencia do envio de uma query
+    # Escreve no log a ocorrencia do envio de uma query
     def qe(self, timestamp, adress, dados):
         try:
             fp = open(self.log_file, "a")
@@ -68,6 +70,52 @@ class Logs:
         fp.write(string)
         fp.close()
 
+    # Escreve no log a ocorrencia do envio de uma query
+    def rp(self, timestamp, adress, dados):
+        try:
+            fp = open(self.log_file, "a")
+        except FileNotFoundError:
+            print("Logging file not found!!")
+            return None
+        #                                          Not sure desta indicaçao do adress.
+        string = get_timestamp(timestamp) + " RP " + str(adress[0]) + " [" + dados + "]\n"
+        fp.write(string)
+        fp.close()
+
+    # Escreve no log a ocorrencia do envio de uma query
+    def rr(self, timestamp, adress, dados):
+        try:
+            fp = open(self.log_file, "a")
+        except FileNotFoundError:
+            print("Logging file not found!!")
+            return None
+        #                                          Not sure desta indicaçao do adress.
+        string = get_timestamp(timestamp) + " RR " + str(adress[0]) + " [" + dados + "]\n"
+        fp.write(string)
+        fp.close()
+
     #definir outros metodos das possiveis linhas existentes num log...
 
+    # Reporta um determinado evento.
+    def ev(self, timestamp, info):
+        try:
+            fp = open(self.log_file, "a")
+        except FileNotFoundError:
+            print("Logging file not found!!")
+            return None
+        #                                          Not sure desta indicaçao do adress.
+        string = get_timestamp(timestamp) + " EV @ " + info + "\n"
+        fp.write(string)
+        fp.close()
 
+    # Reporta o arranque do servidor ((Not sure donde virao os valores do ttl e o mode)). NOT SURE
+    def st(self, timestamp, port, ttl, mode):
+        try:
+            fp = open(self.log_file, "a")
+        except FileNotFoundError:
+            print("Logging file not found!!")
+            return None
+
+        string = get_timestamp(timestamp) + " ST 127.0.0.1 " + port + " " + ttl + " " + mode + "\n"
+        fp.write(string)
+        fp.close()
