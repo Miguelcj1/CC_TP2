@@ -31,7 +31,7 @@ def main(conf):
         msg, add = s.recvfrom(1024)
         msg = msg.decode('utf-8')
         print(msg)
-        log.qr(time.time(), add, msg)
+        log.qr(time.time(), add, msg) # escrita do evento QR no log
         print(f"Recebi uma mensagem do cliente {add}")
         print("----------------------")
 
