@@ -64,7 +64,7 @@ class Logs:
             print("Logging file not found!!")
             return None
         #                                          Not sure desta indicaçao do adress.
-        string = get_timestamp(timestamp) + " QE " + str(adress[0]) + " " + dados
+        string = get_timestamp(timestamp) + " QE " + str(adress[0]) + " [" + dados + "]\n"
         fp.write(string)
         fp.close()
 
