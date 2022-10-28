@@ -12,7 +12,7 @@ def main(conf):
         return
 
     # Obtenção de um objeto que tem informação sobre a escrita de logs.
-    log = Logs(confs.get_all_log_file())
+    log = Logs(confs)
 
     # Abertura do socket.
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

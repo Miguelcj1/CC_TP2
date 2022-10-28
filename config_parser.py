@@ -112,8 +112,8 @@ class Configs:
     # Define as diversas variavéis analisadas no ficheiro de configuração.
     def __init__(self, conf_file):
         self.st_file_path = None
-        self.domains = {}
         self.all_log = None
+        self.domains = {}
 
         ## Leitura e análise do ficheiro inicial de configuração.
         try:
@@ -128,7 +128,7 @@ class Configs:
             if not line.strip() or arr[0].startswith("#"):
                 pass  # does nothing = nop
 
-            elif arr[1] == "DB": # (((talvez tenha de fazer uma verificação da length de arr para n dar seg fault.)))
+            elif arr[1] == "DB" and len(arr) == 3: # (((talvez tenha de fazer uma verificação da length de arr para n dar seg fault.)))
                 domain = arr[0]
                 # uso o pop_slash para remover o primeiro "/" de modo a ter a diretoria de maneira correta
                 db_path = pop_slash(arr[2])
@@ -136,20 +136,20 @@ class Configs:
                     self.domains[domain] = DomainInfo()
 
                 if not self.domains[domain].set_db(db_path):
-                    print("Incoerencia no set_db!")
+                    print(f"Ocorreu mais que uma definição da base de dados do dominio {domain}!")
                     return None # nestes return none talvez faltasse fazer o fp.close() antes.
 
-            elif arr[1] == "SP":
+            elif arr[1] == "SP" and len(arr) == 3:
                 domain = arr[0]
                 sp = arr[2]
                 if self.domains.get(domain) is None:
                     self.domains[domain] = DomainInfo()
                 # talvez pudesse mandar um tuplo (endereço, porta) e caso nao houvesse porta, mandava None no lugar da porta.
                 if not self.domains[domain].set_sp(sp):
-                    print("Incoerencia no set_sp!")
+                    print(f"Ocorreu mais que uma definição do servidor principal do dominio {domain}!")
                     return None
 
-            elif arr[1] == "SS":
+            elif arr[1] == "SS" and len(arr) == 3:
                 domain = arr[0]
                 ss = arr[2]
                 if self.domains.get(domain) is None:
@@ -157,14 +157,14 @@ class Configs:
                 self.domains[domain].add_ss(ss)
 
 
-            elif arr[1] == "DD":
+            elif arr[1] == "DD" and len(arr) == 3:
                 domain = arr[0]
                 dd = arr[2]
                 if self.domains.get(domain) is None:
                     self.domains[domain] = DomainInfo()
                 self.domains[domain].add_dd(dd)
 
-            elif arr[1] == "ST":
+            elif arr[1] == "ST" and len(arr) == 3:
                 if arr[0] != "root":
                     # mensagem de erro, pois o parametro deve ser igual a "root".
                     print("ERRO, o parametro de ST deve ser igual a root!!")
@@ -176,7 +176,7 @@ class Configs:
                     print("ERRO!! Pois há mais que uma indicação de ST filepaths!")
                     return None
 
-            elif arr[1] == "LG":
+            elif arr[1] == "LG" and len(arr) == 3:
                 domain = arr[0]
                 # uso o pop_slash para remover o primeiro "/" de modo a ter a diretoria de maneira correta
                 log_path = pop_slash(arr[2])
@@ -188,12 +188,12 @@ class Configs:
                     return None
                 # Define o log_file do determinado dominio.
                 elif not self.domains[domain].set_log_file(log_path):
-                    print("Incoerencia no set_log_file!")
+                    print(f"Ocorreu mais que uma definição do log_file do dominio {domain}!")
                     return None
 
             else:
-                print("!Passou no else do config_parser!")
-                pass
+                print("Erro! Sintaxe desconhecida.")
+                return None
 
         fp.close()
 
@@ -261,6 +261,12 @@ class Configs:
 
     def get_all_log_file(self):
         return self.all_log
+
+    def get_domains(self):
+        ret = []
+        for key in self.domains:
+            ret.append(key)
+        return ret
 
     # Retorna o path do ficheiro dos servidores de topo.
     def get_st_file(self):

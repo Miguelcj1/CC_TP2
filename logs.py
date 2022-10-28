@@ -1,6 +1,7 @@
 import os
 import time
 from datetime import datetime
+from config_parser import Configs
 
 
 # checks and creates directory
@@ -40,12 +41,14 @@ def get_timestamp(timestamp = time.time()):
 class Logs:
 
     # Verifica a diretoria do ficheiro de log e define o caminho na sua variavel de instancia.
-    def __init__(self, all_log_file):
+    def __init__(self, confs):
         # Verifica a existencia do file e caso não exista, cria-o.
+        all_log_file = confs.get_all_log_file()
         check_dir(all_log_file)
         self.all_log_file = all_log_file
-
-
+        self.domain_log_files = {}
+        for d in confs.get_domains():
+            self.domain_log_files[d] = confs.get_domain_log_file(d)
 
     ## talvez juntar estas 4 primeiras funcoes porque fazem o mesmo exceto nas letras do tipo de entrada.
     ## talvez adicionar printf nestes metodos porque vai ser necessario tambem fazer print para o terminal, ou talvez guardar uma flag no objeto para ver se querem que se faça print no terminal.
