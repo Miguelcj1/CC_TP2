@@ -24,7 +24,6 @@ def check_dir(path_arg):
         print(f"[DEBUG] Diretoria {path_arg} já estava criada.") ##
 
 
-
 # Função que retorna a string formatada do tempo atual. Pode receber uma timestamp como argumento, caso contrário, irá ser calculado relativamente ao tempo atual.
 def get_timestamp(timestamp = time.time()):
     # convert to datetime
@@ -101,7 +100,19 @@ class Logs:
         fp.write(string)
         fp.close()
 
-    #definir outros metodos das possiveis linhas existentes num log...
+    # Reporta a conclusao correta de um processo de transferencia de zona.
+    #end_adress -> o servidor na outra ponta da transferência
+    #papel -> papel do servidor local na transferência (SP ou SS)
+    #(OPCIONAL) duracao da transferencia e total de bytes transferidos
+    def zt(self, timestamp, end_adress, papel, domain="all"):
+        try:
+            fp = open(self.log_files[domain], "a")
+        except FileNotFoundError:
+            print("Logging file not found!!")
+            return None
+        string = get_timestamp(timestamp) + " ZT " + end_adress + " " + papel + "\n"
+        fp.write(string)
+        fp.close()
 
     # Reporta um determinado evento.
     def ev(self, timestamp, info, domain = "all"):
@@ -115,6 +126,40 @@ class Logs:
         fp.write(string)
         fp.close()
 
+    # (ERRO) Reporta a impossibilidade de descodificar um PDU corretamente.
+    #Outras opcionalidades
+    def er(self, timestamp, from_adress, domain="all"):
+        try:
+            fp = open(self.log_files[domain], "a")
+        except FileNotFoundError:
+            print("Logging file not found!!")
+            return None
+        string = get_timestamp(timestamp) + " ER " + from_adress + "\n"
+        fp.write(string)
+        fp.close()
+
+    # (ERRO DE ZONA) Reporta a conclusao incorreta de um processo de transferencia de zona.
+    def ez(self, timestamp, end_adress, papel, domain="all"):
+        try:
+            fp = open(self.log_files[domain], "a")
+        except FileNotFoundError:
+            print("Logging file not found!!")
+            return None
+        string = get_timestamp(timestamp) + " ZT " + end_adress + " " + papel + "\n"
+        fp.write(string)
+        fp.close()
+
+    # (SERVIDOR PAROU) Reporta que a execução do componente foi parado.
+    def sp(self, timestamp, info, domain="all"):
+        try:
+            fp = open(self.log_files[domain], "a")
+        except FileNotFoundError:
+            print("Logging file not found!!")
+            return None
+        string = get_timestamp(timestamp) + " SP 127.0.0.1 " + info + "\n"
+        fp.write(string)
+        fp.close()
+
     # Reporta o arranque do servidor ((Not sure donde virao os valores do ttl e o mode)). NOT SURE
     def st(self, timestamp, port, ttl, mode, domain = "all"):
         try:
@@ -122,7 +167,7 @@ class Logs:
         except FileNotFoundError:
             print("Logging file not found!!")
             return None
-
-        string = get_timestamp(timestamp) + " ST 127.0.0.1 " + port + " " + ttl + " " + mode + "\n"
+        string = get_timestamp(timestamp) + " ST 127.0.0.1 " + str(port) + " " + str(ttl) + " " + mode + "\n"
         fp.write(string)
         fp.close()
+

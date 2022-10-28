@@ -5,6 +5,11 @@ from logs import Logs
 
 def main(conf):
 
+    ttl = 20000
+    mode = "debug"
+    # Guarda a altura em que o servidor arrancou-
+    ts_arranque = time.time()
+
     # Obtenção de um objeto que vai conter toda a informação proveniente do config_file.
     confs = Configs(conf)
     if confs is None:
@@ -14,11 +19,14 @@ def main(conf):
     # Obtenção de um objeto que tem informação sobre a escrita de logs.
     log = Logs(confs)
 
-    # Abertura do socket.
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
     endereco = ''
     porta = 3334
+
+    # Reportar no log o arranque do servidor.
+    log.st(ts_arranque, porta, ttl, mode)
+
+    # Abertura do socket.
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.bind((endereco, porta))
 
     print(f"Estou à escuta no {endereco}:{porta}")
