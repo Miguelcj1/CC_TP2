@@ -149,6 +149,28 @@ class Logs:
         fp.write(string)
         fp.close()
 
+    # Reporta um erro do funcionamento interno de um componente.
+    def fl(self, timestamp, info, domain="all"):
+        try:
+            fp = open(self.log_files[domain], "a")
+        except FileNotFoundError:
+            print("Logging file not found!!")
+            return None
+        string = get_timestamp(timestamp) + " FL 127.0.0.1 " + info + "\n"
+        fp.write(string)
+        fp.close()
+
+    # Deteção de um timeout na interaçao com o servidor no endereço indicado.
+    def to(self, timestamp, adress, info, domain="all"):
+        try:
+            fp = open(self.log_files[domain], "a")
+        except FileNotFoundError:
+            print("Logging file not found!!")
+            return None
+        string = get_timestamp(timestamp) + " TO " + adress + " " + info + "\n"
+        fp.write(string)
+        fp.close()
+
     # (SERVIDOR PAROU) Reporta que a execução do componente foi parado.
     def sp(self, timestamp, info, domain="all"):
         try:
