@@ -1,12 +1,27 @@
 import os
+import time
+import threading
 
-dict = {1: 23, 2: 334, 4: 3213, 6: 1234}
-arr = [1, 2, 3]
+def del_in(dict, key, t):
+    time.sleep(t)
+    del dict[key]
+    print(dict)
 
-x = len(arr)
-print(x)
+def add(dict, key, value, t):
+    dict[key] = value
+    threading.Thread(target=del_in, args=(dict, key, t)).start()
+    print("Passei aqui!")
+    print(dict)
 
-chx = 0
+key = 7
+value = 143
+dict = {1: 23, 2: 2323, 3: 323, 4: 65, 5: 43, 6: 54}
+add(dict, key, value, 10)
+
+
+
+
+
 '''
 # checks and creates directory
 def check_dir(path_arg):

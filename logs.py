@@ -45,17 +45,19 @@ class Logs:
         # Verifica a existencia do file e caso não exista, cria-o.
         all_log_file = confs.get_all_log_file()
         check_dir(all_log_file)
-        self.all_log_file = all_log_file
-        self.domain_log_files = {}
-        for d in confs.get_domains():
-            self.domain_log_files[d] = confs.get_domain_log_file(d)
+        self.log_files = {"all": all_log_file}
+
+        for domain in confs.get_domains():
+            diretoria = confs.get_domain_log_file(domain)
+            check_dir(diretoria)
+            self.log_files[domain] = diretoria
 
     ## talvez juntar estas 4 primeiras funcoes porque fazem o mesmo exceto nas letras do tipo de entrada.
     ## talvez adicionar printf nestes metodos porque vai ser necessario tambem fazer print para o terminal, ou talvez guardar uma flag no objeto para ver se querem que se faça print no terminal.
     # Escreve no log a ocorrencia da receçao de uma query.
-    def qr(self, timestamp, adress, dados):
+    def qr(self, timestamp, adress, dados, domain = "all"):
         try:
-            fp = open(self.all_log_file, "a")
+            fp = open(self.log_files[domain], "a")
         except FileNotFoundError:
             print("Logging file not found!!")
             return None
@@ -64,9 +66,9 @@ class Logs:
         fp.close()
 
     # Escreve no log a ocorrencia do envio de uma query
-    def qe(self, timestamp, adress, dados):
+    def qe(self, timestamp, adress, dados, domain = "all"):
         try:
-            fp = open(self.all_log_file, "a")
+            fp = open(self.log_files[domain], "a")
         except FileNotFoundError:
             print("Logging file not found!!")
             return None
@@ -76,9 +78,9 @@ class Logs:
         fp.close()
 
     # Escreve no log a ocorrencia do envio de uma query
-    def rp(self, timestamp, adress, dados):
+    def rp(self, timestamp, adress, dados, domain = "all"):
         try:
-            fp = open(self.all_log_file, "a")
+            fp = open(self.log_files[domain], "a")
         except FileNotFoundError:
             print("Logging file not found!!")
             return None
@@ -88,9 +90,9 @@ class Logs:
         fp.close()
 
     # Escreve no log a ocorrencia do envio de uma query
-    def rr(self, timestamp, adress, dados):
+    def rr(self, timestamp, adress, dados, domain = "all"):
         try:
-            fp = open(self.all_log_file, "a")
+            fp = open(self.log_files[domain], "a")
         except FileNotFoundError:
             print("Logging file not found!!")
             return None
@@ -102,9 +104,9 @@ class Logs:
     #definir outros metodos das possiveis linhas existentes num log...
 
     # Reporta um determinado evento.
-    def ev(self, timestamp, info):
+    def ev(self, timestamp, info, domain = "all"):
         try:
-            fp = open(self.all_log_file, "a")
+            fp = open(self.log_files[domain], "a")
         except FileNotFoundError:
             print("Logging file not found!!")
             return None
@@ -114,9 +116,9 @@ class Logs:
         fp.close()
 
     # Reporta o arranque do servidor ((Not sure donde virao os valores do ttl e o mode)). NOT SURE
-    def st(self, timestamp, port, ttl, mode):
+    def st(self, timestamp, port, ttl, mode, domain = "all"):
         try:
-            fp = open(self.all_log_file, "a")
+            fp = open(self.log_files[domain], "a")
         except FileNotFoundError:
             print("Logging file not found!!")
             return None
