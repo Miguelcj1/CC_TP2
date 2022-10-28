@@ -40,17 +40,19 @@ def get_timestamp(timestamp = time.time()):
 class Logs:
 
     # Verifica a diretoria do ficheiro de log e define o caminho na sua variavel de instancia.
-    def __init__(self, file):
-        # verifica a existencia do file e caso não exista, cria-o
-        check_dir(file)
-        self.log_file = file
+    def __init__(self, all_log_file):
+        # Verifica a existencia do file e caso não exista, cria-o.
+        check_dir(all_log_file)
+        self.all_log_file = all_log_file
 
-    ## talvez juntar estas 4 primeiras funcoes pq fazem o mesmo exceto nas letras do tipo de entrada.
-    ## talvez adicionar printf nestes metodos pq vai ser necessario tbm fazer print para o terminal, ou talvez guardar uma flag no objeto para ver se querem que se faça print no terminal.
-    # Escreve no log a ocorrencia da receçao de uma query
+
+
+    ## talvez juntar estas 4 primeiras funcoes porque fazem o mesmo exceto nas letras do tipo de entrada.
+    ## talvez adicionar printf nestes metodos porque vai ser necessario tambem fazer print para o terminal, ou talvez guardar uma flag no objeto para ver se querem que se faça print no terminal.
+    # Escreve no log a ocorrencia da receçao de uma query.
     def qr(self, timestamp, adress, dados):
         try:
-            fp = open(self.log_file, "a")
+            fp = open(self.all_log_file, "a")
         except FileNotFoundError:
             print("Logging file not found!!")
             return None
@@ -61,7 +63,7 @@ class Logs:
     # Escreve no log a ocorrencia do envio de uma query
     def qe(self, timestamp, adress, dados):
         try:
-            fp = open(self.log_file, "a")
+            fp = open(self.all_log_file, "a")
         except FileNotFoundError:
             print("Logging file not found!!")
             return None
@@ -73,7 +75,7 @@ class Logs:
     # Escreve no log a ocorrencia do envio de uma query
     def rp(self, timestamp, adress, dados):
         try:
-            fp = open(self.log_file, "a")
+            fp = open(self.all_log_file, "a")
         except FileNotFoundError:
             print("Logging file not found!!")
             return None
@@ -85,7 +87,7 @@ class Logs:
     # Escreve no log a ocorrencia do envio de uma query
     def rr(self, timestamp, adress, dados):
         try:
-            fp = open(self.log_file, "a")
+            fp = open(self.all_log_file, "a")
         except FileNotFoundError:
             print("Logging file not found!!")
             return None
@@ -99,7 +101,7 @@ class Logs:
     # Reporta um determinado evento.
     def ev(self, timestamp, info):
         try:
-            fp = open(self.log_file, "a")
+            fp = open(self.all_log_file, "a")
         except FileNotFoundError:
             print("Logging file not found!!")
             return None
@@ -111,7 +113,7 @@ class Logs:
     # Reporta o arranque do servidor ((Not sure donde virao os valores do ttl e o mode)). NOT SURE
     def st(self, timestamp, port, ttl, mode):
         try:
-            fp = open(self.log_file, "a")
+            fp = open(self.all_log_file, "a")
         except FileNotFoundError:
             print("Logging file not found!!")
             return None

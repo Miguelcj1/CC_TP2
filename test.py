@@ -1,5 +1,13 @@
 import os
 
+dict = {1: 23, 2: 334, 4: 3213, 6: 1234}
+arr = [1, 2, 3]
+
+x = len(arr)
+print(x)
+
+chx = 0
+'''
 # checks and creates directory
 def check_dir(path_arg):
     str = path_arg
@@ -21,3 +29,4 @@ def check_dir(path_arg):
 
 path = "var/dns/all.log"
 check_dir(path)
+'''

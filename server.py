@@ -7,15 +7,12 @@ def main(conf):
 
     # Obtenção de um objeto que vai conter toda a informação proveniente do config_file.
     confs = Configs(conf)
-
-    # Verificar se o server é o SP.
-    if confs.is_sp():
-        print("Sou o servidor principal!")
-    else:
-        print("Sou um servidor secundário do servidor principal" + confs.get_sp() + "!")
+    if confs is None:
+        print("Inicialização do servidor interrompida!")
+        return
 
     # Obtenção de um objeto que tem informação sobre a escrita de logs.
-    log = Logs(confs.get_log_file_path())
+    log = Logs(confs.get_all_log_file())
 
     # Abertura do socket.
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
