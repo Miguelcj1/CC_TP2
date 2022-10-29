@@ -2,6 +2,26 @@ import os
 import time
 import threading
 
+def email_translator(string):
+    arr = string.split("\.")
+    last = arr[-1].split(".")[0]
+    after = arr[-1].split(".")[1:]
+    before = arr[:-1]
+    before.append(last)
+    before_a = ".".join(before)
+    after_a = ".".join(after)
+    final = "@".join((before_a, after_a))
+    # final[:-1] tira o ultimo ponto final, que vem na string final.
+    return final[:-1]
+
+# Retorna o formato do email que penso que seja pra retornar.
+string = "dns\.admin.example.com."
+print(email_translator(string))
+
+
+t = 0
+'''
+# teste de threads que funciona.
 def del_in(dict, key, t):
     time.sleep(t)
     del dict[key]
@@ -17,10 +37,7 @@ key = 7
 value = 143
 dict = {1: 23, 2: 2323, 3: 323, 4: 65, 5: 43, 6: 54}
 add(dict, key, value, 10)
-
-
-
-
+'''
 
 '''
 # checks and creates directory
