@@ -24,7 +24,7 @@ def main(conf):
     log = Logs(confs)
 
     # Obtençao de um objeto database com a informação sobre o servidor.
-    databases = []
+    databases = {}
     for name in confs.get_domain_names():
         try:
             db = Database(confs.get_db_path(name))
@@ -34,7 +34,7 @@ def main(conf):
             log.sp(time.time(), str(exc))
             return
 
-        databases.append(db)
+        databases[name] = db
 
     endereco = ''
     porta = 3334

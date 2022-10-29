@@ -103,3 +103,32 @@ class Database:
                 if not self.ptr.get(dom):
                     self.ptr[dom] = []
                 self.ptr[dom].append((name, ttl))
+
+    def get_default(self):
+        return self.default
+
+    def get_dom_name(self, dom):
+        return self.dom_names.get(dom)
+
+    def get_dom_admin(self, dom):
+        return self.dom_admins.get(dom)
+
+    def get_serial_number(self, dom):
+        return self.serial_numbers.get(dom)
+
+    def get_refresh_interval(self, dom):
+        return self.refresh_interval.get(dom)
+
+    def get_retry_interval(self, dom):
+        return self.retry_interval.get(dom)
+
+    def get_ss_expire_db(self, dom):
+        return self.ss_expire_db.get(dom)
+
+    def get_server_names(self, dom):
+        ret = []
+        sn = self.server_names.get(dom)
+        sn.sort(key=lambda tup: tup[2])
+        for n in sn:
+            ret.append(n)
+        return ret
