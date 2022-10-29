@@ -24,12 +24,20 @@ def co_dir(path, mode):
 
 class DomainInfo:
 
-    def __init__(self): # acho inutil ter aqui o nome do dominio a que se refere, mas talvez possa ser util.
+    def __init__(self):
+        self.name = None
         self.database_path = None
         self.log_file = None
         self.sp = None
         self.ss = []
         self.dd = []
+
+
+    def set_name(self, name):
+        self.name = name
+
+    def get_name(self):
+        return self.name
 
     # Se já houver uma referência de base de dados para este dominio, retorna falso para indicar uma incoerencia no ficheiro.
     def set_db(self, db_path):
@@ -120,7 +128,7 @@ class Configs:
             fp = open(conf_file, "r")
         except FileNotFoundError:
             print("Configuration file not found!")
-            return None
+            raise Exception("Configuration file not found!")
 
         for line in fp:
             arr = line.split()
@@ -128,16 +136,18 @@ class Configs:
             if not line.strip() or arr[0].startswith("#"):
                 pass  # does nothing = nop
 
-            elif arr[1] == "DB" and len(arr) == 3: # (((talvez tenha de fazer uma verificação da length de arr para n dar seg fault.)))
+            elif arr[1] == "DB" and len(arr) == 3:
                 domain = arr[0]
                 # uso o pop_slash para remover o primeiro "/" de modo a ter a diretoria de maneira correta
                 db_path = pop_slash(arr[2])
                 if self.domains.get(domain) is None:
                     self.domains[domain] = DomainInfo()
 
+                self.domains[domain].set_name(domain)
+
                 if not self.domains[domain].set_db(db_path):
-                    print(f"Ocorreu mais que uma definição da base de dados do dominio {domain}!")
-                    return None # nestes return none talvez faltasse fazer o fp.close() antes.
+                    #print(f"Ocorreu mais que uma definição da base de dados do dominio {domain}!")
+                    raise Exception(f"Ocorreu mais que uma definição da base de dados do dominio {domain}!")
 
             elif arr[1] == "SP" and len(arr) == 3:
                 domain = arr[0]
@@ -146,8 +156,8 @@ class Configs:
                     self.domains[domain] = DomainInfo()
                 # talvez pudesse mandar um tuplo (endereço, porta) e caso nao houvesse porta, mandava None no lugar da porta.
                 if not self.domains[domain].set_sp(sp):
-                    print(f"Ocorreu mais que uma definição do servidor principal do dominio {domain}!")
-                    return None
+                    #print(f"Ocorreu mais que uma definição do servidor principal do dominio {domain}!")
+                    raise Exception(f"Ocorreu mais que uma definição do servidor principal do dominio {domain}!")
 
             elif arr[1] == "SS" and len(arr) == 3:
                 domain = arr[0]
@@ -167,14 +177,14 @@ class Configs:
             elif arr[1] == "ST" and len(arr) == 3:
                 if arr[0] != "root":
                     # mensagem de erro, pois o parametro deve ser igual a "root".
-                    print("ERRO, o parametro de ST deve ser igual a root!!")
-                    return None
+                    #print("ERRO, o parametro de ST deve ser igual a root!!")
+                    raise Exception("ERRO, o parametro de ST deve ser igual a root!!")
                 elif self.st_file_path is None:
                     self.st_file_path = pop_slash(arr[2])
                 else:
                     # mensagem de erro, pois há mais que uma indicação de ST filepaths.
-                    print("ERRO!! Pois há mais que uma indicação de ST filepaths!")
-                    return None
+                    #print("ERRO!! Pois há mais que uma indicação de ST filepaths!")
+                    raise Exception("ERRO!! Pois há mais que uma indicação de ST filepaths!")
 
             elif arr[1] == "LG" and len(arr) == 3:
                 domain = arr[0]
@@ -184,16 +194,17 @@ class Configs:
                     self.all_log = log_path
                 # Verfifica se o dominio existe no contexto deste servidor.
                 elif self.domains.get(domain) is None:
-                    print(f"Error! This server is not responsible for the domain {domain}!")
-                    return None
+                    #print(f"Error! This server is not responsible for the domain {domain}!")
+                    raise Exception(f"Error! This server is not responsible for the domain {domain}!")
+                    #return None
                 # Define o log_file do determinado dominio.
                 elif not self.domains[domain].set_log_file(log_path):
                     print(f"Ocorreu mais que uma definição do log_file do dominio {domain}!")
-                    return None
+                    raise Exception(f"Ocorreu mais que uma definição do log_file do dominio {domain}!")
 
             else:
                 print("Erro! Sintaxe desconhecida.")
-                return None
+                raise Exception("Erro! Sintaxe desconhecida.")
 
         fp.close()
 
@@ -210,7 +221,7 @@ class Configs:
         for key in self.domains:
             if self.domains[key].get_log_file is None:
                 print(f"O domínio {key} não tem log file!!")
-                return None
+                raise Exception(f"O domínio {key} não tem log file!!")
 
     # Verifica se o server é Principal para um determinado domínio.
     def is_sp(self, domain):
@@ -262,10 +273,11 @@ class Configs:
     def get_all_log_file(self):
         return self.all_log
 
-    def get_domains(self):
+    def get_domain_names(self):
         ret = []
         for key in self.domains:
-            ret.append(key)
+            if key != "all":
+                ret.append(key)
         return ret
 
     # Retorna o path do ficheiro dos servidores de topo.

@@ -46,7 +46,7 @@ class Logs:
         check_dir(all_log_file)
         self.log_files = {"all": all_log_file}
 
-        for domain in confs.get_domains():
+        for domain in confs.get_domain_names():
             diretoria = confs.get_domain_log_file(domain)
             check_dir(diretoria)
             self.log_files[domain] = diretoria
