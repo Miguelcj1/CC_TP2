@@ -27,7 +27,7 @@ class Database:
         self.server_names = {} # dominio: [nome do server, ttl, prio]
         self.adresses = {} # nome do server(abrev): [ip adress, ttl, prio]
         self.aliases = {} # nome do server(abrev): [alias, ttl]
-        self.mail_server = {} # parametro: [nome do email_server, ttl, prio]
+        self.mail_server = {} # dominio: [nome do email_server, ttl, prio]
         self.ptr = {} # ip adress: [nome do server, ttl] ((not sure))
 
         ## Leitura e análise do ficheiro de base de dados.
@@ -131,4 +131,34 @@ class Database:
         sn.sort(key=lambda tup: tup[2])
         for n in sn:
             ret.append(n)
+        return ret
+
+    def get_adresses(self, name):
+        ret = []
+        sn = self.adresses.get(name)
+        sn.sort(key=lambda tup: tup[2])
+        for n in sn:
+            ret.append(n)
+        return ret
+
+    def get_aliases(self, name):
+        ret = []
+        sn = self.aliases.get(name)
+        for n in sn:
+            ret.append(n)
+        return ret
+
+    def get_mail_server(self, name):
+        ret = []
+        sn = self.mail_server.get(name)
+        sn.sort(key=lambda tup: tup[2])
+        for n in sn:
+            ret.append(n)
+        return ret
+
+    def get_ptr(self, name):
+        ret = []
+        sn = self.ptr.get(name)
+        for n in sn:
+            ret.append(n[0])
         return ret
