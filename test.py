@@ -2,14 +2,20 @@ import os
 import time
 import threading
 
-ret = []
-sn = [("1", 1, 1), ("2", 1, 2), ("5", 1, 5), ("3", 1, 3), ("2", 1, 2)]
-sn.sort(key=lambda tup: tup[2])
-for n in sn:
-    ret.append(n)
-print(ret)
 
-t = 0
+def rexc():
+    raise Exception("Fui Raised!")
+
+
+def func():
+    n = 12
+    try:
+        rexc()
+    except:
+        print("ok!")
+
+
+func()
 '''
 # teste de threads que funciona.
 def del_in(dict, key, t):

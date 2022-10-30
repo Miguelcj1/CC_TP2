@@ -203,8 +203,8 @@ class Configs:
                     raise Exception(f"Ocorreu mais que uma definição do log_file do dominio {domain}!")
 
             else:
-                print("Erro! Sintaxe desconhecida.")
-                raise Exception("Erro! Sintaxe desconhecida.")
+                print(f"Erro! Sintaxe desconhecida na seguinte linha: {line}.")
+                raise Exception(f"Erro! Sintaxe desconhecida na seguinte linha: {line}.")
 
         fp.close()
 

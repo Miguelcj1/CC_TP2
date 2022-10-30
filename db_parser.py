@@ -1,5 +1,6 @@
 import os
 
+
 # Nem sei se vai ser util.
 def email_translator(string):
     arr = string.split("\.")
@@ -13,11 +14,26 @@ def email_translator(string):
     # final[:-1] tira o ultimo ponto final, que vem na string final.
     return final[:-1]
 
+def ends_with_dot(string):
+    b = False
+    if string[-1] == ".":
+        b = True
+    return b
+
+def add_end_dot(string):
+    return string + "."
+
+def add_default(name, default):
+    if default is None:
+        raise Exception("There is no DEFAULT VALUE!")
+    return name + "." + default
+
+
 class Database:
 
     # Define as diversas variavéis analisadas no ficheiro de base de dados.
     def __init__(self, db_file):
-        self.default = None # opcional
+        self.default = {} # simbolo: valor
         self.dom_names = {} # dominio: nome completo do SP do dominio
         self.dom_admins = {} # dominio: endereço de email do admin do dominio
         self.serial_numbers = {} # dominio: serial_number da sb do dominio
@@ -34,32 +50,52 @@ class Database:
         try:
             fp = open(db_file, "r")
         except FileNotFoundError:
-            #print("Database file not found!") ###
-            raise Exception("Database file not found!")
+            raise Exception(f"Database file {db_file} not found!")
 
         for line in fp:
             arr = line.split()
-            # para nao estar a repetir sempre em todos os casos este if, faço-o no inicio.
-            if arr[0] == "@" and self.default:
-                dom = self.default
-            else:
-                dom = arr[0]
-
-            # variavéis usuais nos campos.
-            name = arr[2]
-            ttl = 0
-            prio = -1  # para caso n seja indicada prioridade.
-            if len(arr) > 3:
-                ttl = arr[3]
-            if len(arr) == 5:
-                prio = arr[4]
 
             # Verifica se a linha está vazia ou começa por '#'.
-            if not line.strip() or arr[0].startswith("#"):
-                pass  # does nothing = nop
+            if not line.strip() or line.startswith("#"):
+                continue  # skips this iteration
 
-            elif arr[1] == "DEFAULT" and arr[0] == "@":
-                self.default = arr[2]
+            # Verificação de valores DEFAULT
+            dom = self.default.get(arr[0])
+            if dom is None:
+                dom = arr[0]
+
+            # Verificação da terminação com "."
+            if not ends_with_dot(dom) and arr[1] != "DEFAULT":
+                try:
+                    dom = add_default(dom, self.default.get("@"))
+                except Exception as exc:
+                    raise Exception(str(exc))
+
+            name = self.default.get(arr[2])
+            if name is None:
+                name = arr[2]
+
+
+            if len(arr) > 3:
+                ttl = self.default.get(arr[3])
+                if ttl is None:
+                    ttl = arr[3]
+                ttl = int (ttl)
+
+
+            prio = -1  # para caso n seja indicada prioridade.
+            if len(arr) == 5:
+                prio = self.default.get(arr[4])
+                if prio is None:
+                    prio = arr[4]
+                prio = int(prio)
+
+
+            if arr[1] == "DEFAULT":
+                if self.default.get(dom):
+                    print(f"DEFAULT VALUE {dom} ALREADY SET!") ###
+                    raise Exception(f"DEFAULT VALUE {dom} ALREADY SET!")
+                self.default[dom] = name
 
             elif arr[1] == "SOASP":
                 self.dom_names[dom] = arr[2]
@@ -79,7 +115,7 @@ class Database:
             elif arr[1] == "SOAEXPIRE":
                 self.ss_expire_db[dom] = arr[2]
 
-            elif arr[1] == "NS": # talvez deva adicionar length restrictions.
+            elif arr[1] == "NS" and len(arr) > 3: # talvez deva adicionar length restrictions.
                 if not self.server_names.get(dom):
                     self.server_names[dom] = []
                 self.server_names[dom].append((name, ttl, prio))
