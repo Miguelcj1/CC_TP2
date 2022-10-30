@@ -22,6 +22,13 @@ def co_dir(path, mode):
         f = open(path, mode)
     return f
 
+# talvez acrescentar isto, nas chaves do dicionario de domains em confs, de maneira a haver uma coerencia nos outros parametros de outras estruturas de dados.
+# Funcao que acrescenta um ponto final na string, se ja nao tiver um.
+def add_end_dot(string):
+    if not string[-1] == ".":
+        string += "."
+    return string
+
 class DomainInfo:
 
     def __init__(self):
@@ -132,12 +139,16 @@ class Configs:
 
         for line in fp:
             arr = line.split()
+
             # Verifica se a linha está vazia ou começa por '#'.
             if not line.strip() or arr[0].startswith("#"):
-                pass  # does nothing = nop
+                continue  # does nothing = nop
 
-            elif arr[1] == "DB" and len(arr) == 3:
-                domain = arr[0]
+            domain = arr[0]
+            # Talvez acrescentar "." em domain (com a funcao que fiz), nas chaves do dicionário de domains em confs, de maneira a haver uma coerencia nos outros parametros de outras estruturas de dados. ###
+            #domain = add_end_dot(domain)  ### testing
+
+            if arr[1] == "DB" and len(arr) == 3:
                 # uso o pop_slash para remover o primeiro "/" de modo a ter a diretoria de maneira correta
                 db_path = pop_slash(arr[2])
                 if self.domains.get(domain) is None:
@@ -150,7 +161,6 @@ class Configs:
                     raise Exception(f"Ocorreu mais que uma definição da base de dados do dominio {domain}!")
 
             elif arr[1] == "SP" and len(arr) == 3:
-                domain = arr[0]
                 sp = arr[2]
                 if self.domains.get(domain) is None:
                     self.domains[domain] = DomainInfo()
@@ -160,7 +170,6 @@ class Configs:
                     raise Exception(f"Ocorreu mais que uma definição do servidor principal do dominio {domain}!")
 
             elif arr[1] == "SS" and len(arr) == 3:
-                domain = arr[0]
                 ss = arr[2]
                 if self.domains.get(domain) is None:
                     self.domains[domain] = DomainInfo()
@@ -168,7 +177,6 @@ class Configs:
 
 
             elif arr[1] == "DD" and len(arr) == 3:
-                domain = arr[0]
                 dd = arr[2]
                 if self.domains.get(domain) is None:
                     self.domains[domain] = DomainInfo()
@@ -187,7 +195,6 @@ class Configs:
                     raise Exception("ERRO!! Pois há mais que uma indicação de ST filepaths!")
 
             elif arr[1] == "LG" and len(arr) == 3:
-                domain = arr[0]
                 # uso o pop_slash para remover o primeiro "/" de modo a ter a diretoria de maneira correta
                 log_path = pop_slash(arr[2])
                 if domain == "all":

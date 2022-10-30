@@ -3,6 +3,8 @@ import time
 from config_parser import Configs
 from logs import Logs
 from db_parser import Database
+import query
+
 
 
 def main(conf):
@@ -29,18 +31,25 @@ def main(conf):
         try:
             db = Database(confs.get_db_path(name))
         except Exception as exc:
-            print (str(exc))
+            #print (str(exc))
             log.fl(time.time(), str(exc), name)
             log.sp(time.time(), str(exc))
             return
-
         databases[name] = db
+
+    ### TESTE ###
+    q = query.init_send_query(12, "Q+A", "example.com.", "MX")
+    query.respond_query(q, databases)
+
+    ### FIM ###
 
     endereco = ''
     porta = 3334
 
     # Reportar no log o arranque do servidor.
     log.st(ts_arranque, porta, ttl, mode)
+
+
 
     # Abertura do socket.
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
