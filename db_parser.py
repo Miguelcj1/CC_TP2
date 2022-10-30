@@ -93,7 +93,7 @@ class Database:
 
             if arr[1] == "DEFAULT":
                 if self.default.get(dom):
-                    print(f"DEFAULT VALUE {dom} ALREADY SET!") ###
+                    #print(f"DEFAULT VALUE {dom} ALREADY SET!") ###
                     raise Exception(f"DEFAULT VALUE {dom} ALREADY SET!")
                 self.default[dom] = name
 

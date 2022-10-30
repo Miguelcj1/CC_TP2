@@ -21,7 +21,7 @@ def main(conf):
         return
 
     # Obtenção de um objeto que tem informação sobre a escrita de logs.
-    log = Logs(confs)
+    log = Logs(confs, mode)
 
     # Obtençao de um objeto database com a informação sobre o servidor.
     databases = {}

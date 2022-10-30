@@ -199,11 +199,11 @@ class Configs:
                     #return None
                 # Define o log_file do determinado dominio.
                 elif not self.domains[domain].set_log_file(log_path):
-                    print(f"Ocorreu mais que uma definição do log_file do dominio {domain}!")
+                    #print(f"Ocorreu mais que uma definição do log_file do dominio {domain}!")
                     raise Exception(f"Ocorreu mais que uma definição do log_file do dominio {domain}!")
 
             else:
-                print(f"Erro! Sintaxe desconhecida na seguinte linha: {line}.")
+                #print(f"Erro! Sintaxe desconhecida na seguinte linha: {line}.")
                 raise Exception(f"Erro! Sintaxe desconhecida na seguinte linha: {line}.")
 
         fp.close()
@@ -220,7 +220,7 @@ class Configs:
         # Restrição de haver log file para todos os dominios.
         for key in self.domains:
             if self.domains[key].get_log_file is None:
-                print(f"O domínio {key} não tem log file!!")
+                #print(f"O domínio {key} não tem log file!!")
                 raise Exception(f"O domínio {key} não tem log file!!")
 
     # Verifica se o server é Principal para um determinado domínio.

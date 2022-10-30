@@ -40,11 +40,14 @@ def get_timestamp(timestamp = time.time()):
 class Logs:
 
     # Verifica a diretoria do ficheiro de log e define o caminho na sua variavel de instancia.
-    def __init__(self, confs):
+    def __init__(self, confs, mode):
         # Verifica a existencia do file e caso não exista, cria-o.
         all_log_file = confs.get_all_log_file()
         check_dir(all_log_file)
         self.log_files = {"all": all_log_file}
+        self.stdout = True
+        if mode != "debug":
+            self.stdout = False
 
         for domain in confs.get_domain_names():
             diretoria = confs.get_domain_log_file(domain)
@@ -63,6 +66,9 @@ class Logs:
         string = get_timestamp(timestamp) + " QR " + str(adress[0]) + " [" + dados + "]\n"
         fp.write(string)
         fp.close()
+        # Se for para imprimir no stdout também.
+        if self.stdout:
+            print(string)
 
     # Escreve no log a ocorrencia do envio de uma query
     def qe(self, timestamp, adress, dados, domain = "all"):
@@ -75,6 +81,9 @@ class Logs:
         string = get_timestamp(timestamp) + " QE " + str(adress[0]) + " [" + dados + "]\n"
         fp.write(string)
         fp.close()
+        # Se for para imprimir no stdout também.
+        if self.stdout:
+            print(string)
 
     # Escreve no log a ocorrencia do envio de uma query
     def rp(self, timestamp, adress, dados, domain = "all"):
@@ -87,6 +96,9 @@ class Logs:
         string = get_timestamp(timestamp) + " RP " + str(adress[0]) + " [" + dados + "]\n"
         fp.write(string)
         fp.close()
+        # Se for para imprimir no stdout também.
+        if self.stdout:
+            print(string)
 
     # Escreve no log a ocorrencia do envio de uma query
     def rr(self, timestamp, adress, dados, domain = "all"):
@@ -99,6 +111,9 @@ class Logs:
         string = get_timestamp(timestamp) + " RR " + str(adress[0]) + " [" + dados + "]\n"
         fp.write(string)
         fp.close()
+        # Se for para imprimir no stdout também.
+        if self.stdout:
+            print(string)
 
     # Reporta a conclusao correta de um processo de transferencia de zona.
     #end_adress -> o servidor na outra ponta da transferência
@@ -113,6 +128,9 @@ class Logs:
         string = get_timestamp(timestamp) + " ZT " + end_adress + " " + papel + "\n"
         fp.write(string)
         fp.close()
+        # Se for para imprimir no stdout também.
+        if self.stdout:
+            print(string)
 
     # Reporta um determinado evento.
     def ev(self, timestamp, info, domain = "all"):
@@ -125,6 +143,9 @@ class Logs:
         string = get_timestamp(timestamp) + " EV @ " + info + "\n"
         fp.write(string)
         fp.close()
+        # Se for para imprimir no stdout também.
+        if self.stdout:
+            print(string)
 
     # (ERRO) Reporta a impossibilidade de descodificar um PDU corretamente.
     #Outras opcionalidades
@@ -137,6 +158,9 @@ class Logs:
         string = get_timestamp(timestamp) + " ER " + from_adress + "\n"
         fp.write(string)
         fp.close()
+        # Se for para imprimir no stdout também.
+        if self.stdout:
+            print(string)
 
     # (ERRO DE ZONA) Reporta a conclusao incorreta de um processo de transferencia de zona.
     def ez(self, timestamp, end_adress, papel, domain="all"):
@@ -148,6 +172,9 @@ class Logs:
         string = get_timestamp(timestamp) + " ZT " + end_adress + " " + papel + "\n"
         fp.write(string)
         fp.close()
+        # Se for para imprimir no stdout também.
+        if self.stdout:
+            print(string)
 
     # Reporta um erro do funcionamento interno de um componente.
     def fl(self, timestamp, info, domain="all"):
@@ -159,6 +186,9 @@ class Logs:
         string = get_timestamp(timestamp) + " FL 127.0.0.1 " + info + "\n"
         fp.write(string)
         fp.close()
+        # Se for para imprimir no stdout também.
+        if self.stdout:
+            print(string)
 
     # Deteção de um timeout na interaçao com o servidor no endereço indicado.
     def to(self, timestamp, adress, info, domain="all"):
@@ -170,6 +200,9 @@ class Logs:
         string = get_timestamp(timestamp) + " TO " + adress + " " + info + "\n"
         fp.write(string)
         fp.close()
+        # Se for para imprimir no stdout também.
+        if self.stdout:
+            print(string)
 
     # (SERVIDOR PAROU) Reporta que a execução do componente foi parado.
     def sp(self, timestamp, info, domain="all"):
@@ -181,6 +214,9 @@ class Logs:
         string = get_timestamp(timestamp) + " SP 127.0.0.1 " + info + "\n"
         fp.write(string)
         fp.close()
+        # Se for para imprimir no stdout também.
+        if self.stdout:
+            print(string)
 
     # Reporta o arranque do servidor ((Not sure donde virao os valores do ttl e o mode)). NOT SURE
     def st(self, timestamp, port, ttl, mode, domain = "all"):
@@ -192,4 +228,7 @@ class Logs:
         string = get_timestamp(timestamp) + " ST 127.0.0.1 " + str(port) + " " + str(ttl) + " " + mode + "\n"
         fp.write(string)
         fp.close()
+        # Se for para imprimir no stdout também.
+        if self.stdout:
+            print(string)
 
