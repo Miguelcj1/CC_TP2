@@ -9,7 +9,7 @@ def main(conf):
 
     ttl = 20000
     mode = "debug"
-    # Guarda a altura em que o servidor arrancou-
+    # Guarda a altura em que o servidor arrancou.
     ts_arranque = time.time()
 
     # Obtenção de um objeto que vai conter toda a informação proveniente do config_file.
@@ -20,7 +20,7 @@ def main(conf):
         print("Inicialização do servidor interrompida!")
         return
 
-    # Obtenção de um objeto que tem informação sobre a escrita de logs.
+    # Obtenção de um objeto que tem informação sobre a escrita nos ficheiros de log e stdout.
     log = Logs(confs, mode)
 
     # Obtençao de um objeto database com a informação sobre o servidor.

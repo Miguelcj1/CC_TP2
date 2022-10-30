@@ -2,20 +2,14 @@ import os
 import time
 import threading
 
+def init_send_querry(id, flag, dom, type):
+    string = ",".join((str(id), flag)) + ",0,0,0,0;" + ",".join((dom, type)) + ";"
+    return string
 
-def rexc():
-    raise Exception("Fui Raised!")
-
-
-def func():
-    n = 12
-    try:
-        rexc()
-    except:
-        print("ok!")
+r = init_send_querry(12, "Q+A", "example.com.", "MX")
+print(r)
 
 
-func()
 '''
 # teste de threads que funciona.
 def del_in(dict, key, t):
