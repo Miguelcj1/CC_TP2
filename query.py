@@ -14,13 +14,14 @@ def init_send_query(id, flag, dom, type):
 
 # raises exception in which is caused by a problem in decoding the received string (ER ou FL)
 def respond_query(query, dbs):
+
     arr = query.split(";")
     if len(arr) < 3:
         raise Exception(f"Sintaxe desconhecida da seguinte mensagem: {query}")
 
     header = arr[0]
     data_qi = arr[1]
-
+    response_qi = arr[2]
 
     # Header
     h_fields = header.split(",")
@@ -29,9 +30,9 @@ def respond_query(query, dbs):
     message_id = h_fields[0]
     flags = h_fields[1]
     response_code = h_fields[2]
-    n_values = h_fields[3]
-    n_authorities = h_fields[4]
-    n_extra_values = h_fields[5]
+    num_responses = h_fields[3]
+    num_authorities = h_fields[4]
+    num_extra = h_fields[5]
 
     # Data: Query Info
     qi_fields = data_qi.split(",")
@@ -41,16 +42,14 @@ def respond_query(query, dbs):
     q_type = qi_fields[1]
 
 
-    ''' talvez esta parte seja desnecessaria uma vez que faço isto para queries de perguntas.
+    #talvez esta parte seja desnecessaria uma vez que faço isto para queries de perguntas.
     # Terceira parte da mensagem onde vem informaçao de resposta
     # Data: List of Response, Authorities and Extra Values
-    resp_fields = data_r.split(",")
-    responses = []
-    for r in resp_fields:
-        responses.append(r)
-    '''
-    # Talvez atras estive uma procura em cache.
-    #pass
+    if response_qi:
+        resp_fields = response_qi.split(",")
+        responses = []
+        for r in resp_fields:
+            responses.append(r)
 
 
     # Procura e obtenção de respostas (MANEIRA PROVISORIA DE TESTE)
@@ -62,15 +61,44 @@ def respond_query(query, dbs):
 
     # Identificação do tipo de query
     if q_type == "MX":
-        nv = 0
-        arr_ans = [] # array de linhas de resposta para serem joined por ","
+        # Aqui estaria uma procura em cache talvez, antes de verificar na base de dados.
+
+        all_values = []
+
+        # Obtencao de response_values
+        n_resp = 0 ### estas variaveis talvez devessem estar antes destes ifs
+        arr_resp = [] # array de linhas de resposta para serem joined por ","
         mails = db.get_MX(q_name)
         # mails = lista de tuplos (string, int, int)
         for m in mails:
-            nv += 1
+            n_resp += 1
             string = q_name + " MX " + m[0] + " " + str(m[1]) + " " + str(m[2])
-            arr_ans.append(string)
-        answers = ",".join(arr_ans)
-        t=0
+            all_values.append(m[0])
+            arr_resp.append(string)
+        responses_f = ",".join(arr_resp)
+
+        # Obtencao de authority_values
+        n_authorities = 0
+        arr_authorities = []
+        authorities = db.get_NS(q_name)
+        for a in authorities:
+            n_authorities += 1
+            string = q_name + " NS " + a[0] + " " + str(a[1]) + " " + str(a[2])
+            all_values.append(a[0])
+            arr_authorities.append(string)
+        authorities_f = ",".join(arr_authorities)
+
+        # Obtencao de extra_values (HA UNS PROBLEMAS DEVIDO A UM "." COM ESTA PARTE)
+        n_extras = 0
+        arr_extras = []
+        for v in all_values:
+            extras = db.get_A(v)
+            for e in extras:
+                n_extras += 1
+                string = q_name + " A " + e[0] + " " + str(e[1]) + " " + str(e[2])
+                arr_extras.append(string)
+            extras_f = ",".join(arr_extras)
+
+    ## ENVIAR MENSAGEM DE VOLTA OU RETORNAR A STRING DE RESPOSTA PARA O SERVIDOR TRATAR DO ENVIO
 
 

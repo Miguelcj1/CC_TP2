@@ -87,7 +87,7 @@ class Database:
                     ttl = arr[3]
                 ttl = int (ttl)
 
-
+            ### PRECISO VER MELHOR COMO TRATO PRIORIDADES NULAS.
             prio = -1  # para caso n seja indicada prioridade.
             if len(arr) == 5:
                 prio = self.DEFAULT.get(arr[4])
@@ -177,6 +177,8 @@ class Database:
     def get_A(self, name):
         ret = []
         sn = self.A.get(name)
+        #if sn is None: ### VERIFICAR PRECONDICOES QUE SE USAM ESTA FUNCAO PARA TALVEZ IMPLEMENTAR UMA EXCEPCAO CASO SEJA NECESSARIO
+        #   return ret
         sn.sort(key=lambda tup: tup[2])
         for n in sn:
             ret.append(n)
