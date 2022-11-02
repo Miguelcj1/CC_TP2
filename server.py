@@ -25,7 +25,7 @@ def main(conf):
     # Obtenção de um objeto que tem informação sobre a escrita nos ficheiros de log e stdout.
     log = Logs(confs, mode)
 
-    # Obtençao de um objeto database com a informação sobre o servidor.
+    # Obtençao de um objeto database para cada dominio (que tenha uma database) com a informação sobre o dominio.
     databases = {}
     for name in confs.get_domain_names():
         try:

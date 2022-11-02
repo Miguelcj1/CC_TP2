@@ -38,18 +38,18 @@ class Database:
 
     # Define as diversas variavéis analisadas no ficheiro de base de dados.
     def __init__(self, db_file):
-        self.default = {} # simbolo: valor
-        self.dom_names = {} # dominio: nome completo do SP do dominio
-        self.dom_admins = {} # dominio: endereço de email do admin do dominio
-        self.serial_numbers = {} # dominio: serial_number da sb do dominio
-        self.refresh_interval = {} # dominio: refresh interval para um SS perguntar ao SP qual o número de série da base de dados dessa zona
-        self.retry_interval = {} # dominio: refresh interval para um SS perguntar ao SP qual o número de série da base de dados dessa zona, apos um timeout.
-        self.ss_expire_db = {} # dominio: expire time of the ss database replica
-        self.server_names = {} # dominio: [nome do server, ttl, prio]
-        self.adresses = {} # nome do server(abrev): [ip adress, ttl, prio]
-        self.aliases = {} # nome do server(abrev): [alias, ttl]
-        self.mail_server = {} # MX dominio: [nome do email_server, ttl, prio]
-        self.ptr = {} # ip adress: [nome do server, ttl] ((not sure))
+        self.default = {} # simbolo: valor  DEFAULT
+        self.dom_names = {} # dominio: nome completo do SP do dominio SOASP
+        self.dom_admins = {} # dominio: endereço de email do admin do dominio SOAADMIN
+        self.serial_numbers = {} # dominio: serial_number da sb do dominio SOASERIAL
+        self.refresh_interval = {} # dominio: refresh interval para um SS perguntar ao SP qual o número de série da base de dados dessa zona SOAREFRESH
+        self.retry_interval = {} # dominio: refresh interval para um SS perguntar ao SP qual o número de série da base de dados dessa zona, apos um timeout. SOARETRY
+        self.ss_expire_db = {} # dominio: expire time of the ss database replica SOAEXPIRE
+        self.server_names = {} # dominio: [nome do server, ttl, prio] NS
+        self.adresses = {} # nome do server(abrev): [ip adress, ttl, prio] A
+        self.aliases = {} # nome do server(abrev): [alias, ttl] CNAME
+        self.mail_server = {} # MX dominio: [nome do email_server, ttl, prio] MX
+        self.ptr = {} # ip adress: [nome do server, ttl] ((not sure)) PTR
 
         ## Leitura e análise do ficheiro de base de dados.
         try:
