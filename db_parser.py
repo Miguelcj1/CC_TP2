@@ -38,18 +38,18 @@ class Database:
 
     # Define as diversas variavéis analisadas no ficheiro de base de dados.
     def __init__(self, db_file):
-        self.default = {} # simbolo: valor  DEFAULT
-        self.dom_names = {} # dominio: nome completo do SP do dominio SOASP
-        self.dom_admins = {} # dominio: endereço de email do admin do dominio SOAADMIN
-        self.serial_numbers = {} # dominio: serial_number da sb do dominio SOASERIAL
-        self.refresh_interval = {} # dominio: refresh interval para um SS perguntar ao SP qual o número de série da base de dados dessa zona SOAREFRESH
-        self.retry_interval = {} # dominio: refresh interval para um SS perguntar ao SP qual o número de série da base de dados dessa zona, apos um timeout. SOARETRY
-        self.ss_expire_db = {} # dominio: expire time of the ss database replica SOAEXPIRE
-        self.server_names = {} # dominio: [nome do server, ttl, prio] NS
-        self.adresses = {} # nome do server(abrev): [ip adress, ttl, prio] A
-        self.aliases = {} # nome do server(abrev): [alias, ttl] CNAME
-        self.mail_server = {} # MX dominio: [nome do email_server, ttl, prio] MX
-        self.ptr = {} # ip adress: [nome do server, ttl] ((not sure)) PTR
+        self.DEFAULT = {} # simbolo: valor  DEFAULT
+        self.SOASP = {} # dominio: nome completo do SP do dominio SOASP
+        self.SOAADMIN = {} # dominio: endereço de email do admin do dominio SOAADMIN
+        self.SOASERIAL = {} # dominio: serial_number da sb do dominio SOASERIAL
+        self.SOAREFRESH = {} # dominio: refresh interval para um SS perguntar ao SP qual o número de série da base de dados dessa zona SOAREFRESH
+        self.SOARETRY = {} # dominio: refresh interval para um SS perguntar ao SP qual o número de série da base de dados dessa zona, apos um timeout. SOARETRY
+        self.SOAEXPIRE = {} # dominio: expire time of the ss database replica SOAEXPIRE
+        self.NS = {} # dominio: [nome do server, ttl, prio] NS
+        self.A = {} # nome do server(abrev): [ip adress, ttl, prio] A
+        self.CNAME = {} # nome do server(abrev): [alias, ttl] CNAME
+        self.MX = {} # MX dominio: [nome do email_server, ttl, prio] MX
+        self.PTR = {} # ip adress: [nome do server, ttl] ((not sure)) PTR
 
         ## Leitura e análise do ficheiro de base de dados.
         try:
@@ -65,24 +65,24 @@ class Database:
                 continue  # skips this iteration
 
             # Verificação de valores DEFAULT
-            dom = self.default.get(arr[0])
+            dom = self.DEFAULT.get(arr[0])
             if dom is None:
                 dom = arr[0]
 
             # Verificação da terminação com "."
             if not ends_with_dot(dom) and arr[1] != "DEFAULT":
                 try:
-                    dom = add_default(dom, self.default.get("@"))
+                    dom = add_default(dom, self.DEFAULT.get("@"))
                 except Exception as exc:
                     raise Exception(str(exc))
 
-            name = self.default.get(arr[2])
+            name = self.DEFAULT.get(arr[2])
             if name is None:
                 name = arr[2]
 
 
             if len(arr) > 3:
-                ttl = self.default.get(arr[3])
+                ttl = self.DEFAULT.get(arr[3])
                 if ttl is None:
                     ttl = arr[3]
                 ttl = int (ttl)
@@ -90,116 +90,116 @@ class Database:
 
             prio = -1  # para caso n seja indicada prioridade.
             if len(arr) == 5:
-                prio = self.default.get(arr[4])
+                prio = self.DEFAULT.get(arr[4])
                 if prio is None:
                     prio = arr[4]
                 prio = int(prio)
 
 
             if arr[1] == "DEFAULT":
-                if self.default.get(dom):
+                if self.DEFAULT.get(dom):
                     #print(f"DEFAULT VALUE {dom} ALREADY SET!") ###
                     raise Exception(f"DEFAULT VALUE {dom} ALREADY SET!")
-                self.default[dom] = name
+                self.DEFAULT[dom] = name
 
             elif arr[1] == "SOASP":
-                self.dom_names[dom] = arr[2]
+                self.SOASP[dom] = arr[2]
 
             elif arr[1] == "SOAADMIN":
-                self.dom_admins[dom] = email_translator(arr[2]) # faço a tal traduçao de email.
+                self.SOAADMIN[dom] = email_translator(arr[2]) # faço a tal traduçao de email.
 
             elif arr[1] == "SOASERIAL":
-                self.serial_numbers[dom] = arr[2]
+                self.SOASERIAL[dom] = arr[2]
 
             elif arr[1] == "SOAREFRESH":
-                self.refresh_interval[dom] = arr[2]
+                self.SOAREFRESH[dom] = arr[2]
 
             elif arr[1] == "SOARETRY":
-                self.retry_interval[dom] = arr[2]
+                self.SOARETRY[dom] = arr[2]
 
             elif arr[1] == "SOAEXPIRE":
-                self.ss_expire_db[dom] = arr[2]
+                self.SOAEXPIRE[dom] = arr[2]
 
             elif arr[1] == "NS" and len(arr) > 3: # talvez deva adicionar length restrictions.
-                if not self.server_names.get(dom):
-                    self.server_names[dom] = []
-                self.server_names[dom].append((name, ttl, prio))
+                if not self.NS.get(dom):
+                    self.NS[dom] = []
+                self.NS[dom].append((name, ttl, prio))
 
             elif arr[1] == "A":
-                if not self.adresses.get(dom):
-                    self.adresses[dom] = []
-                self.adresses[dom].append((name, ttl, prio))
+                if not self.A.get(dom):
+                    self.A[dom] = []
+                self.A[dom].append((name, ttl, prio))
 
             elif arr[1] == "CNAME":
-                if not self.aliases.get(dom):
-                    self.aliases[dom] = []
-                self.aliases[dom].append((name, ttl))
+                if not self.CNAME.get(dom):
+                    self.CNAME[dom] = []
+                self.CNAME[dom].append((name, ttl))
 
             elif arr[1] == "MX":
-                if not self.mail_server.get(dom):
-                    self.mail_server[dom] = []
-                self.mail_server[dom].append((name, ttl, prio))
+                if not self.MX.get(dom):
+                    self.MX[dom] = []
+                self.MX[dom].append((name, ttl, prio))
 
             elif arr[1] == "PTR":
-                if not self.ptr.get(dom):
-                    self.ptr[dom] = []
-                self.ptr[dom].append((name, ttl))
+                if not self.PTR.get(dom):
+                    self.PTR[dom] = []
+                self.PTR[dom].append((name, ttl))
 
-    def get_default(self):
-        return self.default
+    def get_DEFAULT(self):
+        return self.DEFAULT
 
-    def get_dom_name(self, dom):
-        return self.dom_names.get(dom)
+    def get_SOASP(self, dom):
+        return self.SOASP.get(dom)
 
-    def get_dom_admin(self, dom):
-        return self.dom_admins.get(dom)
+    def get_SOAADMIN(self, dom):
+        return self.SOAADMIN.get(dom)
 
-    def get_serial_number(self, dom):
-        return self.serial_numbers.get(dom)
+    def get_SOASERIAL(self, dom):
+        return self.SOASERIAL.get(dom)
 
-    def get_refresh_interval(self, dom):
-        return self.refresh_interval.get(dom)
+    def get_SOAREFRESH(self, dom):
+        return self.SOAREFRESH.get(dom)
 
-    def get_retry_interval(self, dom):
-        return self.retry_interval.get(dom)
+    def get_SOARETRY(self, dom):
+        return self.SOARETRY.get(dom)
 
-    def get_ss_expire_db(self, dom):
-        return self.ss_expire_db.get(dom)
+    def get_SOAEXPIRE(self, dom):
+        return self.SOAEXPIRE.get(dom)
 
-    def get_server_names(self, dom):
+    def get_NS(self, dom):
         ret = []
-        sn = self.server_names.get(dom)
+        sn = self.NS.get(dom)
         sn.sort(key=lambda tup: tup[2])
         for n in sn:
             ret.append(n)
         return ret
 
-    def get_adresses(self, name):
+    def get_A(self, name):
         ret = []
-        sn = self.adresses.get(name)
+        sn = self.A.get(name)
         sn.sort(key=lambda tup: tup[2])
         for n in sn:
             ret.append(n)
         return ret
 
-    def get_aliases(self, name):
+    def get_CNAME(self, name):
         ret = []
-        sn = self.aliases.get(name)
+        sn = self.CNAME.get(name)
         for n in sn:
             ret.append(n)
         return ret
 
-    def get_mail_server(self, name):
+    def get_MX(self, name):
         ret = []
-        sn = self.mail_server.get(name)
+        sn = self.MX.get(name)
         sn.sort(key=lambda tup: tup[2])
         for n in sn:
             ret.append(n)
         return ret
 
-    def get_ptr(self, name):
+    def get_PTR(self, name):
         ret = []
-        sn = self.ptr.get(name)
+        sn = self.PTR.get(name)
         for n in sn:
             ret.append(n[0])
         return ret
