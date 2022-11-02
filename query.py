@@ -64,7 +64,7 @@ def respond_query(query, dbs):
     if q_type == "MX":
         nv = 0
         arr_ans = [] # array de linhas de resposta para serem joined por ","
-        mails = db.get_mail_server(q_name)
+        mails = db.get_MX(q_name)
         # mails = lista de tuplos (string, int, int)
         for m in mails:
             nv += 1
