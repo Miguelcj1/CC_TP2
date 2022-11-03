@@ -97,7 +97,7 @@ def respond_query(query, dbs):
                 n_extras += 1
                 string = v + " A " + e[0] + " " + str(e[1]) + " " + str(e[2])
                 arr_extras.append(string)
-            extras_f = ",".join(arr_extras)
+        extras_f = ",".join(arr_extras)
 
         data = ";".join((responses_f, authorities_f, extras_f))
 
