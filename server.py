@@ -62,7 +62,6 @@ def main(conf):
 
     while True:
         msg, add = s.recvfrom(1024)
-        print(add)
         msg = msg.decode('utf-8')
         print(msg)
         log.qr(time.time(), add, msg) # escrita do evento QR no log
