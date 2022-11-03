@@ -44,12 +44,11 @@ def main(conf):
 
     ### FIM ###
 
-    endereco = ''
+    endereco = '127.0.0.1'
     porta = 3334
 
     # Reportar no log o arranque do servidor.
     log.st(ts_arranque, porta, ttl, mode)
-
 
 
     # Abertura do socket.
@@ -68,8 +67,7 @@ def main(conf):
         print(f"Recebi uma mensagem do cliente {add}")
         print("----------------------")
 
-        sR = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sR.sendto(msg.encode('utf-8'), (add[0], porta))
+        s.sendto(msg.encode('utf-8'), add)
 
 
 

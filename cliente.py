@@ -10,10 +10,8 @@ msg = "Adoro Redes :)"
 for i in range(1):
     s.sendto(msg.encode('utf-8'), (endereco, porta))
     print(endereco + " " + str(porta))
+    msg, add = s.recvfrom(1024)
+    print(msg.decode('utf-8'))
+    print(add)
 
 
-sR = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sR.bind((endereco, porta))
-msg, add = sR.recvfrom(1024)
-msg.decode('utf-8')
-print(msg)
