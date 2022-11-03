@@ -30,7 +30,7 @@ def add_end_dot(string):
 
 def add_default(name, default):
     if default is None:
-        raise Exception("There is no DEFAULT VALUE!")
+        raise Exception(f"There is no DEFAULT value to add to this name: {name}!")
     return name + "." + default
 
 
@@ -64,12 +64,12 @@ class Database:
             if not line.strip() or line.startswith("#"):
                 continue  # skips this iteration
 
-            # Verificação de valores DEFAULT
+            # Verifica se é usado (na primeira palavra) algum símbolo definido em DEFAULT.
             dom = self.DEFAULT.get(arr[0])
             if dom is None:
                 dom = arr[0]
 
-            # Verificação da terminação com "."
+            # Verificação da terminação dos nomes com "."
             if not ends_with_dot(dom) and arr[1] != "DEFAULT":
                 try:
                     dom = add_default(dom, self.DEFAULT.get("@"))
