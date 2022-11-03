@@ -43,7 +43,7 @@ class Database:
         self.SOAADMIN = {} # dominio: endereço de email do admin do dominio SOAADMIN
         self.SOASERIAL = {} # dominio: serial_number da sb do dominio SOASERIAL
         self.SOAREFRESH = {} # dominio: refresh interval para um SS perguntar ao SP qual o número de série da base de dados dessa zona SOAREFRESH
-        self.SOARETRY = {} # dominio: refresh interval para um SS perguntar ao SP qual o número de série da base de dados dessa zona, apos um timeout. SOARETRY
+        self.SOARETRY = {} # domínio: refresh interval para um SS perguntar ao SP qual o número de série da base de dados dessa zona, apos um timeout. SOARETRY
         self.SOAEXPIRE = {} # dominio: expire time of the ss database replica SOAEXPIRE
         self.NS = {} # dominio: [nome do server, ttl, prio] NS
         self.A = {} # nome do server(abrev): [ip adress, ttl, prio] A
@@ -69,17 +69,23 @@ class Database:
             if dom is None:
                 dom = arr[0]
 
-            # Verificação da terminação dos nomes com "."
-            if not ends_with_dot(dom) and arr[1] != "DEFAULT":
-                try:
-                    dom = add_default(dom, self.DEFAULT.get("@"))
-                except Exception as exc:
-                    raise Exception(str(exc))
 
             name = self.DEFAULT.get(arr[2])
             if name is None:
                 name = arr[2]
 
+            # Verificação da terminação dos nomes com "."
+            if arr[1] != "DEFAULT":
+                if not ends_with_dot(dom):
+                    try:
+                        dom = add_default(dom, self.DEFAULT.get("@"))
+                    except Exception as exc:
+                        raise Exception(str(exc))
+                elif not ends_with_dot(name):
+                    try:
+                        name = add_default(name, self.DEFAULT.get("@"))
+                    except Exception as exc:
+                        raise Exception(str(exc))
 
             if len(arr) > 3:
                 ttl = self.DEFAULT.get(arr[3])
@@ -169,7 +175,8 @@ class Database:
     def get_NS(self, dom):
         ret = []
         sn = self.NS.get(dom)
-        sn.sort(key=lambda tup: tup[2])
+        if sn is None:
+            return ret
         for n in sn:
             ret.append(n)
         return ret
@@ -177,9 +184,8 @@ class Database:
     def get_A(self, name):
         ret = []
         sn = self.A.get(name)
-        #if sn is None: ### VERIFICAR PRECONDICOES QUE SE USAM ESTA FUNCAO PARA TALVEZ IMPLEMENTAR UMA EXCEPCAO CASO SEJA NECESSARIO
-        #   return ret
-        sn.sort(key=lambda tup: tup[2])
+        if sn is None:
+            return ret
         for n in sn:
             ret.append(n)
         return ret
@@ -187,6 +193,8 @@ class Database:
     def get_CNAME(self, name):
         ret = []
         sn = self.CNAME.get(name)
+        if sn is None:
+            return ret
         for n in sn:
             ret.append(n)
         return ret
@@ -194,7 +202,8 @@ class Database:
     def get_MX(self, name):
         ret = []
         sn = self.MX.get(name)
-        sn.sort(key=lambda tup: tup[2])
+        if sn is None:
+            return ret
         for n in sn:
             ret.append(n)
         return ret
@@ -202,6 +211,8 @@ class Database:
     def get_PTR(self, name):
         ret = []
         sn = self.PTR.get(name)
+        if sn is None:
+            return ret
         for n in sn:
             ret.append(n[0])
         return ret

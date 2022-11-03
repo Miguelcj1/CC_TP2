@@ -88,16 +88,18 @@ def respond_query(query, dbs):
             arr_authorities.append(string)
         authorities_f = ",".join(arr_authorities)
 
-        # Obtencao de extra_values (HA UNS PROBLEMAS DEVIDO A UM "." COM ESTA PARTE)
+        # Obtencao de extra_values
         n_extras = 0
         arr_extras = []
         for v in all_values:
             extras = db.get_A(v)
             for e in extras:
                 n_extras += 1
-                string = q_name + " A " + e[0] + " " + str(e[1]) + " " + str(e[2])
+                string = v + " A " + e[0] + " " + str(e[1]) + " " + str(e[2])
                 arr_extras.append(string)
             extras_f = ",".join(arr_extras)
+
+        data = ";".join((responses_f, authorities_f, extras_f))
 
     ## ENVIAR MENSAGEM DE VOLTA OU RETORNAR A STRING DE RESPOSTA PARA O SERVIDOR TRATAR DO ENVIO
 

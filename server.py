@@ -40,7 +40,7 @@ def main(conf):
     ### TESTE ###
     # constroi uma string no formato da mensagem que vai ser transmitida.
     q = query.init_send_query(12, "Q+A", "example.com.", "MX")
-    query.respond_query(q, databases)
+    answer = query.respond_query(q, databases)
 
     ### FIM ###
 
