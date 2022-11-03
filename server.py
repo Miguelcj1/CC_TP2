@@ -1,5 +1,7 @@
 import socket
 import time
+
+import auxs
 from config_parser import Configs
 from logs import Logs
 from db_parser import Database
@@ -35,7 +37,7 @@ def main(conf):
             log.fl(time.time(), str(exc), name)
             log.sp(time.time(), str(exc))
             return
-        databases[name] = db
+        databases[auxs.add_end_dot(name)] = db # adiciona o ponto final, para coerencia na busca aquando da chegada de queries.
 
     ### TESTE ###
     # constroi uma string no formato da mensagem que vai ser transmitida.

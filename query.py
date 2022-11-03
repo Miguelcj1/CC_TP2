@@ -1,5 +1,6 @@
 import random
 import time
+import auxs
 from db_parser import Database
 from logs import Logs
 
@@ -52,18 +53,20 @@ def respond_query(query, dbs):
             responses.append(r)
 
 
-    # Procura e obtenção de respostas (MANEIRA PROVISORIA DE TESTE)
-    db = dbs.get(pop_end_dot(q_name)) # caso tenha um "." no final, retira-o de maneira a haver coerencia com a maneira que está guardado o valor.
+    # Procura e obtenção de respostas
+    db = dbs.get(q_name) # caso tenha um "." no final, retira-o de maneira a haver coerencia com a maneira que está guardado o valor.
     if db is None:
         # O VALOR NAO FOI ENCONTRADO NA BASE DE DADOS E PROSSEGUIR COM O RESPETIVO PROCEDIMENTO. ###
         # raise Exception("")
         return
 
+    all_values = []
+    responses_f = None
+
     # Identificação do tipo de query
     if q_type == "MX":
         # Aqui estaria uma procura em cache talvez, antes de verificar na base de dados.
 
-        all_values = []
 
         # Obtencao de response_values
         n_resp = 0 ### estas variaveis talvez devessem estar antes destes ifs
@@ -72,34 +75,49 @@ def respond_query(query, dbs):
         # mails = lista de tuplos (string, int, int)
         for m in mails:
             n_resp += 1
-            string = q_name + " MX " + m[0] + " " + str(m[1]) + " " + str(m[2])
-            all_values.append(m[0])
+            value = m[0]
+            ttl = m[1]
+            prio = m[2]
+            string = q_name + " MX " + value + " " + str(ttl)
+            if prio > -1: # Verifica se foi indicado alguma prioridade. Se tiver o valor -1 não foi atribuida.
+                string += " " + str(m[2])
+            all_values.append(m[0]) # adiciona os valores dos response values aos all values
             arr_resp.append(string)
         responses_f = ",".join(arr_resp)
 
-        # Obtencao de authority_values
-        n_authorities = 0
-        arr_authorities = []
-        authorities = db.get_NS(q_name)
-        for a in authorities:
-            n_authorities += 1
-            string = q_name + " NS " + a[0] + " " + str(a[1]) + " " + str(a[2])
-            all_values.append(a[0])
-            arr_authorities.append(string)
-        authorities_f = ",".join(arr_authorities)
+    # Obtencao de authority_values
+    n_authorities = 0
+    arr_authorities = []
+    authorities = db.get_NS(q_name)
+    for a in authorities:
+        n_authorities += 1
+        value = a[0]
+        ttl = a[1]
+        prio = a[2]
+        string = q_name + " NS " + value + " " + str(ttl)
+        if prio > -1: # Verifica se foi indicado alguma prioridade. Se tiver o valor -1 não foi atribuida.
+            string += " " + str(prio)
+        all_values.append(a[0]) # adiciona os valores dos response values aos all values
+        arr_authorities.append(string)
+    authorities_f = ",".join(arr_authorities)
 
-        # Obtencao de extra_values
-        n_extras = 0
-        arr_extras = []
-        for v in all_values:
-            extras = db.get_A(v)
-            for e in extras:
-                n_extras += 1
-                string = v + " A " + e[0] + " " + str(e[1]) + " " + str(e[2])
-                arr_extras.append(string)
-        extras_f = ",".join(arr_extras)
+    # Obtencao de extra_values
+    n_extras = 0
+    arr_extras = []
+    for v in all_values:
+        extras = db.get_A(v)
+        for e in extras:
+            n_extras += 1
+            value = e[0]
+            ttl = e[1]
+            prio = e[2]
+            string = v + " A " + value + " " + str(ttl)
+            if prio > -1:  # Verifica se foi indicado alguma prioridade. Se tiver o valor -1 não foi atribuida.
+                string += " " + str(prio)
+            arr_extras.append(string)
+    extras_f = ",".join(arr_extras)
 
-        data = ";".join((responses_f, authorities_f, extras_f))
+    data = ";".join((responses_f, authorities_f, extras_f))
 
     ## ENVIAR MENSAGEM DE VOLTA OU RETORNAR A STRING DE RESPOSTA PARA O SERVIDOR TRATAR DO ENVIO
 

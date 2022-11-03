@@ -1,5 +1,5 @@
 import os
-
+import auxs
 
 # Nem sei se vai ser util.
 def email_translator(string):
@@ -14,19 +14,6 @@ def email_translator(string):
     # final[:-1] tira o ultimo ponto final, que vem na string final.
     return final[:-1]
 
-# Verifica se tem um ponto final no fim da string.
-def ends_with_dot(string):
-    b = False
-    if string[-1] == ".":
-        b = True
-    return b
-
-# Talvez acrescentar isto, nas chaves do dicionário de domains em confs, de maneira a haver uma coerencia nos outros parametros de outras estruturas de dados.
-# Funcao que acrescenta um ponto final na string, se ja nao tiver um.
-def add_end_dot(string):
-    if not string[-1] == ".":
-        string += "."
-    return string
 
 def add_default(name, default):
     if default is None:
@@ -38,18 +25,18 @@ class Database:
 
     # Define as diversas variavéis analisadas no ficheiro de base de dados.
     def __init__(self, db_file):
-        self.DEFAULT = {} # simbolo: valor  DEFAULT
-        self.SOASP = {} # dominio: nome completo do SP do dominio SOASP
-        self.SOAADMIN = {} # dominio: endereço de email do admin do dominio SOAADMIN
-        self.SOASERIAL = {} # dominio: serial_number da sb do dominio SOASERIAL
-        self.SOAREFRESH = {} # dominio: refresh interval para um SS perguntar ao SP qual o número de série da base de dados dessa zona SOAREFRESH
-        self.SOARETRY = {} # domínio: refresh interval para um SS perguntar ao SP qual o número de série da base de dados dessa zona, apos um timeout. SOARETRY
-        self.SOAEXPIRE = {} # dominio: expire time of the ss database replica SOAEXPIRE
-        self.NS = {} # dominio: [nome do server, ttl, prio] NS
-        self.A = {} # nome do server(abrev): [ip adress, ttl, prio] A
-        self.CNAME = {} # nome do server(abrev): [alias, ttl] CNAME
-        self.MX = {} # MX dominio: [nome do email_server, ttl, prio] MX
-        self.PTR = {} # ip adress: [nome do server, ttl] ((not sure)) PTR
+        self.DEFAULT = {} # simbolo: valor
+        self.SOASP = {} # dominio: nome completo do SP do dominio
+        self.SOAADMIN = {} # dominio: endereço de email do admin do dominio
+        self.SOASERIAL = {} # dominio: serial_number da sb do dominio
+        self.SOAREFRESH = {} # dominio: refresh interval para um SS perguntar ao SP qual o número de série da base de dados dessa zona
+        self.SOARETRY = {} # domínio: refresh interval para um SS perguntar ao SP qual o número de série da base de dados dessa zona, apos um timeout.
+        self.SOAEXPIRE = {} # dominio: expire time of the ss database replica
+        self.NS = {} # dominio: [nome do server, ttl, prio] SUPORTA PRIORIDADES
+        self.A = {} # nome do server(abrev): [ip adress, ttl, prio] SUPORTA PRIORIDADES
+        self.CNAME = {} # nome do server(abrev): [alias, ttl]
+        self.MX = {} # MX dominio: [nome do email_server, ttl, prio] SUPORTA PRIORIDADES
+        self.PTR = {} # ip adress: [nome do server, ttl] ((not sure))
 
         ## Leitura e análise do ficheiro de base de dados.
         try:
@@ -76,12 +63,12 @@ class Database:
 
             # Verificação da terminação dos nomes com "."
             if arr[1] != "DEFAULT":
-                if not ends_with_dot(dom):
+                if not auxs.ends_with_dot(dom):
                     try:
                         dom = add_default(dom, self.DEFAULT.get("@"))
                     except Exception as exc:
                         raise Exception(str(exc))
-                elif not ends_with_dot(name):
+                elif not auxs.ends_with_dot(name):
                     try:
                         name = add_default(name, self.DEFAULT.get("@"))
                     except Exception as exc:
