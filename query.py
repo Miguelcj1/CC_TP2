@@ -54,7 +54,7 @@ def respond_query(query, dbs):
 
 
     # Procura e obtenção de respostas
-    db = dbs.get(q_name) # caso tenha um "." no final, retira-o de maneira a haver coerencia com a maneira que está guardado o valor.
+    db = dbs.get(q_name)
     if db is None:
         # O VALOR NAO FOI ENCONTRADO NA BASE DE DADOS E PROSSEGUIR COM O RESPETIVO PROCEDIMENTO. ###
         # raise Exception("")
@@ -62,32 +62,95 @@ def respond_query(query, dbs):
 
     all_values = []
     responses_f = None
+    n_resp = 0
+    arr_resp = []
+    n_authorities = 0
+    arr_authorities = []
+    n_extras = 0
+    arr_extras = []
 
     # Identificação do tipo de query
-    if q_type == "MX":
-        # Aqui estaria uma procura em cache talvez, antes de verificar na base de dados.
 
-
+    if q_type in ["SOASP", "SOAADMIN", "SOASERIAL", "SOAREFRESH", "SOARETRY", "SOAEXPIRE"]:
         # Obtencao de response_values
-        n_resp = 0 ### estas variaveis talvez devessem estar antes destes ifs
-        arr_resp = [] # array de linhas de resposta para serem joined por ","
-        mails = db.get_MX(q_name)
-        # mails = lista de tuplos (string, int, int)
-        for m in mails:
+        responses_f = db.get_SOA_(q_type, q_name)
+
+    elif q_type == "NS":
+        # Obtencao de response_values
+        valores = db.get_NS(q_name)
+        # valores = lista de tuplos (string, int, int)
+        for v in valores:
             n_resp += 1
-            value = m[0]
-            ttl = m[1]
-            prio = m[2]
+            value = v[0]
+            ttl = v[1]
+            prio = v[2]
             string = q_name + " MX " + value + " " + str(ttl)
             if prio > -1: # Verifica se foi indicado alguma prioridade. Se tiver o valor -1 não foi atribuida.
-                string += " " + str(m[2])
-            all_values.append(m[0]) # adiciona os valores dos response values aos all values
+                string += " " + str(v[2])
+            all_values.append(v[0]) # adiciona os valores dos response values aos all values
             arr_resp.append(string)
         responses_f = ",".join(arr_resp)
 
+    elif q_type == "A":
+        # Obtencao de response_values
+        valores = db.get_A(q_name)
+        # valores = lista de tuplos (string, int, int)
+        for v in valores:
+            n_resp += 1
+            value = v[0]
+            ttl = v[1]
+            prio = v[2]
+            string = q_name + " MX " + value + " " + str(ttl)
+            if prio > -1: # Verifica se foi indicado alguma prioridade. Se tiver o valor -1 não foi atribuida.
+                string += " " + str(v[2])
+            all_values.append(v[0]) # adiciona os valores dos response values aos all values
+            arr_resp.append(string)
+        responses_f = ",".join(arr_resp)
+
+    elif q_type == "CNAME":
+        # Obtencao de response_values
+        valores = db.get_NS(q_name)
+        # valores = lista de tuplos (string, int, int)
+        for v in valores:
+            n_resp += 1
+            value = v[0]
+            ttl = v[1]
+            string = q_name + " MX " + value + " " + str(ttl)
+            all_values.append(v[0]) # adiciona os valores dos response values aos all values
+            arr_resp.append(string)
+        responses_f = ",".join(arr_resp)
+
+    elif q_type == "MX":
+        # Obtencao de response_values
+        valores = db.get_MX(q_name)
+        # valores = lista de tuplos (string, int, int)
+        for v in valores:
+            n_resp += 1
+            value = v[0]
+            ttl = v[1]
+            prio = v[2]
+            string = q_name + " MX " + value + " " + str(ttl)
+            if prio > -1: # Verifica se foi indicado alguma prioridade. Se tiver o valor -1 não foi atribuida.
+                string += " " + str(v[2])
+            all_values.append(v[0]) # adiciona os valores dos response values aos all values
+            arr_resp.append(string)
+        responses_f = ",".join(arr_resp)
+
+    elif q_type == "PTR":
+        # Obtencao de response_values
+        valores = db.get_NS(q_name)
+        # valores = lista de tuplos (string, int, int)
+        for v in valores:
+            n_resp += 1
+            value = v[0]
+            ttl = v[1]
+            string = q_name + " MX " + value + " " + str(ttl)
+            all_values.append(v[0]) # adiciona os valores dos response values aos all values
+            arr_resp.append(string)
+        responses_f = ",".join(arr_resp)
+
+
     # Obtencao de authority_values
-    n_authorities = 0
-    arr_authorities = []
     authorities = db.get_NS(q_name)
     for a in authorities:
         n_authorities += 1
@@ -102,8 +165,6 @@ def respond_query(query, dbs):
     authorities_f = ",".join(arr_authorities)
 
     # Obtencao de extra_values
-    n_extras = 0
-    arr_extras = []
     for v in all_values:
         extras = db.get_A(v)
         for e in extras:

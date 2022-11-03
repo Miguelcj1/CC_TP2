@@ -79,8 +79,9 @@ class Database:
                 if ttl is None:
                     ttl = arr[3]
                 ttl = int (ttl)
+            else:
+                ttl = 0 # Quote: "Quando o TTL não é suportado num determinado tipo, o seu valor deve ser igual a zero."
 
-            ### PRECISO VER MELHOR COMO TRATO PRIORIDADES NULAS.
             prio = -1  # para caso n seja indicada prioridade.
             if len(arr) == 5:
                 prio = self.DEFAULT.get(arr[4])
@@ -91,27 +92,26 @@ class Database:
 
             if arr[1] == "DEFAULT":
                 if self.DEFAULT.get(dom):
-                    #print(f"DEFAULT VALUE {dom} ALREADY SET!") ###
                     raise Exception(f"DEFAULT VALUE {dom} ALREADY SET!")
                 self.DEFAULT[dom] = name
 
             elif arr[1] == "SOASP":
-                self.SOASP[dom] = arr[2]
+                self.SOASP[dom] = name
 
             elif arr[1] == "SOAADMIN":
                 self.SOAADMIN[dom] = email_translator(arr[2]) # faço a tal traduçao de email.
 
             elif arr[1] == "SOASERIAL":
-                self.SOASERIAL[dom] = arr[2]
+                self.SOASERIAL[dom] = name
 
             elif arr[1] == "SOAREFRESH":
-                self.SOAREFRESH[dom] = arr[2]
+                self.SOAREFRESH[dom] = name
 
             elif arr[1] == "SOARETRY":
-                self.SOARETRY[dom] = arr[2]
+                self.SOARETRY[dom] = name
 
             elif arr[1] == "SOAEXPIRE":
-                self.SOAEXPIRE[dom] = arr[2]
+                self.SOAEXPIRE[dom] = name
 
             elif arr[1] == "NS" and len(arr) > 3: # talvez deva adicionar length restrictions.
                 if not self.NS.get(dom):
@@ -159,6 +159,22 @@ class Database:
     def get_SOAEXPIRE(self, dom):
         return self.SOAEXPIRE.get(dom)
 
+    def get_SOA_(self, param, dom):
+        if param == "SOASP":
+            return self.SOASP.get(dom)
+        elif param == "SOAADMIN":
+            return self.SOAADMIN.get(dom)
+        elif param == "SOASERIAL":
+            return self.SOASERIAL.get(dom)
+        elif param == "SOAREFRESH":
+            return self.SOAREFRESH.get(dom)
+        elif param == "SOARETRY":
+            return self.SOARETRY.get(dom)
+        elif param == "SOAEXPIRE":
+            return self.SOAEXPIRE.get(dom)
+
+
+    # returns [(name, ttl, prio)]
     def get_NS(self, dom):
         ret = []
         sn = self.NS.get(dom)
@@ -168,6 +184,7 @@ class Database:
             ret.append(n)
         return ret
 
+    # returns [(ip adress, ttl, prio)]
     def get_A(self, name):
         ret = []
         sn = self.A.get(name)
@@ -177,6 +194,7 @@ class Database:
             ret.append(n)
         return ret
 
+    # returns [(name, ttl)]
     def get_CNAME(self, name):
         ret = []
         sn = self.CNAME.get(name)
@@ -186,6 +204,7 @@ class Database:
             ret.append(n)
         return ret
 
+    # returns [(name, ttl, prio)]
     def get_MX(self, name):
         ret = []
         sn = self.MX.get(name)
@@ -195,6 +214,7 @@ class Database:
             ret.append(n)
         return ret
 
+    # returns [(name, ttl)]
     def get_PTR(self, name):
         ret = []
         sn = self.PTR.get(name)

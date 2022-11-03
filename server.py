@@ -11,7 +11,7 @@ import query
 
 def main(conf):
 
-    ttl = 20000
+    ttl = 200
     mode = "debug"
     # Guarda a altura em que o servidor arrancou.
     ts_arranque = time.time()
@@ -37,7 +37,7 @@ def main(conf):
             log.fl(time.time(), str(exc), name)
             log.sp(time.time(), str(exc))
             return
-        databases[auxs.add_end_dot(name)] = db # adiciona o ponto final, para coerencia na busca aquando da chegada de queries.
+        databases[auxs.add_end_dot(name)] = db # adiciona o ponto final, para coerencia na busca de informaçao para queries.
 
     ### TESTE ###
     # constroi uma string no formato da mensagem que vai ser transmitida.
@@ -64,7 +64,6 @@ def main(conf):
     while True:
         msg, add = s.recvfrom(1024)
         msg = msg.decode('utf-8')
-        print(msg)
         log.qr(time.time(), add, msg) # escrita do evento QR no log
         print(f"Recebi uma mensagem do cliente {add}")
         print("----------------------")

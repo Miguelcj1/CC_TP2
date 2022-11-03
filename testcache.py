@@ -8,5 +8,5 @@ from cachetools import cached, TTLCache
 
 arr = []
 
-for a in arr:
-    print("ola")
+final = " ".join(arr)
+print(final)
