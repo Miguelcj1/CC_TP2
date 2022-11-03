@@ -39,8 +39,8 @@ def main(conf):
 
     ### TESTE ###
     # constroi uma string no formato da mensagem que vai ser transmitida.
-    q = query.init_send_query(12, "Q+A", "example.com.", "MX")
-    query.respond_query(q, databases)
+    #q = query.init_send_query(12, "Q+A", "example.com.", "MX")
+    #query.respond_query(q, databases)
 
     ### FIM ###
 
@@ -59,13 +59,19 @@ def main(conf):
     print(f"Estou à escuta no {endereco}:{porta}")
     print("----------------------")
 
+
     while True:
         msg, add = s.recvfrom(1024)
+        print(add)
         msg = msg.decode('utf-8')
         print(msg)
         log.qr(time.time(), add, msg) # escrita do evento QR no log
         print(f"Recebi uma mensagem do cliente {add}")
         print("----------------------")
+
+        sR = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sR.sendto(msg.encode('utf-8'), (add[0], porta))
+
 
 
     s.close()

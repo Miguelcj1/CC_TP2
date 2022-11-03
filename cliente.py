@@ -7,5 +7,12 @@ endereco = '127.0.0.1'
 porta = 3334 # porta qualquer acima de 1024
 
 msg = "Adoro Redes :)"
-for i in range(10):
+for i in range(1):
     s.sendto(msg.encode('utf-8'), (endereco, porta))
+
+
+sR = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sR.bind((endereco, porta))
+msg, add = sR.recvfrom(1024)
+msg.decode('utf-8')
+print(msg)
