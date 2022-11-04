@@ -60,17 +60,17 @@ class Database:
                 name = arr[2]
 
             # Verificação da terminação com "." dos nomes completos de e-mail, domínios, servidores e hosts.
-            if arr[1] not in ("DEFAULT", "A", "SOASERIAL", "SOAREFRESH", "SOARETRY", "SOAEXPIRE"):
-                if not auxs.ends_with_dot(dom):
-                    try:
-                        dom = add_default(dom, self.DEFAULT.get("@"))
-                    except Exception as exc:
-                        raise Exception(str(exc))
-                if not auxs.ends_with_dot(name):
-                    try:
-                        name = add_default(name, self.DEFAULT.get("@"))
-                    except Exception as exc:
-                        raise Exception(str(exc))
+            #if arr[1] not in ("DEFAULT", "A", "SOASERIAL", "SOAREFRESH", "SOARETRY", "SOAEXPIRE"):
+            if arr[1] != "DEFAULT" and not auxs.ends_with_dot(dom):
+                try:
+                    dom = add_default(dom, self.DEFAULT.get("@"))
+                except Exception as exc:
+                    raise Exception(str(exc))
+            if arr[1] not in ("DEFAULT", "A", "SOASERIAL", "SOAREFRESH", "SOARETRY", "SOAEXPIRE") and not auxs.ends_with_dot(name):
+                try:
+                    name = add_default(name, self.DEFAULT.get("@"))
+                except Exception as exc:
+                    raise Exception(str(exc))
 
             if len(arr) > 3:
                 ttl = self.DEFAULT.get(arr[3])
