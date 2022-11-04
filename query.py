@@ -80,7 +80,10 @@ def respond_query(query, confs, dbs):
 
     if q_type in ["SOASP", "SOAADMIN", "SOASERIAL", "SOAREFRESH", "SOARETRY", "SOAEXPIRE"]:
         # Obtencao de response_values
-        responses_f = db.get_SOA_(q_type, q_name)
+        v = db.get_SOA_(q_type, q_name)
+        value = v[0]
+        ttl = str(v[1])
+        responses_f = " ".join((q_name, q_type, value, ttl))
 
     elif q_type == "NS":
         # Obtencao de response_values
@@ -118,14 +121,14 @@ def respond_query(query, confs, dbs):
         # Obtencao de response_values
         v = db.get_CNAME(q_name)
         # v = (string, int)
-
-        n_resp += 1
-        value = v[0]
-        ttl = v[1]
-        string = q_name + " CNAME " + value + " " + str(ttl)
-        all_values.append(v[0]) # adiciona os valores dos response values aos all values
-        arr_resp.append(string)
-        responses_f = ",".join(arr_resp)
+        if v is not None:
+            n_resp += 1
+            value = v[0]
+            ttl = v[1]
+            string = q_name + " CNAME " + value + " " + str(ttl)
+            all_values.append(v[0]) # adiciona os valores dos response values aos all values
+            arr_resp.append(string)
+            responses_f = ",".join(arr_resp)
 
     elif q_type == "MX":
         # Obtencao de response_values

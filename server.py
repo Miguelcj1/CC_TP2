@@ -41,7 +41,7 @@ def main(conf):
 
     ### TESTE ###
     # constroi uma string no formato da mensagem que vai ser transmitida.
-    q = query.init_send_query(12, "Q+A", "example.com.", "MX")
+    q = query.init_send_query(12, "Q+A", "example.com.", "SOASERIAL")
     query.respond_query(q, confs, databases)
 
 

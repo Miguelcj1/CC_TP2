@@ -94,22 +94,22 @@ class Database:
                 self.DEFAULT[dom] = name
 
             elif arr[1] == "SOASP":
-                self.SOASP[dom] = name
+                self.SOASP[dom] = (name, ttl)
 
             elif arr[1] == "SOAADMIN":
-                self.SOAADMIN[dom] = email_translator(arr[2]) # faço a tal traduçao de email.
+                self.SOAADMIN[dom] = (email_translator(arr[2]), ttl) # faço a tal traduçao de email.
 
             elif arr[1] == "SOASERIAL":
-                self.SOASERIAL[dom] = name
+                self.SOASERIAL[dom] = (name, ttl)
 
             elif arr[1] == "SOAREFRESH":
-                self.SOAREFRESH[dom] = name
+                self.SOAREFRESH[dom] = (name, ttl)
 
             elif arr[1] == "SOARETRY":
-                self.SOARETRY[dom] = name
+                self.SOARETRY[dom] = (name, ttl)
 
             elif arr[1] == "SOAEXPIRE":
-                self.SOAEXPIRE[dom] = name
+                self.SOAEXPIRE[dom] = (name, ttl)
 
             elif arr[1] == "NS" and len(arr) > 3: # talvez deva adicionar length restrictions.
                 if not self.NS.get(dom):
