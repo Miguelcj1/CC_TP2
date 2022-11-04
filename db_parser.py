@@ -88,7 +88,7 @@ class Database:
                 prio = int(prio)
 
 
-            if arr[1] == "DEFAULT":
+            if arr[1] == "DEFAULT": ### talvez devesse percorrer o ficheiro, primeiro por DEFAULTs e depois é que percorria tudo o resto, para valores default que estejam depois de uma utilização serem validos.
                 if self.DEFAULT.get(dom):
                     raise Exception(f"DEFAULT VALUE {dom} ALREADY SET!")
                 self.DEFAULT[dom] = name
