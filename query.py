@@ -84,7 +84,7 @@ def respond_query(query, dbs):
             value = v[0]
             ttl = v[1]
             prio = v[2]
-            string = q_name + " MX " + value + " " + str(ttl)
+            string = q_name + " NS " + value + " " + str(ttl)
             if prio > -1: # Verifica se foi indicado alguma prioridade. Se tiver o valor -1 não foi atribuida.
                 string += " " + str(v[2])
             all_values.append(v[0]) # adiciona os valores dos response values aos all values
@@ -100,7 +100,7 @@ def respond_query(query, dbs):
             value = v[0]
             ttl = v[1]
             prio = v[2]
-            string = q_name + " MX " + value + " " + str(ttl)
+            string = q_name + " A " + value + " " + str(ttl)
             if prio > -1: # Verifica se foi indicado alguma prioridade. Se tiver o valor -1 não foi atribuida.
                 string += " " + str(v[2])
             all_values.append(v[0]) # adiciona os valores dos response values aos all values
@@ -109,15 +109,15 @@ def respond_query(query, dbs):
 
     elif q_type == "CNAME":
         # Obtencao de response_values
-        valores = db.get_NS(q_name)
-        # valores = lista de tuplos (string, int, int)
-        for v in valores:
-            n_resp += 1
-            value = v[0]
-            ttl = v[1]
-            string = q_name + " MX " + value + " " + str(ttl)
-            all_values.append(v[0]) # adiciona os valores dos response values aos all values
-            arr_resp.append(string)
+        v = db.get_CNAME(q_name)
+        # v = (string, int)
+
+        n_resp += 1
+        value = v[0]
+        ttl = v[1]
+        string = q_name + " CNAME " + value + " " + str(ttl)
+        all_values.append(v[0]) # adiciona os valores dos response values aos all values
+        arr_resp.append(string)
         responses_f = ",".join(arr_resp)
 
     elif q_type == "MX":
@@ -138,13 +138,13 @@ def respond_query(query, dbs):
 
     elif q_type == "PTR":
         # Obtencao de response_values
-        valores = db.get_NS(q_name)
-        # valores = lista de tuplos (string, int, int)
+        valores = db.get_PTR(q_name)
+        # valores = lista de tuplos (string, int)
         for v in valores:
             n_resp += 1
             value = v[0]
             ttl = v[1]
-            string = q_name + " MX " + value + " " + str(ttl)
+            string = q_name + " PTR " + value + " " + str(ttl)
             all_values.append(v[0]) # adiciona os valores dos response values aos all values
             arr_resp.append(string)
         responses_f = ",".join(arr_resp)

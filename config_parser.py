@@ -274,6 +274,7 @@ class Configs:
     def get_all_log_file(self):
         return self.all_log
 
+    # talvez isto fosse verificar as entradas DD se for um SP ou SS, para ver quais os dominios que pode responder.
     def get_domain_names(self):
         ret = []
         for key in self.domains:

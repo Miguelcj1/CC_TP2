@@ -51,24 +51,22 @@ class Database:
             if not line.strip() or line.startswith("#"):
                 continue  # skips this iteration
 
-            # Verifica se é usado (na primeira palavra) algum símbolo definido em DEFAULT.
+            # Verifica se é usado algum símbolo definido em DEFAULT.
             dom = self.DEFAULT.get(arr[0])
             if dom is None:
                 dom = arr[0]
-
-
             name = self.DEFAULT.get(arr[2])
             if name is None:
                 name = arr[2]
 
-            # Verificação da terminação dos nomes com "."
-            if arr[1] != "DEFAULT":
+            # Verificação da terminação com "." dos nomes completos de e-mail, domínios, servidores e hosts.
+            if arr[1] not in ("DEFAULT", "A", "SOASERIAL", "SOAREFRESH", "SOARETRY", "SOAEXPIRE"):
                 if not auxs.ends_with_dot(dom):
                     try:
                         dom = add_default(dom, self.DEFAULT.get("@"))
                     except Exception as exc:
                         raise Exception(str(exc))
-                elif not auxs.ends_with_dot(name):
+                if not auxs.ends_with_dot(name):
                     try:
                         name = add_default(name, self.DEFAULT.get("@"))
                     except Exception as exc:
@@ -125,8 +123,9 @@ class Database:
 
             elif arr[1] == "CNAME":
                 if not self.CNAME.get(dom):
-                    self.CNAME[dom] = []
-                self.CNAME[dom].append((name, ttl))
+                    self.CNAME[dom] = (name, ttl)
+                else:
+                    raise Exception(f"Valor canónico {name} usado mais que uma vez!")
 
             elif arr[1] == "MX":
                 if not self.MX.get(dom):
@@ -194,15 +193,9 @@ class Database:
             ret.append(n)
         return ret
 
-    # returns [(name, ttl)]
-    def get_CNAME(self, name):
-        ret = []
-        sn = self.CNAME.get(name)
-        if sn is None:
-            return ret
-        for n in sn:
-            ret.append(n)
-        return ret
+    # returns (name, ttl)
+    def get_CNAME(self, key):
+        return self.CNAME.get(key)
 
     # returns [(name, ttl, prio)]
     def get_MX(self, name):
