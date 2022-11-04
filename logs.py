@@ -218,7 +218,7 @@ class Logs:
         if self.stdout:
             print(string)
 
-    # Reporta o arranque do servidor ((Not sure donde virao os valores do ttl e o mode)). NOT SURE
+    # Reporta o arranque do servidor ((Not sure donde virao os valores do ttl e o mode)). NOT SURE ###
     def st(self, timestamp, port, ttl, mode, domain = "all"):
         try:
             fp = open(self.log_files[domain], "a")

@@ -14,7 +14,7 @@ def init_send_query(id, flag, dom, type):
     return string
 
 # raises exception in which is caused by a problem in decoding the received string (ER ou FL)
-def respond_query(query, dbs):
+def respond_query(query, confs, dbs):
 
     arr = query.split(";")
     if len(arr) < 3:
@@ -54,11 +54,18 @@ def respond_query(query, dbs):
 
 
     # Procura e obtenção de respostas
+    respondable_domains = confs.get_all_dd()
+    respondable_domains = map(auxs.add_end_dot, respondable_domains) # acrescenta o ponto final para haver coerencia nos nomes.
+    if q_name not in respondable_domains:
+        # Não irá ser respondida a query.
+        print("Não irá ser respondida a query!")
+        return
+
     db = dbs.get(q_name)
     if db is None:
-        # O VALOR NAO FOI ENCONTRADO NA BASE DE DADOS E PROSSEGUIR COM O RESPETIVO PROCEDIMENTO. ###
-        # raise Exception("")
-        return
+        # O VALOR NAO FOI ENCONTRADO NA BASE DE DADOS E PROSSEGUIR COM O RESPETIVO PROCEDIMENTO. ### em princípio isto não faz sentido ocorrer, mas...
+        # Retornar alguma query de resposta que indique que n foi possivel a resposta da query. (NOT SURE) ###
+        pass
 
     all_values = []
     responses_f = None

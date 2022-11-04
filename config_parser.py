@@ -274,11 +274,19 @@ class Configs:
     def get_all_log_file(self):
         return self.all_log
 
-    # talvez isto fosse verificar as entradas DD se for um SP ou SS, para ver quais os dominios que pode responder.
+    # talvez isto fosse verificar as entradas DD se for um SP ou SS, para ver quais os dominios que pode responder. ### TALVEZ A FUNCAO DE BAIXO INUTILIZE ESTA
     def get_domain_names(self):
         ret = []
         for key in self.domains:
             if key != "all":
+                ret.append(key)
+        return ret
+
+    # Retorna todos os dominios que têm uma entrada DD, ou seja, todos os dominios que o server pode responder.
+    def get_all_dd(self):
+        ret = []
+        for key in self.domains:
+            if key != "all" and self.domains[key].get_dd():
                 ret.append(key)
         return ret
 
