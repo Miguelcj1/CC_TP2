@@ -1,5 +1,6 @@
 import socket
 import time
+from cache import Cache
 
 import auxs
 from config_parser import Configs
@@ -40,9 +41,12 @@ def main(conf):
         databases[auxs.add_end_dot(name)] = db # adiciona o ponto final, para coerencia na busca de informaçao para queries.
 
     ### TESTE ###
+    cache = Cache()
     # constroi uma string no formato da mensagem que vai ser transmitida.
-    q = query.init_send_query(12, "Q+A", "example.com.", "SOASERIAL")
-    query.respond_query(q, confs, databases)
+    q = query.init_send_query(12, "Q+A", "example.com.", "MX")
+    query.respond_query(q, confs, databases, cache)
+
+    cache.get("example.com.", "MX")
 
 
     ### FIM ###

@@ -1,8 +1,8 @@
-import random
 import time
 import auxs
 from db_parser import Database
 from logs import Logs
+from cache import Cache
 
 def pop_end_dot(string):
     if string[-1] == ".":
@@ -14,7 +14,7 @@ def init_send_query(id, flag, dom, type):
     return string
 
 # raises exception in which is caused by a problem in decoding the received string (ER ou FL)
-def respond_query(query, confs, dbs):
+def respond_query(query, confs, dbs, cache):
 
     arr = query.split(";")
     if len(arr) < 3:
@@ -189,6 +189,14 @@ def respond_query(query, confs, dbs):
     extras_f = ",".join(arr_extras)
 
     data = ";".join((responses_f, authorities_f, extras_f))
+
+    # Adiciona as respostas à cache
+    all_entries = arr_resp + arr_authorities + arr_extras
+    for e in all_entries:
+        arr = e.split()
+        name = arr[0]
+        type_of_value = arr[1]
+        cache.add_to_cache(name, type_of_value, e)
 
     ## ENVIAR MENSAGEM DE VOLTA OU RETORNAR A STRING DE RESPOSTA PARA O SERVIDOR TRATAR DO ENVIO
 

@@ -6,7 +6,8 @@ from cachetools import cached, TTLCache
 
 #cache = TTLCache(maxsize=100, ttl=4)
 
-arr = []
+bef = time.time()
+time.sleep(5)
+now = time.time()
 
-final = " ".join(arr)
-print(final)
+print(now-bef)
