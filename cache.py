@@ -15,10 +15,17 @@ class Cache:
         self.cache[name][type_of_value].append((resposta, timestamp))
 
     def get(self, name, type_of_value):
+        all_values = []
+        responses_f = None
+        n_resp = 0
         arr_resp = []
+        n_authorities = 0
+        arr_authorities = []
+        n_extras = 0
+        arr_extras = []
         if self.cache.get(name) is None:
             return None
-        if self.cache[name][type_of_value] is None:
+        if self.cache[name].get(type_of_value) is None:
             return None
         for i in range(len(self.cache[name][type_of_value])):
             r = self.cache[name][type_of_value][i]
@@ -26,11 +33,15 @@ class Cache:
             ts = r[1]
             ttl = int (resp.split()[3]) # obtenção do ttl da entrada
             now = time.time()
-            #ttl = 0 ###### DEBUGING ####
             if now - ts > ttl:
                 del self.cache[name][type_of_value][i]
                 continue
 
             self.cache[name][type_of_value][i] = (resp, now)
+            n_resp += 1
             arr_resp.append(resp)
+
+        # Obtenção do resto dos valores (NS, A) se forem necessarios
+        # ...
+
         return ",".join(arr_resp)
