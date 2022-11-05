@@ -41,6 +41,7 @@ while inp != "0":
         for i in range(1):
             q_id = random.choice(tuple(ids))
             q = query.init_send_query(q_id, "Q+A", "example.com.", "MX")
+            print("Foi enviada a seguinte query: " + q)
             s.sendto(q.encode('utf-8'), (endereco, porta))
             msg, add = s.recvfrom(1024)
             msg = msg.decode('utf-8')
