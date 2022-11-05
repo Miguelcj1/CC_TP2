@@ -35,7 +35,7 @@ while inp != "0":
         print("Há espera da resposta..")
         msg, add = s.recvfrom(1024)
         msg = msg.decode('utf-8')
-        print(f"Mensagem recebida: {msg}\nVinda deste endereço: {add}")
+        print(f"Mensagem recebida: \n{msg}\nVinda deste endereço: {add}")
 
     elif inp == "a" or inp == "A":
         for i in range(1):
@@ -45,7 +45,7 @@ while inp != "0":
             s.sendto(q.encode('utf-8'), (endereco, porta))
             msg, add = s.recvfrom(1024)
             msg = msg.decode('utf-8')
-            print(f"Mensagem recebida: {msg}\nVinda deste endereço: {add}")
+            print(f"Mensagem recebida: \n{msg}\nVinda deste endereço: {add}")
 
     elif inp != "0":
         print("Input inválido!")

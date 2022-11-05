@@ -52,38 +52,52 @@ def respond_query(query, confs, dbs, cache):
         for r in resp_fields:
             responses.append(r)
 
+    # Verificação em CACHE ### RETORNA A RESPOSTA COMPLETA CASO SEJA ENCONTRADO ALGO NA CACHE NAO VERIFICANDO A BASE DE DADOS. ###
+    result = cache.search(message_id, q_name, q_type)
+    if result is not None:
+        return result
 
-    # Procura e obtenção de respostas
+    # Verifica se deve responder a queries deste dominio.
     respondable_domains = confs.get_all_dd()
     respondable_domains = map(auxs.add_end_dot, respondable_domains) # acrescenta o ponto final para haver coerencia nos nomes.
     if q_name not in respondable_domains:
         # Não irá ser respondida a query.
-        print("Não irá ser respondida a query!")
-        return
+        result = ",".join((str(message_id), "A", "2", "0", "0", "0"))
+        result += ";" + q_name + "," + q_type + ";" + ";" # campo de dados vai vazio
+        return result
 
+    # Procura e obtenção de respostas
     db = dbs.get(q_name)
     if db is None:
-        # O VALOR NAO FOI ENCONTRADO NA BASE DE DADOS E PROSSEGUIR COM O RESPETIVO PROCEDIMENTO. ### em princípio isto não faz sentido ocorrer, mas...
-        # Retornar alguma query de resposta que indique que n foi possivel a resposta da query. (NOT SURE) ###
-        pass
+        # O VALOR NAO FOI ENCONTRADO NA BASE DE DADOS E PROSSEGUIR COM O RESPETIVO PROCEDIMENTO.
+        # Não irá ser respondida a query.
+        result = ",".join((str(message_id), "A", "2", "0", "0", "0"))
+        result += ";" + q_name + "," + q_type + ";" + ";"  # campo de dados vai vazio
+        return result
 
     all_values = []
-    responses_f = None
+    responses_f = ""
+    authorities_f = ""
+    extras_f = ""
     n_resp = 0
     arr_resp = []
     n_authorities = 0
     arr_authorities = []
     n_extras = 0
     arr_extras = []
+    flags = "A"
 
     # Identificação do tipo de query
-
     if q_type in ["SOASP", "SOAADMIN", "SOASERIAL", "SOAREFRESH", "SOARETRY", "SOAEXPIRE"]:
         # Obtencao de response_values
         v = db.get_SOA_(q_type, q_name)
-        value = v[0]
-        ttl = str(v[1])
-        responses_f = " ".join((q_name, q_type, value, ttl))
+        if v is None:
+            responses_f = ""
+        else:
+            n_resp += 1
+            value = v[0]
+            ttl = str(v[1])
+            responses_f = " ".join((q_name, q_type, value, ttl))
 
     elif q_type == "NS":
         # Obtencao de response_values
@@ -197,6 +211,9 @@ def respond_query(query, confs, dbs, cache):
         name = arr[0]
         type_of_value = arr[1]
         cache.add_to_cache(name, type_of_value, e)
+
+    if n_resp == 0:
+        responde_code = 1 # não foi encontrado nenhum type_value relativo a este dominio.
 
     ## ENVIAR MENSAGEM DE VOLTA OU RETORNAR A STRING DE RESPOSTA PARA O SERVIDOR TRATAR DO ENVIO
     result = ",".join((str(message_id), flags, str(response_code), str(n_resp), str(n_authorities), str(n_extras)))

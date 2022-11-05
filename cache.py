@@ -14,9 +14,12 @@ class Cache:
         timestamp = time.time()
         self.cache[name][type_of_value].append((resposta, timestamp))
 
-    def get(self, name, type_of_value):
+
+    def search(self, message_id, name, type_of_value):
         all_values = []
-        responses_f = None
+        responses_f = ""
+        authorities_f = ""
+        extras_f = ""
         n_resp = 0
         arr_resp = []
         n_authorities = 0
@@ -25,14 +28,20 @@ class Cache:
         arr_extras = []
         if self.cache.get(name) is None:
             return None
+
         if self.cache[name].get(type_of_value) is None:
-            return None
-        for i in range(len(self.cache[name][type_of_value])):
+            lista = []
+        else:
+            lista = self.cache[name].get(type_of_value)
+
+        # Obtenção dos response values
+        for i in range(len(lista)):
             r = self.cache[name][type_of_value][i]
             resp = r[0] # obtençao da resposta
             ts = r[1]
             ttl = int (resp.split()[3]) # obtenção do ttl da entrada
             now = time.time()
+            # Verificação da validade do timestamp, relativamente ao ttl.
             if now - ts > ttl:
                 del self.cache[name][type_of_value][i]
                 continue
@@ -40,8 +49,14 @@ class Cache:
             self.cache[name][type_of_value][i] = (resp, now)
             n_resp += 1
             arr_resp.append(resp)
+        responses_f = ",".join(arr_resp)
 
-        # Obtenção do resto dos valores (NS, A) se forem necessarios
+        # Obtenção do resto dos valores (NS, A)
         # ...
 
-        return ",".join(arr_resp)
+        data = ";".join((responses_f, authorities_f, extras_f))
+
+        result = ",".join((str(message_id), "", "0", str(n_resp), str(n_authorities), str(n_extras)))
+        result += ";" + name  + "," + type_of_value + ";"
+        result += data
+        return result

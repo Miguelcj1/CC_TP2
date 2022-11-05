@@ -45,13 +45,14 @@ def main(conf):
     '''
     ### TESTE ###
     # constroi uma string no formato da mensagem que vai ser transmitida.
-    q = query.init_send_query(12, "Q+A", "example.com.", "MX")
+    id = 12
+    q = query.init_send_query(id, "Q+A", "example.com.", "MX")
     query.respond_query(q, confs, databases, cache)
 
-    cache.get("example.com.", "MX")
+    cache.search(id, "example.com.", "MX")
 
-    ### FIM ###
-    '''
+    ### FIM ###'''
+
 
     endereco = '127.0.0.1'
     porta = 3334
