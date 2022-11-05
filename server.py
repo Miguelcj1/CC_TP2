@@ -40,16 +40,18 @@ def main(conf):
             return
         databases[auxs.add_end_dot(name)] = db # adiciona o ponto final, para coerencia na busca de informaçao para queries.
 
-    ### TESTE ###
     cache = Cache()
+
+    '''
+    ### TESTE ###
     # constroi uma string no formato da mensagem que vai ser transmitida.
     q = query.init_send_query(12, "Q+A", "example.com.", "MX")
     query.respond_query(q, confs, databases, cache)
 
     cache.get("example.com.", "MX")
 
-
     ### FIM ###
+    '''
 
     endereco = '127.0.0.1'
     porta = 3334
@@ -70,10 +72,11 @@ def main(conf):
         msg, add = s.recvfrom(1024)
         msg = msg.decode('utf-8')
         log.qr(time.time(), add, msg) # escrita do evento QR no log
-        print(f"Recebi uma mensagem do cliente {add}")
-        print("----------------------")
+        #print(f"Recebi uma mensagem do cliente {add}")
+        #print("----------------------")
+        answer = query.respond_query(msg, confs, databases, cache)
 
-        s.sendto(msg.encode('utf-8'), add)
+        s.sendto(answer.encode('utf-8'), add)
 
 
     s.close()

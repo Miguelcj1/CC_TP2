@@ -188,7 +188,7 @@ def respond_query(query, confs, dbs, cache):
             arr_extras.append(string)
     extras_f = ",".join(arr_extras)
 
-    data = ";".join((responses_f, authorities_f, extras_f))
+    data = ";".join((responses_f, authorities_f, extras_f)) + ";"
 
     # Adiciona as respostas à cache
     all_entries = arr_resp + arr_authorities + arr_extras
@@ -199,5 +199,8 @@ def respond_query(query, confs, dbs, cache):
         cache.add_to_cache(name, type_of_value, e)
 
     ## ENVIAR MENSAGEM DE VOLTA OU RETORNAR A STRING DE RESPOSTA PARA O SERVIDOR TRATAR DO ENVIO
-
+    result = ",".join((str(message_id), flags, str(response_code), str(n_resp), str(n_authorities), str(n_extras)))
+    result += ";" + q_name + "," + q_type + ";"
+    result += data
+    return result
 
