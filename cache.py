@@ -1,5 +1,24 @@
 import time
 
+
+
+class Cache:
+
+    def __init__(self):
+        #w, h = 9, 1024
+        col = 9
+        MAX = 1024
+        self.table = [[0 for x in range(col)] for y in range(MAX)]
+
+
+
+
+table = Cache()
+
+t=0
+
+
+'''
 # sug: lista de strings que sao a resposta e têm ja toda a informaçao necessaria.
 class Cache:
 
@@ -59,4 +78,5 @@ class Cache:
         result = ",".join((str(message_id), "", "0", str(n_resp), str(n_authorities), str(n_extras)))
         result += ";" + name  + "," + type_of_value + ";"
         result += data
-        return result
+        return result'''
+

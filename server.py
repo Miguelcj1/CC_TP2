@@ -42,16 +42,16 @@ def main(conf):
 
     cache = Cache()
 
-    '''
+
     ### TESTE ###
     # constroi uma string no formato da mensagem que vai ser transmitida.
     id = 12
     q = query.init_send_query(id, "Q+A", "example.com.", "MX")
     query.respond_query(q, confs, databases, cache)
 
-    cache.search(id, "example.com.", "MX")
+    #cache.search(id, "example.com.", "MX")
 
-    ### FIM ###'''
+    ### FIM ###
 
 
     endereco = '127.0.0.1'
