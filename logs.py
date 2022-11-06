@@ -51,8 +51,9 @@ class Logs:
 
         for domain in confs.get_domain_names():
             diretoria = confs.get_domain_log_file(domain)
-            check_dir(diretoria)
-            self.log_files[domain] = diretoria
+            if diretoria is not None:
+                check_dir(diretoria)
+                self.log_files[domain] = diretoria
 
     ## talvez juntar estas 4 primeiras funcoes porque fazem o mesmo exceto nas letras do tipo de entrada.
     ## talvez adicionar printf nestes metodos porque vai ser necessario tambem fazer print para o terminal, ou talvez guardar uma flag no objeto para ver se querem que se faça print no terminal.

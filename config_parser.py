@@ -46,7 +46,6 @@ class DomainInfo:
             self.database_path = db_path
             return True
         else:
-            print("ERRO!! False SET_DB") ###
             return False
 
     # Get the domain info database
@@ -71,7 +70,7 @@ class DomainInfo:
         if self.log_file:
             return self.log_file
         else:
-            print("Error: wasnt found a log file for the domain")
+            #print("Error: wasnt found a log file for the domain")
             return None
 
     # Se já houver uma referência de SP para este dominio, retorna falso para indicar uma incoerencia no ficheiro.
@@ -221,7 +220,6 @@ class Configs:
         # Restrição de haver log file para todos os dominios.
         for key in self.domains:
             if self.domains[key].get_log_file is None:
-                #print(f"O domínio {key} não tem log file!!")
                 raise Exception(f"O domínio {key} não tem log file!!")
 
     # Verifica se o server é Principal para um determinado domínio.
@@ -260,7 +258,7 @@ class Configs:
         if self.domains[domain].get_db():
             return self.domains[domain].get_db()
         else:
-            print("!get_db_path não obteve nenhuma referencia a base de dados!")
+            #print("!get_db_path não obteve nenhuma referencia a base de dados!")
             return None
 
     # Retorna o path do ficheiro de log de um determinado dominio.
@@ -268,7 +266,7 @@ class Configs:
         if self.domains[domain].get_log_file():
             return self.domains[domain].get_log_file()
         else:
-            print("!get_db_path não obteve nenhuma referencia a base de dados!")
+            #print("!get_db_path não obteve nenhuma referencia a base de dados!")
             return None
 
     def get_all_log_file(self):

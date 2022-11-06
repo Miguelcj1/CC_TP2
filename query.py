@@ -211,7 +211,13 @@ def respond_query(query, confs, dbs, cache):
         arr = e.split()
         name = arr[0]
         type_of_value = arr[1]
-        cache.add_to_cache(name, type_of_value, e)
+        value = arr[2]
+        ttl = int(arr[3])
+        prio = -1
+        if len(arr) > 4:
+            prio = int(arr[4])
+        # Tenho de acrescentar os logs, pois o update retorna a string para se meter nos logs.
+        cache.update(name, type_of_value, value, ttl, prio=prio, origin = "OTHERS")
 
     if n_resp == 0:
         responde_code = 1 # não foi encontrado nenhum type_value relativo a este dominio.

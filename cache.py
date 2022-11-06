@@ -5,7 +5,7 @@ class Cache:
 
     def __init__(self):
         self.COL = 9 # nº de colunas
-        self.MAX = 5 # nº maximo de entradas
+        self.MAX = 20 # nº maximo de entradas
 
         #init_line = [Name(0), Type(1), Value(2), TTL(3), Prio(4), origin(5), TimeStamp(6), Index(7), STATUS(8)]
         self.table = [[0, 0, 0, 0, 0, 0, 0, y, "FREE"] for y in range(self.MAX)]
@@ -68,6 +68,8 @@ table = Cache()
 table.update("example.com.", "MX", "ns1", 30, origin = "OTHERS")
 index = table.search("example.com.", "MX")
 t=0
+
+
 
 
 '''
