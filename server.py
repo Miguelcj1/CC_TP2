@@ -9,6 +9,41 @@ from db_parser import Database
 import query
 
 
+def secundaryServer(dom, sp):
+    q = query.init_send_query(time.time(), "ZT", dom.get_name(), "SP") #query "normal" para começar a transferencia de zona
+    ss = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    ss.connect(sp)
+
+    ss.send(dom.encode("utf-8")) # envia o dominio
+
+    msg = ss.recv(1024) # espera receber o nº de entradas da base de dados
+    msg.decode("utf-8")
+
+    #verifica se pode receber aquilo tudo (não percebo bem qual será o criterio para isto)
+
+    ss.send(msg.encode("utf-8")) #envia o nº de entradas que quer receber
+
+    # deve receber todas as entradas de base de dados em um determinado tempo
+
+
+def primaryServer(dom, port):
+    ss = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    ss.bind((socket.gethostname(), port))
+    ss.listen()
+
+    while True:
+        clienteSocket, address = ss.accept()
+        msg = ss.recv(1024)
+        msg.decode("utf-8") # recebe o dominio e terá de verificar a validade e se aquele address tem permissao para o fazer
+
+        if address in dom.get_ss() and msg == dom.get_name():
+            ss.send()       # envia o nº de entradas das bases de dados
+
+            msg = ss.recv(1024) # nº de entradas que o SS quer receber
+
+            # deve enviar todas as entradas do ficheiro de base de dados numerados sem comentarios
+
+
 
 def main(conf):
 
