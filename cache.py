@@ -1,20 +1,53 @@
 import time
 
 
-
 class Cache:
 
     def __init__(self):
-        #w, h = 9, 1024
-        col = 9
-        MAX = 1024
-        self.table = [[0 for x in range(col)] for y in range(MAX)]
+        self.COL = 9 # nº de colunas
+        self.MAX = 5 # nº maximo de entradas
+
+        #init_line = [Name(0), Type(1), Value(2), TTL(3), Prio(4), origin(5), TimeStamp(6), Index(7), STATUS(8)]
+        self.table = [[0, 0, 0, 0, 0, 0, 0, y, "FREE"] for y in range(self.MAX)]
 
 
+    def search(self, name, type_of_value, ind=0):
+        res = 0
+        now = time.time()
+        for i in range(ind, self.MAX):
+            line = self.table[i]
+            # Libertação de espaços
+            if line[8] == "VALID" and line[5] == "OTHERS" and now - line[6] > line[3]:
+                self.table[i][8] = "FREE"
+            if line[8] == "VALID" and line[0] == name and line[1] == type_of_value:
+                res = i
+                break
+        return res # retorna o primeiro indice que faz match com (name, type)
+
+    # Retorna True se for feita alguma alteração
+    def update(self, name, type_of_value, value, ttl, prio = -1, origin = "OTHERS"):
+        last_free = 0
+        for i in range(self.MAX):
+            line = self.table[i]
+            if line[8] == "FREE":
+                last_free = i
+            if origin != "OTHERS" and line[8] == "FREE":
+                self.table[i] = [name, type_of_value, value, ttl, prio, origin, time.time(), i, "VALID"]
+                return True
+            elif origin != "OTHERS" and line[0] == name and line[1] == type_of_value and line[2] == value and line[3] == ttl and line[4] == prio and line[8] == "VALID":
+                # se o registo já existir e o campo Origin da entrada existente for igual a FILE ou SP, ignorasse o pedido de registo.
+                return False
+            elif origin == "OTHERS" and line[0] == name and line[1] == type_of_value and line[2] == value and line[3] == ttl and line[4] == prio and line[8] == "VALID":
+                # Atualiza o timestamp do registo que é igual ao que era para ser inserido.
+                self.table[i][6] = time.time()
+                return True
+        self.table[last_free] = [name, type_of_value, value, ttl, prio, origin, time.time(), last_free, "VALID"]
+        return True
 
 
 table = Cache()
-
+table.update("example.com.", "MX", "ns1", 30, origin = "OTHERS")
+index = table.search("example.com.", "MX")
 t=0
 
 
