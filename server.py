@@ -22,8 +22,11 @@ def main(conf):
         confs = Configs(conf)
     except Exception as exc:
         print(str(exc))
-        print("Inicialização do servidor interrompida!")
+        #print("Inicialização do servidor interrompida!")
         return
+
+    sp_domains = confs.get_sp_domains()
+    ss_domains = confs.get_ss_domains()
 
     # Obtenção de um objeto que tem informação sobre a escrita nos ficheiros de log e stdout.
     log = Logs(confs, mode)

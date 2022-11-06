@@ -122,6 +122,8 @@ class Configs:
         self.st_file_path = None
         self.all_log = None
         self.domains = {}
+        #self.sp = [] # nomes do dominios em que o servidor é servidor principal
+        #self.ss = [] # nomes do dominios em que o servidor é servidor secundario
 
         ## Leitura e análise do ficheiro inicial de configuração.
         try:
@@ -138,89 +140,74 @@ class Configs:
                 continue  # does nothing = nop
 
             domain = arr[0]
-            # Talvez acrescentar "." em domain (com a funcao que fiz), nas chaves do dicionário de domains em confs, de maneira a haver uma coerencia nos outros parametros de outras estruturas de dados. ###
-            #domain = add_end_dot(domain)  ### testing
 
             if arr[1] == "DB" and len(arr) == 3:
                 # uso o pop_slash para remover o primeiro "/" de modo a ter a diretoria de maneira correta
                 db_path = pop_slash(arr[2])
                 if self.domains.get(domain) is None:
                     self.domains[domain] = DomainInfo()
-
                 self.domains[domain].set_name(domain)
-
                 if not self.domains[domain].set_db(db_path):
-                    #print(f"Ocorreu mais que uma definição da base de dados do dominio {domain}!")
                     raise Exception(f"Ocorreu mais que uma definição da base de dados do dominio {domain}!")
 
             elif arr[1] == "SP" and len(arr) == 3:
                 sp = arr[2]
                 if self.domains.get(domain) is None:
                     self.domains[domain] = DomainInfo()
+                self.domains[domain].set_name(domain)
                 # talvez pudesse mandar um tuplo (endereço, porta) e caso nao houvesse porta, mandava None no lugar da porta.
                 if not self.domains[domain].set_sp(sp):
-                    #print(f"Ocorreu mais que uma definição do servidor principal do dominio {domain}!")
                     raise Exception(f"Ocorreu mais que uma definição do servidor principal do dominio {domain}!")
 
             elif arr[1] == "SS" and len(arr) == 3:
                 ss = arr[2]
                 if self.domains.get(domain) is None:
                     self.domains[domain] = DomainInfo()
+                self.domains[domain].set_name(domain)
                 self.domains[domain].add_ss(ss)
-
 
             elif arr[1] == "DD" and len(arr) == 3:
                 dd = arr[2]
                 if self.domains.get(domain) is None:
                     self.domains[domain] = DomainInfo()
+                self.domains[domain].set_name(domain)
                 self.domains[domain].add_dd(dd)
 
             elif arr[1] == "ST" and len(arr) == 3:
                 if arr[0] != "root":
                     # mensagem de erro, pois o parametro deve ser igual a "root".
-                    #print("ERRO, o parametro de ST deve ser igual a root!!")
                     raise Exception("ERRO, o parametro de ST deve ser igual a root!!")
                 elif self.st_file_path is None:
                     self.st_file_path = pop_slash(arr[2])
                 else:
                     # mensagem de erro, pois há mais que uma indicação de ST filepaths.
-                    #print("ERRO!! Pois há mais que uma indicação de ST filepaths!")
                     raise Exception("ERRO!! Pois há mais que uma indicação de ST filepaths!")
 
             elif arr[1] == "LG" and len(arr) == 3:
+
                 # uso o pop_slash para remover o primeiro "/" de modo a ter a diretoria de maneira correta
                 log_path = pop_slash(arr[2])
                 if domain == "all":
                     self.all_log = log_path
+
                 # Verfifica se o dominio existe no contexto deste servidor.
                 elif self.domains.get(domain) is None:
-                    #print(f"Error! This server is not responsible for the domain {domain}!")
                     raise Exception(f"Error! This server is not responsible for the domain {domain}!")
-                    #return None
+
                 # Define o log_file do determinado dominio.
                 elif not self.domains[domain].set_log_file(log_path):
-                    #print(f"Ocorreu mais que uma definição do log_file do dominio {domain}!")
                     raise Exception(f"Ocorreu mais que uma definição do log_file do dominio {domain}!")
 
             else:
-                #print(f"Erro! Sintaxe desconhecida na seguinte linha: {line}.")
                 raise Exception(f"Erro! Sintaxe desconhecida na seguinte linha: {line}.")
 
         fp.close()
 
         '''
-        # Acho que não é preciso fazer isto
-        # Define em todos os dominios, o respetivo ficheiro de log, assigned "all". 
-        if self.all_log is not None:
-            for key in self.domains:
-                if self.domains[key].get_log_file() is None:
-                    self.domains[key].set_log_file(self.all_log)
-        '''
-
         # Restrição de haver log file para todos os dominios.
         for key in self.domains:
             if self.domains[key].get_log_file is None:
-                raise Exception(f"O domínio {key} não tem log file!!")
+                raise Exception(f"O domínio {key} não tem log file!!")'''
 
     # Verifica se o server é Principal para um determinado domínio.
     def is_sp(self, domain):
@@ -273,6 +260,7 @@ class Configs:
         return self.all_log
 
     # talvez isto fosse verificar as entradas DD se for um SP ou SS, para ver quais os dominios que pode responder. ### TALVEZ A FUNCAO DE BAIXO INUTILIZE ESTA
+    # obtem os dominios que têm uma entrada DB no ficheiro de configuração.
     def get_domain_names(self):
         ret = []
         for key in self.domains:
@@ -291,3 +279,22 @@ class Configs:
     # Retorna o path do ficheiro dos servidores de topo.
     def get_st_file(self):
         return self.st_file_path
+
+    # Retorna uma lista com os nomes dos dominios que não tem um servidor principal no DomainInfo.
+    def get_sp_domains(self):
+        result = []
+        for value in self.domains.values():
+            if value.get_sp() is None:
+                result.append(value.get_name())
+        return result
+
+    # Retorna uma lista com os nomes dos dominios que tem um servidor principal no DomainInfo.
+    def get_ss_domains(self):
+        result = []
+        for value in self.domains.values():
+            if value.get_sp() is not None:
+                result.append(value.get_name())
+        return result
+
+
+
