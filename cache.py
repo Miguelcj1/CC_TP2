@@ -1,6 +1,12 @@
 import time
 from logs import Logs
 
+def line_to_string(arr):
+    string = f"{arr[0]} {arr[1]} {arr[2]} {arr[3]} "
+    if arr[4] != -1:
+        string += str(arr[4])
+    return string
+
 class Cache:
 
     def __init__(self):
@@ -23,6 +29,63 @@ class Cache:
                 res = i
                 break
         return res # retorna o primeiro indice que faz match com (name, type)
+
+    # Retorna SÓ o campo de dados de resposta ou None, caso nada seja encontrado.
+    def get_answers(self, name, type_of_value):
+        all_values = []
+        n_resp = 0
+        arr_resp = []
+        n_authorities = 0
+        arr_authorities = []
+        n_extras = 0
+        arr_extras = []
+        responses_f = ""
+        authorities_f = ""
+        extras_f = ""
+
+        now = time.time()
+        # Obtencao de response_values
+        for i in range(self.MAX):
+            line = self.table[i]
+            # Libertação de espaços
+            if line[8] == "VALID" and line[5] == "OTHERS" and now - line[6] > line[3]:
+                self.table[i][8] = "FREE"
+            if line[8] == "VALID" and line[0] == name and line[1] == type_of_value:
+                arr_resp.append(line_to_string(line))
+                n_resp +=1
+        # CASO NÃO HAJA RESPOSTAS RETORNA NONE.
+        if n_resp == 0:
+            return None
+        responses_f = ",".join(arr_resp)
+
+        # Obtencao de authority_values
+        for i in range(self.MAX):
+            line = self.table[i]
+            # Libertação de espaços
+            if line[8] == "VALID" and line[5] == "OTHERS" and time.time() - line[6] > line[3]:
+                self.table[i][8] = "FREE"
+            if line[8] == "VALID" and line[0] == name and line[1] == "NS":
+                arr_authorities.append(line_to_string(line))
+                n_authorities += 1
+        authorities_f = ",".join(arr_authorities)
+
+        # init_line = [Name(0), Type(1), Value(2), TTL(3), Prio(4), origin(5), TimeStamp(6), Index(7), STATUS(8)]
+        # Obtencao de extra_values
+        for v in arr_resp + arr_authorities:
+            name = v[2]
+            for i in range(self.MAX):
+                line = self.table[i]
+                # Libertação de espaços ((TALVEZ RETIRAR ESTA VERIFICAÇÃO DE TIMEOUTS))
+                if line[8] == "VALID" and line[5] == "OTHERS" and time.time() - line[6] > line[3]:
+                    self.table[i][8] = "FREE"
+                if line[8] == "VALID" and line[0] == name and line[1] == "A":
+                    arr_extras.append(line_to_string(line))
+                    n_extras += 1
+        extras_f = ",".join(arr_extras)
+
+        data = ";".join((responses_f, authorities_f, extras_f)) + ";"
+
+        return data
 
 
     # Retorna uma string com informação para os logs. Retorna None caso não tenha ocorrido nenhuma alteração.

@@ -7,6 +7,6 @@ from cachetools import cached, TTLCache
 #cache = TTLCache(maxsize=100, ttl=4)
 
 
-cache = [[]]
-cache[1][2] = 2
-print(cache)
+lista = [1,2,3,4,5]
+r=lista.get(2)
+print(r)
