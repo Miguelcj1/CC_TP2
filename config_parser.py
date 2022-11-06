@@ -253,7 +253,7 @@ class Configs:
         return self.all_log
 
     # talvez isto fosse verificar as entradas DD se for um SP ou SS, para ver quais os dominios que pode responder. ### TALVEZ A FUNCAO DE BAIXO INUTILIZE ESTA
-    # obtem os dominios que têm uma entrada DB no ficheiro de configuração.
+    # Obtem todos os dominios mencionados no ficheiro de configuração
     def get_domain_names(self):
         ret = []
         for key in self.domains:
