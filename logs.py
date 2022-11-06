@@ -58,6 +58,8 @@ class Logs:
     ## talvez adicionar printf nestes metodos porque vai ser necessario tambem fazer print para o terminal, ou talvez guardar uma flag no objeto para ver se querem que se faça print no terminal.
     # Escreve no log a ocorrencia da receçao de uma query.
     def qr(self, timestamp, adress, dados, domain = "all"):
+        if self.log_files.get(domain) is None:
+            domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         try:
             fp = open(self.log_files[domain], "a")
         except FileNotFoundError:
@@ -72,6 +74,8 @@ class Logs:
 
     # Escreve no log a ocorrencia do envio de uma query
     def qe(self, timestamp, adress, dados, domain = "all"):
+        if self.log_files.get(domain) is None:
+            domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         try:
             fp = open(self.log_files[domain], "a")
         except FileNotFoundError:
@@ -87,6 +91,8 @@ class Logs:
 
     # Escreve no log a ocorrencia do envio de uma query
     def rp(self, timestamp, adress, dados, domain = "all"):
+        if self.log_files.get(domain) is None:
+            domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         try:
             fp = open(self.log_files[domain], "a")
         except FileNotFoundError:
@@ -102,6 +108,8 @@ class Logs:
 
     # Escreve no log a ocorrencia do envio de uma query
     def rr(self, timestamp, adress, dados, domain = "all"):
+        if self.log_files.get(domain) is None:
+            domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         try:
             fp = open(self.log_files[domain], "a")
         except FileNotFoundError:
@@ -120,6 +128,8 @@ class Logs:
     #papel -> papel do servidor local na transferência (SP ou SS)
     #(OPCIONAL) duracao da transferencia e total de bytes transferidos
     def zt(self, timestamp, end_adress, papel, domain="all"):
+        if self.log_files.get(domain) is None:
+            domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         try:
             fp = open(self.log_files[domain], "a")
         except FileNotFoundError:
@@ -134,6 +144,8 @@ class Logs:
 
     # Reporta um determinado evento.
     def ev(self, timestamp, info, domain = "all"):
+        if self.log_files.get(domain) is None:
+            domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         try:
             fp = open(self.log_files[domain], "a")
         except FileNotFoundError:
@@ -150,6 +162,8 @@ class Logs:
     # (ERRO) Reporta a impossibilidade de descodificar um PDU corretamente.
     #Outras opcionalidades
     def er(self, timestamp, from_adress, domain="all"):
+        if self.log_files.get(domain) is None:
+            domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         try:
             fp = open(self.log_files[domain], "a")
         except FileNotFoundError:
@@ -164,6 +178,8 @@ class Logs:
 
     # (ERRO DE ZONA) Reporta a conclusao incorreta de um processo de transferencia de zona.
     def ez(self, timestamp, end_adress, papel, domain="all"):
+        if self.log_files.get(domain) is None:
+            domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         try:
             fp = open(self.log_files[domain], "a")
         except FileNotFoundError:
@@ -178,6 +194,8 @@ class Logs:
 
     # Reporta um erro do funcionamento interno de um componente.
     def fl(self, timestamp, info, domain="all"):
+        if self.log_files.get(domain) is None:
+            domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         try:
             fp = open(self.log_files[domain], "a")
         except FileNotFoundError:
@@ -192,6 +210,8 @@ class Logs:
 
     # Deteção de um timeout na interaçao com o servidor no endereço indicado.
     def to(self, timestamp, adress, info, domain="all"):
+        if self.log_files.get(domain) is None:
+            domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         try:
             fp = open(self.log_files[domain], "a")
         except FileNotFoundError:
@@ -206,6 +226,8 @@ class Logs:
 
     # (SERVIDOR PAROU) Reporta que a execução do componente foi parado.
     def sp(self, timestamp, info, domain="all"):
+        if self.log_files.get(domain) is None:
+            domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         try:
             fp = open(self.log_files[domain], "a")
         except FileNotFoundError:
@@ -220,6 +242,8 @@ class Logs:
 
     # Reporta o arranque do servidor ((Not sure donde virao os valores do ttl e o mode)). NOT SURE ###
     def st(self, timestamp, port, ttl, mode, domain = "all"):
+        if self.log_files.get(domain) is None:
+            domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         try:
             fp = open(self.log_files[domain], "a")
         except FileNotFoundError:

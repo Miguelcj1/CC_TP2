@@ -1,5 +1,5 @@
 import time
-
+from logs import Logs
 
 class Cache:
 
@@ -12,7 +12,7 @@ class Cache:
 
 
     def search(self, name, type_of_value, ind=0):
-        res = 0
+        res = None
         now = time.time()
         for i in range(ind, self.MAX):
             line = self.table[i]
@@ -24,25 +24,44 @@ class Cache:
                 break
         return res # retorna o primeiro indice que faz match com (name, type)
 
-    # Retorna True se for feita alguma alteração
+
+    # Retorna uma string com informação para os logs. Retorna None caso não tenha ocorrido nenhuma alteração.
     def update(self, name, type_of_value, value, ttl, prio = -1, origin = "OTHERS"):
         last_free = 0
         for i in range(self.MAX):
             line = self.table[i]
+
             if line[8] == "FREE":
                 last_free = i
+
             if origin != "OTHERS" and line[8] == "FREE":
                 self.table[i] = [name, type_of_value, value, ttl, prio, origin, time.time(), i, "VALID"]
-                return True
+                ###log.ev(time.time(), f"Foi criada uma entrada na cache dos seguintes valores: {name} {type_of_value} {value} {ttl} origem:{origin}")
+                return f"Foi criada uma entrada na cache dos seguintes valores: {name} {type_of_value} {value} {ttl} origem:{origin}"
+
             elif origin != "OTHERS" and line[0] == name and line[1] == type_of_value and line[2] == value and line[3] == ttl and line[4] == prio and line[8] == "VALID":
                 # se o registo já existir e o campo Origin da entrada existente for igual a FILE ou SP, ignorasse o pedido de registo.
-                return False
+                return None
+
             elif origin == "OTHERS" and line[0] == name and line[1] == type_of_value and line[2] == value and line[3] == ttl and line[4] == prio and line[8] == "VALID":
                 # Atualiza o timestamp do registo que é igual ao que era para ser inserido.
                 self.table[i][6] = time.time()
-                return True
+                ###log.ev(time.time(), f"Foi atualizada uma entrada na cache dos seguintes valores: {name} {type_of_value} {value} {ttl} origem:{origin}")
+                return f"Foi atualizada uma entrada na cache dos seguintes valores: {name} {type_of_value} {value} {ttl} origem:{origin}"
+
         self.table[last_free] = [name, type_of_value, value, ttl, prio, origin, time.time(), last_free, "VALID"]
-        return True
+        ###log.ev(time.time(), f"Foi criada uma entrada na cache dos seguintes valores: {name} {type_of_value} {value} {ttl} origem:{origin}")
+        return f"Foi criada uma entrada na cache dos seguintes valores: {name} {type_of_value} {value} {ttl} origem:{origin}"
+
+    # atualiza, em todas as entradas da cache com Name igual
+    # ao domínio passado como argumento, o campo Status para FREE. Quando o temporizador
+    # associado à idade da base de dados dum SS relativo a um domínio atinge o valor de SOAEXPIRE,
+    # então o SS deve executar esta função para esse domínio. Esta função é exclusiva dos servidores
+    # do tipo secundário.
+    def free_domain(self, domain):
+        for line in self.table:
+            if line[0] == domain:
+                line[8] = "FREE"
 
 
 table = Cache()
