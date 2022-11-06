@@ -15,13 +15,14 @@ def check_dir(path_arg):
         os.makedirs(joined_str)
         f = open(path_arg, "w")  # cria ficheiro
         f.close()
-        print(f"[DEBUG] Diretoria e ficheiro criado {path_arg}.") ##
+        #print(f"[DEBUG] Diretoria e ficheiro criado {path_arg}.") ##
     elif not exists_file:
         f = open(path_arg, "w")  # cria ficheiro
         f.close()
-        print(f"[DEBUG] Ficheiro criado {path_arg}.")  ##
+        #print(f"[DEBUG] Ficheiro criado {path_arg}.")  ##
     else:
-        print(f"[DEBUG] Diretoria {path_arg} já estava criada.") ##
+        #print(f"[DEBUG] Diretoria {path_arg} já estava criada.") ##
+        pass
 
 
 # Função que retorna a string formatada do tempo atual. Pode receber uma timestamp como argumento, caso contrário, irá ser calculado relativamente ao tempo atual.
@@ -54,6 +55,7 @@ class Logs:
             if diretoria is not None:
                 check_dir(diretoria)
                 self.log_files[domain] = diretoria
+            # else todas as funcoes vão escrever no "all".
 
     ## talvez juntar estas 4 primeiras funcoes porque fazem o mesmo exceto nas letras do tipo de entrada.
     ## talvez adicionar printf nestes metodos porque vai ser necessario tambem fazer print para o terminal, ou talvez guardar uma flag no objeto para ver se querem que se faça print no terminal.

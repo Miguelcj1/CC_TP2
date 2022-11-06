@@ -53,7 +53,6 @@ class DomainInfo:
         if self.database_path:
             return self.database_path
         else:
-            print("Error: wasnt found a database for the domain")
             return None
 
     # Se já houver uma referência de ficheiro de log para este dominio, retorna falso para indicar uma incoerencia no ficheiro.
@@ -62,7 +61,6 @@ class DomainInfo:
             self.log_file = log_path
             return True
         else:
-            print("ERRO!! False SET_LOG_FILE")  ###
             return False
 
     # Get the domain info log_file
@@ -70,7 +68,6 @@ class DomainInfo:
         if self.log_file:
             return self.log_file
         else:
-            #print("Error: wasnt found a log file for the domain")
             return None
 
     # Se já houver uma referência de SP para este dominio, retorna falso para indicar uma incoerencia no ficheiro.
@@ -79,7 +76,6 @@ class DomainInfo:
             self.sp = sp
             return True
         else:
-            print("ERRO!! False SET_SP")  ###
             return False
 
     # Get the domain info SP
@@ -87,7 +83,6 @@ class DomainInfo:
         if self.sp:
             return self.sp
         else:
-            print("Error: wasnt found a SP for the domain")
             return None
 
     # Adiciona à lista de SS's, o argumento passado.
@@ -99,10 +94,9 @@ class DomainInfo:
         if self.ss:
             return self.ss
         else:
-            print("Error: wasnt found a SS for the domain")
             return None
 
-    # Adiciona à lista de SS's, o argumento passado.
+    # Adiciona à lista de DD's, o argumento passado.
     def add_dd(self, dd):
         self.dd.append(dd)
 
@@ -111,7 +105,6 @@ class DomainInfo:
         if self.dd:
             return self.dd
         else:
-            print("Error: wasnt found a DD for the domain")
             return None
 
 

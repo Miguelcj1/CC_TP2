@@ -31,9 +31,11 @@ def main(conf):
     # Obtenção de um objeto que tem informação sobre a escrita nos ficheiros de log e stdout.
     log = Logs(confs, mode)
 
+    ############################# SEPARAÇÃO DO QUE CADA DOMINIO FARÁ #############################
+
     # Obtençao de um objeto database para cada dominio (que tenha uma database) com a informação sobre o dominio.
     databases = {}
-    for name in confs.get_domain_names():
+    for name in sp_domains:
         try:
             db = Database(confs.get_db_path(name))
         except Exception as exc:
@@ -69,7 +71,7 @@ def main(conf):
     s.bind((endereco, porta))
 
     print(f"Estou à escuta no {endereco}:{porta}")
-    print("----------------------")
+    print("--------------------------------")
 
 
     while True:
