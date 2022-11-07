@@ -84,8 +84,6 @@ def main(conf):
         databases[auxs.add_end_dot(name)] = db # adiciona o ponto final, para coerencia na busca de informaçao para queries.
 
 
-
-
     ### TESTE ###
     # constroi uma string no formato da mensagem que vai ser transmitida.
     id = 12
@@ -99,7 +97,6 @@ def main(conf):
 
     endereco = '127.0.0.1'
     porta = 3334
-
 
 
 
