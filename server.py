@@ -88,6 +88,7 @@ def main(conf):
 
     ### TESTE ###
     # constroi uma string no formato da mensagem que vai ser transmitida.
+    cache = Cache()
     id = 12
     q = query.init_send_query(id, "Q+A", "example.com.", "MX")
     res = query.respond_query(q, confs, databases, cache, log)
@@ -116,7 +117,7 @@ def main(conf):
         log.qr(time.time(), add, msg) # escrita do evento QR no log
         #print(f"Recebi uma mensagem do cliente {add}")
         #print("----------------------")
-        answer = query.respond_query(msg, confs, databases, cache)
+        answer = query.respond_query(msg, confs, databases, cache, log)
 
         s.sendto(answer.encode('utf-8'), add)
 

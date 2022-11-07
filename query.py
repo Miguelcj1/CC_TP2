@@ -53,11 +53,6 @@ def respond_query(query, confs, dbs, cache, log):
         for r in resp_fields:
             responses.append(r)
 
-    '''
-    # Verificação em CACHE ### RETORNA A RESPOSTA COMPLETA CASO SEJA ENCONTRADO ALGO NA CACHE NAO VERIFICANDO A BASE DE DADOS. ###
-    result = cache.search(message_id, q_name, q_type)
-    if result is not None:
-        return result'''
 
     # Verifica se deve responder a queries deste dominio, relativamente aos DD's.
     respondable_domains = confs.get_all_dd()
@@ -69,8 +64,12 @@ def respond_query(query, confs, dbs, cache, log):
         return result
 
     # Procura em cache
+    result = cache.get_answers(message_id, q_name, q_type)
+    if result is not None:
+        result = message_id + result
+        return result
 
-    # Procura e obtenção de respostas
+    # Procura e obtenção de respostas na base de dados.
     db = dbs.get(q_name)
     if db is None:
         # O VALOR NAO FOI ENCONTRADO NA BASE DE DADOS E PROSSEGUIR COM O RESPETIVO PROCEDIMENTO.

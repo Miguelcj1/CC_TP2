@@ -30,8 +30,8 @@ class Cache:
                 break
         return res # retorna o primeiro indice que faz match com (name, type)
 
-    # Retorna SÓ o campo de dados de resposta da query ou None, caso nada seja encontrado.
-    def get_answers(self, name, type_of_value):
+    # Retorna a resposta ou None, caso nada seja encontrado.
+    def get_answers(self, id, name, type_of_value):
         all_values = []
         n_resp = 0
         arr_resp = []
@@ -53,6 +53,7 @@ class Cache:
             if line[8] == "VALID" and line[0] == name and line[1] == type_of_value:
                 arr_resp.append(line_to_string(line))
                 n_resp +=1
+                all_values.append(line[2])
         # CASO NÃO HAJA RESPOSTAS RETORNA NONE.
         if n_resp == 0:
             return None
@@ -67,25 +68,24 @@ class Cache:
             if line[8] == "VALID" and line[0] == name and line[1] == "NS":
                 arr_authorities.append(line_to_string(line))
                 n_authorities += 1
+                all_values.append(line[2])
         authorities_f = ",".join(arr_authorities)
 
         # init_line = [Name(0), Type(1), Value(2), TTL(3), Prio(4), origin(5), TimeStamp(6), Index(7), STATUS(8)]
         # Obtencao de extra_values
-        for v in arr_resp + arr_authorities:
-            name = v[2]
-            for i in range(self.MAX):
-                line = self.table[i]
-                # Libertação de espaços ((TALVEZ RETIRAR ESTA VERIFICAÇÃO DE TIMEOUTS))
-                if line[8] == "VALID" and line[5] == "OTHERS" and time.time() - line[6] > line[3]:
-                    self.table[i][8] = "FREE"
-                if line[8] == "VALID" and line[0] == name and line[1] == "A":
-                    arr_extras.append(line_to_string(line))
-                    n_extras += 1
+        for i in range(self.MAX):
+            line = self.table[i]
+            # Libertação de espaços ((TALVEZ RETIRAR ESTA VERIFICAÇÃO DE TIMEOUTS))
+            if line[8] == "VALID" and line[5] == "OTHERS" and time.time() - line[6] > line[3]:
+                self.table[i][8] = "FREE"
+            if line[8] == "VALID" and line[0] in all_values and line[1] == "A":
+                arr_extras.append(line_to_string(line))
+                n_extras += 1
         extras_f = ",".join(arr_extras)
 
+        string = f"{id}, ,0,{n_resp},{n_authorities},{n_extras};{name},{type_of_value};"
         data = ";".join((responses_f, authorities_f, extras_f)) + ";"
-
-        return data
+        return string + data
 
 
     # Atualiza a cache com os respetivos valores.
@@ -119,6 +119,7 @@ class Cache:
         now = time.time()
         self.table[last_free] = [name, type_of_value, value, ttl, prio, origin, now, last_free, "VALID"]
         log.ev(now, f"Foi criada uma entrada na cache dos seguintes valores: {name} {type_of_value} {value} {ttl} origem:{origin}", name)
+
 
     # Faz o mesmo que a função anterior (UPDATE) mas faz recebe como argumento uma linha do género do ficheiro de base de dados.
     def update_with_line(self, log, line, origin):

@@ -106,7 +106,8 @@ class Database:
             self.SOASP[dom] = (name, ttl)
 
         elif arr[1] == "SOAADMIN":
-            self.SOAADMIN[dom] = (email_translator(arr[2]), ttl)  # faço a tal traduçao de email.
+            #self.SOAADMIN[dom] = (email_translator(name), ttl)  # faço a tal traduçao de email.
+            self.SOAADMIN[dom] = (name, ttl)
 
         elif arr[1] == "SOASERIAL":
             self.SOASERIAL[dom] = (name, ttl)
