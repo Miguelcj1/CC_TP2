@@ -30,7 +30,7 @@ class Cache:
                 break
         return res # retorna o primeiro indice que faz match com (name, type)
 
-    # Retorna SÓ o campo de dados de resposta ou None, caso nada seja encontrado.
+    # Retorna SÓ o campo de dados de resposta da query ou None, caso nada seja encontrado.
     def get_answers(self, name, type_of_value):
         all_values = []
         n_resp = 0
@@ -90,23 +90,27 @@ class Cache:
 
     # Retorna uma string com informação para os logs. Retorna None caso não tenha ocorrido nenhuma alteração.
     def update(self, name, type_of_value, value, ttl, prio = -1, origin = "OTHERS"):
-        last_free = 0
+        if type_of_value is "DEFAULT":
+            return
+
+        last_free = None
+        i = 0
         for i in range(self.MAX):
             line = self.table[i]
 
             if line[8] == "FREE":
                 last_free = i
 
+            if origin != "OTHERS" and line[0] == name and line[1] == type_of_value and line[2] == value and line[3] == ttl and line[4] == prio and line[8] == "VALID":
+                # se o registo já existir e o campo Origin da entrada existente for igual a FILE ou SP, ignorasse o pedido de registo.
+                return None
+
             if origin != "OTHERS" and line[8] == "FREE":
                 self.table[i] = [name, type_of_value, value, ttl, prio, origin, time.time(), i, "VALID"]
                 ###log.ev(time.time(), f"Foi criada uma entrada na cache dos seguintes valores: {name} {type_of_value} {value} {ttl} origem:{origin}")
                 return f"Foi criada uma entrada na cache dos seguintes valores: {name} {type_of_value} {value} {ttl} origem:{origin}"
 
-            elif origin != "OTHERS" and line[0] == name and line[1] == type_of_value and line[2] == value and line[3] == ttl and line[4] == prio and line[8] == "VALID":
-                # se o registo já existir e o campo Origin da entrada existente for igual a FILE ou SP, ignorasse o pedido de registo.
-                return None
-
-            elif origin == "OTHERS" and line[0] == name and line[1] == type_of_value and line[2] == value and line[3] == ttl and line[4] == prio and line[8] == "VALID":
+            elif line[8] == "VALID" and origin == "OTHERS" and line[0] == name and line[1] == type_of_value and line[2] == value and line[3] == ttl and line[4] == prio:
                 # Atualiza o timestamp do registo que é igual ao que era para ser inserido.
                 self.table[i][6] = time.time()
                 ###log.ev(time.time(), f"Foi atualizada uma entrada na cache dos seguintes valores: {name} {type_of_value} {value} {ttl} origem:{origin}")
@@ -115,6 +119,22 @@ class Cache:
         self.table[last_free] = [name, type_of_value, value, ttl, prio, origin, time.time(), last_free, "VALID"]
         ###log.ev(time.time(), f"Foi criada uma entrada na cache dos seguintes valores: {name} {type_of_value} {value} {ttl} origem:{origin}")
         return f"Foi criada uma entrada na cache dos seguintes valores: {name} {type_of_value} {value} {ttl} origem:{origin}"
+
+    # Faz o mesmo que a função anterior (UPDATE) mas faz recebe como argumento uma linha do género do ficheiro de base de dados.
+    def update_with_line(self, line, origin):
+        # Verifica se a linha está vazia ou começa por '#'.
+        if not line.strip() or line.startswith("#"):
+            return
+
+        arr = line.split()
+        name = arr[0]
+        type_of_value = arr[1]
+        value = arr[2]
+        ttl = int(arr[3])
+        prio = -1
+        if len(arr) > 4:
+            prio = int(arr[4])
+        self.update(name, type_of_value, value, ttl, prio, origin)
 
     # atualiza, em todas as entradas da cache com Name igual
     # ao domínio passado como argumento, o campo Status para FREE. Quando o temporizador
@@ -127,10 +147,12 @@ class Cache:
                 line[8] = "FREE"
 
 
+'''
 table = Cache()
 table.update("example.com.", "MX", "ns1", 30, origin = "OTHERS")
 index = table.search("example.com.", "MX")
 t=0
+'''
 
 
 

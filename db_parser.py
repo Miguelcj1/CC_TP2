@@ -24,7 +24,7 @@ def add_default(name, default):
 class Database:
 
     # Define as diversas variavéis analisadas no ficheiro de base de dados.
-    def __init__(self, db_file):
+    def __init__(self, db_file, cache, origin):
         self.DEFAULT = {} # simbolo: valor
         self.SOASP = {} # dominio: nome completo do SP do dominio
         self.SOAADMIN = {} # dominio: endereço de email do admin do dominio
@@ -45,97 +45,110 @@ class Database:
             raise Exception(f"Database file {db_file} not found!")
 
         for line in fp:
-            arr = line.split()
+            try:
+                self.add_parsed_line(line, cache, origin)
+            except Exception as exc:
+                raise Exception(str(exc))
 
-            # Verifica se a linha está vazia ou começa por '#'.
-            if not line.strip() or line.startswith("#"):
-                continue  # skips this iteration
 
-            # Verifica se é usado algum símbolo definido em DEFAULT.
-            dom = self.DEFAULT.get(arr[0])
-            if dom is None:
-                dom = arr[0]
-            name = self.DEFAULT.get(arr[2])
-            if name is None:
-                name = arr[2]
+    # Parses an individual line of a DB File for the database and also caches it.
+    def add_parsed_line(self, line, cache, origin):
+        arr = line.split()
 
-            # Verificação da terminação com "." dos nomes completos de e-mail, domínios, servidores e hosts.
-            #if arr[1] not in ("DEFAULT", "A", "SOASERIAL", "SOAREFRESH", "SOARETRY", "SOAEXPIRE"):
-            if arr[1] != "DEFAULT" and not auxs.ends_with_dot(dom):
-                try:
-                    dom = add_default(dom, self.DEFAULT.get("@"))
-                except Exception as exc:
-                    raise Exception(str(exc))
-            if arr[1] not in ("DEFAULT", "A", "SOASERIAL", "SOAREFRESH", "SOARETRY", "SOAEXPIRE") and not auxs.ends_with_dot(name):
-                try:
-                    name = add_default(name, self.DEFAULT.get("@"))
-                except Exception as exc:
-                    raise Exception(str(exc))
+        # Verifica se a linha está vazia ou começa por '#'.
+        if not line.strip() or line.startswith("#"):
+            return
 
-            if len(arr) > 3:
-                ttl = self.DEFAULT.get(arr[3])
-                if ttl is None:
-                    ttl = arr[3]
-                ttl = int (ttl)
+        # Verifica se é usado algum símbolo definido em DEFAULT.
+        dom = self.DEFAULT.get(arr[0])
+        if dom is None:
+            dom = arr[0]
+        name = self.DEFAULT.get(arr[2])
+        if name is None:
+            name = arr[2]
+
+        # Verificação da terminação com "." dos nomes completos de e-mail, domínios, servidores e hosts.
+        # if arr[1] not in ("DEFAULT", "A", "SOASERIAL", "SOAREFRESH", "SOARETRY", "SOAEXPIRE"):
+        if arr[1] != "DEFAULT" and not auxs.ends_with_dot(dom):
+            try:
+                dom = add_default(dom, self.DEFAULT.get("@"))
+            except Exception as exc:
+                raise Exception(str(exc))
+        if arr[1] not in ("DEFAULT", "A", "SOASERIAL", "SOAREFRESH", "SOARETRY", "SOAEXPIRE") and not auxs.ends_with_dot(name):
+            try:
+                name = add_default(name, self.DEFAULT.get("@"))
+            except Exception as exc:
+                raise Exception(str(exc))
+
+        if len(arr) > 3:
+            ttl = self.DEFAULT.get(arr[3])
+            if ttl is None:
+                ttl = arr[3]
+            ttl = int(ttl)
+        else:
+            ttl = 0  # Quote: "Quando o TTL não é suportado num determinado tipo, o seu valor deve ser igual a zero."
+
+        prio = -1  # para caso n seja indicada prioridade.
+        if len(arr) == 5:
+            prio = self.DEFAULT.get(arr[4])
+            if prio is None:
+                prio = arr[4]
+            prio = int(prio)
+
+
+        # Adição dos valores à base de dados.
+        if arr[1] == "DEFAULT":  ### talvez devesse percorrer o ficheiro, primeiro por DEFAULTs e depois é que percorria tudo o resto, para valores default que estejam depois de uma utilização serem validos.
+            if self.DEFAULT.get(dom):
+                raise Exception(f"DEFAULT VALUE {dom} ALREADY SET!")
+            self.DEFAULT[dom] = name
+
+        elif arr[1] == "SOASP":
+            self.SOASP[dom] = (name, ttl)
+
+        elif arr[1] == "SOAADMIN":
+            self.SOAADMIN[dom] = (email_translator(arr[2]), ttl)  # faço a tal traduçao de email.
+
+        elif arr[1] == "SOASERIAL":
+            self.SOASERIAL[dom] = (name, ttl)
+
+        elif arr[1] == "SOAREFRESH":
+            self.SOAREFRESH[dom] = (name, ttl)
+
+        elif arr[1] == "SOARETRY":
+            self.SOARETRY[dom] = (name, ttl)
+
+        elif arr[1] == "SOAEXPIRE":
+            self.SOAEXPIRE[dom] = (name, ttl)
+
+        elif arr[1] == "NS" and len(arr) > 3:  # talvez deva adicionar length restrictions.
+            if not self.NS.get(dom):
+                self.NS[dom] = []
+            self.NS[dom].append((name, ttl, prio))
+
+        elif arr[1] == "A":
+            if not self.A.get(dom):
+                self.A[dom] = []
+            self.A[dom].append((name, ttl, prio))
+
+        elif arr[1] == "CNAME":
+            if not self.CNAME.get(dom):
+                self.CNAME[dom] = (name, ttl)
             else:
-                ttl = 0 # Quote: "Quando o TTL não é suportado num determinado tipo, o seu valor deve ser igual a zero."
+                raise Exception(f"Valor canónico {name} usado mais que uma vez!")
 
-            prio = -1  # para caso n seja indicada prioridade.
-            if len(arr) == 5:
-                prio = self.DEFAULT.get(arr[4])
-                if prio is None:
-                    prio = arr[4]
-                prio = int(prio)
+        elif arr[1] == "MX":
+            if not self.MX.get(dom):
+                self.MX[dom] = []
+            self.MX[dom].append((name, ttl, prio))
 
+        elif arr[1] == "PTR":
+            if not self.PTR.get(dom):
+                self.PTR[dom] = []
+            self.PTR[dom].append((name, ttl))
 
-            if arr[1] == "DEFAULT": ### talvez devesse percorrer o ficheiro, primeiro por DEFAULTs e depois é que percorria tudo o resto, para valores default que estejam depois de uma utilização serem validos.
-                if self.DEFAULT.get(dom):
-                    raise Exception(f"DEFAULT VALUE {dom} ALREADY SET!")
-                self.DEFAULT[dom] = name
+        # Adição dos valores na cache.
+        cache.update(dom, arr[1], name, ttl, prio, origin)
 
-            elif arr[1] == "SOASP":
-                self.SOASP[dom] = (name, ttl)
-
-            elif arr[1] == "SOAADMIN":
-                self.SOAADMIN[dom] = (email_translator(arr[2]), ttl) # faço a tal traduçao de email.
-
-            elif arr[1] == "SOASERIAL":
-                self.SOASERIAL[dom] = (name, ttl)
-
-            elif arr[1] == "SOAREFRESH":
-                self.SOAREFRESH[dom] = (name, ttl)
-
-            elif arr[1] == "SOARETRY":
-                self.SOARETRY[dom] = (name, ttl)
-
-            elif arr[1] == "SOAEXPIRE":
-                self.SOAEXPIRE[dom] = (name, ttl)
-
-            elif arr[1] == "NS" and len(arr) > 3: # talvez deva adicionar length restrictions.
-                if not self.NS.get(dom):
-                    self.NS[dom] = []
-                self.NS[dom].append((name, ttl, prio))
-
-            elif arr[1] == "A":
-                if not self.A.get(dom):
-                    self.A[dom] = []
-                self.A[dom].append((name, ttl, prio))
-
-            elif arr[1] == "CNAME":
-                if not self.CNAME.get(dom):
-                    self.CNAME[dom] = (name, ttl)
-                else:
-                    raise Exception(f"Valor canónico {name} usado mais que uma vez!")
-
-            elif arr[1] == "MX":
-                if not self.MX.get(dom):
-                    self.MX[dom] = []
-                self.MX[dom].append((name, ttl, prio))
-
-            elif arr[1] == "PTR":
-                if not self.PTR.get(dom):
-                    self.PTR[dom] = []
-                self.PTR[dom].append((name, ttl))
 
     def get_DEFAULT(self):
         return self.DEFAULT

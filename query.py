@@ -9,8 +9,9 @@ def pop_end_dot(string):
         return string[:-1]
     return string
 
-def init_send_query(id, flag, dom, type):
-    string = ",".join((str(id), flag)) + ",0,0,0,0;" + ",".join((dom, type)) + ";"
+# Talvez passar a escolha do ID para dentro desta função.
+def init_send_query(id, flag, dom, tipo):
+    string = f"{id},{flag},0,0,0,0;{dom},{tipo};"
     return string
 
 # raises exception in which is caused by a problem in decoding the received string (ER ou FL)

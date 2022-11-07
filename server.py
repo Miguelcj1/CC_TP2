@@ -66,21 +66,24 @@ def main(conf):
     # Obtenção de um objeto que tem informação sobre a escrita nos ficheiros de log e stdout.
     log = Logs(confs, mode)
 
-    ############################# SEPARAÇÃO DO QUE CADA DOMINIO FARÁ #############################
+    porta = 3334
+    # Reportar no log o arranque do servidor.
+    log.st(ts_arranque, porta, ttl, mode)
+
+    cache = Cache()
 
     # Obtençao de um objeto database para cada dominio (que tenha uma database) com a informação sobre o dominio.
     databases = {}
     for name in sp_domains:
         try:
-            db = Database(confs.get_db_path(name))
+            db = Database(confs.get_db_path(name), cache, "SP")
         except Exception as exc:
-            #print (str(exc))
             log.fl(time.time(), str(exc), name)
             log.sp(time.time(), str(exc))
             return
         databases[auxs.add_end_dot(name)] = db # adiciona o ponto final, para coerencia na busca de informaçao para queries.
 
-    cache = Cache()
+
 
 
     ### TESTE ###
@@ -97,8 +100,7 @@ def main(conf):
     endereco = '127.0.0.1'
     porta = 3334
 
-    # Reportar no log o arranque do servidor.
-    log.st(ts_arranque, porta, ttl, mode)
+
 
 
     # Abertura do socket.
