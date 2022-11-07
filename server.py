@@ -75,12 +75,12 @@ def main(conf):
     # Obtençao de um objeto database para cada dominio (que tenha uma database) com a informação sobre o dominio.
     databases = {}
     for name in sp_domains:
-        try:
-            db = Database(confs.get_db_path(name), cache, "SP")
-        except Exception as exc:
-            log.fl(time.time(), str(exc), name)
-            log.sp(time.time(), str(exc))
-            return
+        #try:
+        db = Database(confs.get_db_path(name), cache, "SP")
+        #except Exception as exc:
+            #log.fl(time.time(), str(exc), name)
+            #log.sp(time.time(), str(exc))
+            #return
         databases[auxs.add_end_dot(name)] = db # adiciona o ponto final, para coerencia na busca de informaçao para queries.
 
 

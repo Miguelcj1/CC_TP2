@@ -23,7 +23,7 @@ def add_default(name, default):
 
 class Database:
 
-    # Define as diversas variavéis analisadas no ficheiro de base de dados.
+    # Define as diversas variavéis analisadas no ficheiro de base de dados. Também adiciona automaticamente na cache os valores lidos.
     def __init__(self, db_file, cache, origin):
         self.DEFAULT = {} # simbolo: valor
         self.SOASP = {} # dominio: nome completo do SP do dominio
@@ -46,13 +46,13 @@ class Database:
 
         for line in fp:
             try:
-                self.add_parsed_line(line, cache, origin)
+                self.add_db_line(line, cache, origin)
             except Exception as exc:
                 raise Exception(str(exc))
 
 
     # Parses an individual line of a DB File for the database and also caches it.
-    def add_parsed_line(self, line, cache, origin):
+    def add_db_line(self, line, cache, origin):
         arr = line.split()
 
         # Verifica se a linha está vazia ou começa por '#'.
@@ -67,28 +67,27 @@ class Database:
         if name is None:
             name = arr[2]
 
-        # Verificação da terminação com "." dos nomes completos de e-mail, domínios, servidores e hosts.
-        # if arr[1] not in ("DEFAULT", "A", "SOASERIAL", "SOAREFRESH", "SOARETRY", "SOAEXPIRE"):
+        # Verificação da terminação com "." dos nomes completos dos dominios.
         if arr[1] != "DEFAULT" and not auxs.ends_with_dot(dom):
             try:
                 dom = add_default(dom, self.DEFAULT.get("@"))
             except Exception as exc:
                 raise Exception(str(exc))
+        # Verificação da terminação com "." dos nomes completos de e-mail, servidores e hosts (Values).
         if arr[1] not in ("DEFAULT", "A", "SOASERIAL", "SOAREFRESH", "SOARETRY", "SOAEXPIRE") and not auxs.ends_with_dot(name):
             try:
                 name = add_default(name, self.DEFAULT.get("@"))
             except Exception as exc:
                 raise Exception(str(exc))
 
+        ttl = 0  # Quote: "Quando o TTL não é suportado num determinado tipo, o seu valor deve ser igual a zero."
         if len(arr) > 3:
             ttl = self.DEFAULT.get(arr[3])
             if ttl is None:
                 ttl = arr[3]
             ttl = int(ttl)
-        else:
-            ttl = 0  # Quote: "Quando o TTL não é suportado num determinado tipo, o seu valor deve ser igual a zero."
 
-        prio = -1  # para caso n seja indicada prioridade.
+        prio = -1  # para caso não seja indicada prioridade.
         if len(arr) == 5:
             prio = self.DEFAULT.get(arr[4])
             if prio is None:
@@ -147,7 +146,8 @@ class Database:
             self.PTR[dom].append((name, ttl))
 
         # Adição dos valores na cache.
-        cache.update(dom, arr[1], name, ttl, prio, origin)
+        if arr[1] != "DEFAULT": # SE O TYPE_OF_VALUE == DEFAULT, N É COLOCADA NA CACHE ### NOT SURE ###
+            cache.update(dom, arr[1], name, ttl, prio, origin)
 
 
     def get_DEFAULT(self):

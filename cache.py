@@ -11,7 +11,7 @@ class Cache:
 
     def __init__(self):
         self.COL = 9 # nº de colunas
-        self.MAX = 20 # nº maximo de entradas
+        self.MAX = 50 # nº maximo de entradas
 
         #init_line = [Name(0), Type(1), Value(2), TTL(3), Prio(4), origin(5), TimeStamp(6), Index(7), STATUS(8)]
         self.table = [[0, 0, 0, 0, 0, 0, 0, y, "FREE"] for y in range(self.MAX)]
@@ -90,10 +90,8 @@ class Cache:
 
     # Retorna uma string com informação para os logs. Retorna None caso não tenha ocorrido nenhuma alteração.
     def update(self, name, type_of_value, value, ttl, prio = -1, origin = "OTHERS"):
-        if type_of_value is "DEFAULT":
-            return
 
-        last_free = None
+        last_free = 0
         i = 0
         for i in range(self.MAX):
             line = self.table[i]
