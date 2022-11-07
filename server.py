@@ -90,7 +90,7 @@ def main(conf):
     # constroi uma string no formato da mensagem que vai ser transmitida.
     id = 12
     q = query.init_send_query(id, "Q+A", "example.com.", "MX")
-    query.respond_query(q, confs, databases, cache, log)
+    res = query.respond_query(q, confs, databases, cache, log)
 
     #cache.search(id, "example.com.", "MX")
 

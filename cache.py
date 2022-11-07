@@ -107,12 +107,14 @@ class Cache:
                 now = time.time()
                 self.table[i] = [name, type_of_value, value, ttl, prio, origin, now, i, "VALID"]
                 log.ev(now, f"Foi criada uma entrada na cache dos seguintes valores: {name} {type_of_value} {value} {ttl} origem:{origin}", name)
+                return
 
             elif line[8] == "VALID" and origin == "OTHERS" and line[0] == name and line[1] == type_of_value and line[2] == value and line[3] == ttl and line[4] == prio:
                 # Atualiza o timestamp do registo que é igual ao que era para ser inserido.
                 now = time.time()
                 self.table[i][6] = now
                 log.ev(now, f"Foi atualizada uma entrada na cache dos seguintes valores: {name} {type_of_value} {value} {ttl} origem:{origin}", name)
+                return
 
         now = time.time()
         self.table[last_free] = [name, type_of_value, value, ttl, prio, origin, now, last_free, "VALID"]

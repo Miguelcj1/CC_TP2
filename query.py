@@ -59,7 +59,7 @@ def respond_query(query, confs, dbs, cache, log):
     if result is not None:
         return result'''
 
-    # Verifica se deve responder a queries deste dominio.
+    # Verifica se deve responder a queries deste dominio, relativamente aos DD's.
     respondable_domains = confs.get_all_dd()
     respondable_domains = map(auxs.add_end_dot, respondable_domains) # acrescenta o ponto final para haver coerencia nos nomes.
     if q_name not in respondable_domains:
@@ -67,6 +67,8 @@ def respond_query(query, confs, dbs, cache, log):
         result = ",".join((str(message_id), "A", "2", "0", "0", "0"))
         result += ";" + q_name + "," + q_type + ";" + ";" # campo de dados vai vazio
         return result
+
+    # Procura em cache
 
     # Procura e obtenção de respostas
     db = dbs.get(q_name)
