@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 from datetime import datetime
 from config_parser import Configs
@@ -73,7 +74,8 @@ class Logs:
         fp.close()
         # Se for para imprimir no stdout também.
         if self.stdout:
-            print(string)
+            #print(string)
+            sys.stdout.write(string)
 
     # Escreve no log a ocorrencia do envio de uma query
     def qe(self, timestamp, adress, dados, domain = "all"):
@@ -90,7 +92,8 @@ class Logs:
         fp.close()
         # Se for para imprimir no stdout também.
         if self.stdout:
-            print(string)
+            # print(string)
+            sys.stdout.write(string)
 
     # Escreve no log a ocorrencia do envio de uma query
     def rp(self, timestamp, adress, dados, domain = "all"):
@@ -107,7 +110,8 @@ class Logs:
         fp.close()
         # Se for para imprimir no stdout também.
         if self.stdout:
-            print(string)
+            # print(string)
+            sys.stdout.write(string)
 
     # Escreve no log a ocorrencia do envio de uma query
     def rr(self, timestamp, adress, dados, domain = "all"):
@@ -124,7 +128,8 @@ class Logs:
         fp.close()
         # Se for para imprimir no stdout também.
         if self.stdout:
-            print(string)
+            # print(string)
+            sys.stdout.write(string)
 
     # Reporta a conclusao correta de um processo de transferencia de zona.
     #end_adress -> o servidor na outra ponta da transferência
@@ -143,10 +148,13 @@ class Logs:
         fp.close()
         # Se for para imprimir no stdout também.
         if self.stdout:
-            print(string)
+            # print(string)
+            sys.stdout.write(string)
 
     # Reporta um determinado evento.
     def ev(self, timestamp, info, domain = "all"):
+        if info is None:
+            return
         if self.log_files.get(domain) is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         try:
@@ -160,7 +168,8 @@ class Logs:
         fp.close()
         # Se for para imprimir no stdout também.
         if self.stdout:
-            print(string)
+            # print(string)
+            sys.stdout.write(string)
 
     # (ERRO) Reporta a impossibilidade de descodificar um PDU corretamente.
     #Outras opcionalidades
@@ -177,7 +186,8 @@ class Logs:
         fp.close()
         # Se for para imprimir no stdout também.
         if self.stdout:
-            print(string)
+            # print(string)
+            sys.stdout.write(string)
 
     # (ERRO DE ZONA) Reporta a conclusao incorreta de um processo de transferencia de zona.
     def ez(self, timestamp, end_adress, papel, domain="all"):
@@ -193,7 +203,8 @@ class Logs:
         fp.close()
         # Se for para imprimir no stdout também.
         if self.stdout:
-            print(string)
+            # print(string)
+            sys.stdout.write(string)
 
     # Reporta um erro do funcionamento interno de um componente.
     def fl(self, timestamp, info, domain="all"):
@@ -209,7 +220,8 @@ class Logs:
         fp.close()
         # Se for para imprimir no stdout também.
         if self.stdout:
-            print(string)
+            # print(string)
+            sys.stdout.write(string)
 
     # Deteção de um timeout na interaçao com o servidor no endereço indicado.
     def to(self, timestamp, adress, info, domain="all"):
@@ -225,7 +237,8 @@ class Logs:
         fp.close()
         # Se for para imprimir no stdout também.
         if self.stdout:
-            print(string)
+            # print(string)
+            sys.stdout.write(string)
 
     # (SERVIDOR PAROU) Reporta que a execução do componente foi parado.
     def sp(self, timestamp, info, domain="all"):
@@ -241,7 +254,8 @@ class Logs:
         fp.close()
         # Se for para imprimir no stdout também.
         if self.stdout:
-            print(string)
+            # print(string)
+            sys.stdout.write(string)
 
     # Reporta o arranque do servidor ((Not sure donde virao os valores do ttl e o mode)). NOT SURE ###
     def st(self, timestamp, port, ttl, mode, domain = "all"):
@@ -257,5 +271,6 @@ class Logs:
         fp.close()
         # Se for para imprimir no stdout também.
         if self.stdout:
-            print(string)
+            # print(string)
+            sys.stdout.write(string)
 

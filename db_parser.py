@@ -1,4 +1,5 @@
 import os
+import time
 import auxs
 
 # Nem sei se vai ser util.
@@ -24,7 +25,7 @@ def add_default(name, default):
 class Database:
 
     # Define as diversas variavéis analisadas no ficheiro de base de dados. Também adiciona automaticamente na cache os valores lidos.
-    def __init__(self, db_file, cache, origin):
+    def __init__(self, db_file, cache, origin, log):
         self.DEFAULT = {} # simbolo: valor
         self.SOASP = {} # dominio: nome completo do SP do dominio
         self.SOAADMIN = {} # dominio: endereço de email do admin do dominio
@@ -46,13 +47,13 @@ class Database:
 
         for line in fp:
             try:
-                self.add_db_line(line, cache, origin)
+                self.add_db_line(line, cache, origin, log)
             except Exception as exc:
                 raise Exception(str(exc))
 
 
     # Parses an individual line of a DB File for the database and also caches it.
-    def add_db_line(self, line, cache, origin):
+    def add_db_line(self, line, cache, origin, log):
         arr = line.split()
 
         # Verifica se a linha está vazia ou começa por '#'.
@@ -147,7 +148,8 @@ class Database:
 
         # Adição dos valores na cache.
         if arr[1] != "DEFAULT": # SE O TYPE_OF_VALUE == DEFAULT, N É COLOCADA NA CACHE ### NOT SURE ###
-            cache.update(dom, arr[1], name, ttl, prio, origin)
+            cache.update(log, dom, arr[1], name, ttl, prio=prio, origin=origin)
+
 
 
     def get_DEFAULT(self):

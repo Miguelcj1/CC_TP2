@@ -15,7 +15,7 @@ def init_send_query(id, flag, dom, tipo):
     return string
 
 # raises exception in which is caused by a problem in decoding the received string (ER ou FL)
-def respond_query(query, confs, dbs, cache):
+def respond_query(query, confs, dbs, cache, log):
 
     arr = query.split(";")
     if len(arr) < 3:
@@ -217,8 +217,8 @@ def respond_query(query, confs, dbs, cache):
         prio = -1
         if len(arr) > 4:
             prio = int(arr[4])
-        # Tenho de acrescentar os logs, pois o update retorna a string para se meter nos logs.
-        cache.update(name, type_of_value, value, ttl, prio=prio, origin = "OTHERS")
+        # Informação relativa ao caching para ser denotado nos logs.
+        cache.update(log, name, type_of_value, value, ttl, prio=prio, origin="OTHERS", )
 
     if n_resp == 0:
         responde_code = 1 # não foi encontrado nenhum type_value relativo a este dominio.

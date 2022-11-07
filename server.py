@@ -1,6 +1,7 @@
 import socket
 import time
 from cache import Cache
+import traceback
 
 import auxs
 from config_parser import Configs
@@ -57,7 +58,7 @@ def main(conf):
         confs = Configs(conf)
     except Exception as exc:
         print(str(exc))
-        #print("Inicialização do servidor interrompida!")
+        print("Inicialização do servidor interrompida!")
         return
 
     sp_domains = confs.get_sp_domains()
@@ -75,12 +76,13 @@ def main(conf):
     # Obtençao de um objeto database para cada dominio (que tenha uma database) com a informação sobre o dominio.
     databases = {}
     for name in sp_domains:
-        #try:
-        db = Database(confs.get_db_path(name), cache, "SP")
-        #except Exception as exc:
-            #log.fl(time.time(), str(exc), name)
-            #log.sp(time.time(), str(exc))
-            #return
+        try:
+            db = Database(confs.get_db_path(name), cache, "SP", log)
+        except Exception as exc:
+            log.fl(time.time(), str(exc), name)
+            log.sp(time.time(), str(exc))
+            traceback.print_exc()
+            return
         databases[auxs.add_end_dot(name)] = db # adiciona o ponto final, para coerencia na busca de informaçao para queries.
 
 
@@ -88,7 +90,7 @@ def main(conf):
     # constroi uma string no formato da mensagem que vai ser transmitida.
     id = 12
     q = query.init_send_query(id, "Q+A", "example.com.", "MX")
-    query.respond_query(q, confs, databases, cache)
+    query.respond_query(q, confs, databases, cache, log)
 
     #cache.search(id, "example.com.", "MX")
 

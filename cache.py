@@ -88,9 +88,9 @@ class Cache:
         return data
 
 
-    # Retorna uma string com informação para os logs. Retorna None caso não tenha ocorrido nenhuma alteração.
-    def update(self, name, type_of_value, value, ttl, prio = -1, origin = "OTHERS"):
-
+    # Atualiza a cache com os respetivos valores.
+    def update(self, log, name, type_of_value, value, ttl, prio = -1, origin = "OTHERS"):
+        now = time.time()
         last_free = 0
         i = 0
         for i in range(self.MAX):
@@ -104,22 +104,22 @@ class Cache:
                 return None
 
             if origin != "OTHERS" and line[8] == "FREE":
-                self.table[i] = [name, type_of_value, value, ttl, prio, origin, time.time(), i, "VALID"]
-                ###log.ev(time.time(), f"Foi criada uma entrada na cache dos seguintes valores: {name} {type_of_value} {value} {ttl} origem:{origin}")
-                return f"Foi criada uma entrada na cache dos seguintes valores: {name} {type_of_value} {value} {ttl} origem:{origin}"
+                now = time.time()
+                self.table[i] = [name, type_of_value, value, ttl, prio, origin, now, i, "VALID"]
+                log.ev(now, f"Foi criada uma entrada na cache dos seguintes valores: {name} {type_of_value} {value} {ttl} origem:{origin}", name)
 
             elif line[8] == "VALID" and origin == "OTHERS" and line[0] == name and line[1] == type_of_value and line[2] == value and line[3] == ttl and line[4] == prio:
                 # Atualiza o timestamp do registo que é igual ao que era para ser inserido.
-                self.table[i][6] = time.time()
-                ###log.ev(time.time(), f"Foi atualizada uma entrada na cache dos seguintes valores: {name} {type_of_value} {value} {ttl} origem:{origin}")
-                return f"Foi atualizada uma entrada na cache dos seguintes valores: {name} {type_of_value} {value} {ttl} origem:{origin}"
+                now = time.time()
+                self.table[i][6] = now
+                log.ev(now, f"Foi atualizada uma entrada na cache dos seguintes valores: {name} {type_of_value} {value} {ttl} origem:{origin}", name)
 
-        self.table[last_free] = [name, type_of_value, value, ttl, prio, origin, time.time(), last_free, "VALID"]
-        ###log.ev(time.time(), f"Foi criada uma entrada na cache dos seguintes valores: {name} {type_of_value} {value} {ttl} origem:{origin}")
-        return f"Foi criada uma entrada na cache dos seguintes valores: {name} {type_of_value} {value} {ttl} origem:{origin}"
+        now = time.time()
+        self.table[last_free] = [name, type_of_value, value, ttl, prio, origin, now, last_free, "VALID"]
+        log.ev(now, f"Foi criada uma entrada na cache dos seguintes valores: {name} {type_of_value} {value} {ttl} origem:{origin}", name)
 
     # Faz o mesmo que a função anterior (UPDATE) mas faz recebe como argumento uma linha do género do ficheiro de base de dados.
-    def update_with_line(self, line, origin):
+    def update_with_line(self, log, line, origin):
         # Verifica se a linha está vazia ou começa por '#'.
         if not line.strip() or line.startswith("#"):
             return
@@ -132,7 +132,7 @@ class Cache:
         prio = -1
         if len(arr) > 4:
             prio = int(arr[4])
-        self.update(name, type_of_value, value, ttl, prio, origin)
+        self.update(log, name, type_of_value, value, ttl, prio=prio, origin=origin)
 
     # atualiza, em todas as entradas da cache com Name igual
     # ao domínio passado como argumento, o campo Status para FREE. Quando o temporizador
