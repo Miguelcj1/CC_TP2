@@ -95,7 +95,7 @@ def main(conf):
             log.sp(time.time(), str(exc))
             traceback.print_exc()
             return
-        databases[auxs.add_end_dot(name)] = db # adiciona o ponto final, para coerencia na busca de informaçao para queries.
+        databases[name] = db # adiciona o ponto final, para coerencia na busca de informaçao para queries.
 
     '''
     ### TESTE ###
