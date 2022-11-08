@@ -54,7 +54,7 @@ class Logs:
 
         for domain in confs.get_domain_names():
             diretoria = confs.get_domain_log_file(domain)
-            domain = auxs.add_end_dot(domain) # Adiciona o ponto no final do domínio por questão de coerência com os outros componentes.
+            #domain = auxs.add_end_dot(domain) # Adiciona o ponto no final do domínio por questão de coerência com os outros componentes.
             if diretoria is not None:
                 check_dir(diretoria)
                 self.log_files[domain] = diretoria

@@ -1,9 +1,8 @@
 import socket
 import time
-from cache import Cache
 import traceback
-
 import auxs
+from cache import Cache
 from config_parser import Configs
 from logs import Logs
 from db_parser import Database
@@ -11,7 +10,7 @@ import query
 
 
 def secundaryServer(dom, sp):
-    q = query.init_send_query(time.time(), "ZT", dom.get_name(), "SP") #query "normal" para começar a transferencia de zona
+    q = dom # nome do domínio, enviado para receber a cópia da base de dados.
     ss = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     ss.connect(sp)
 
@@ -85,10 +84,10 @@ def main(conf):
             return
         databases[auxs.add_end_dot(name)] = db # adiciona o ponto final, para coerencia na busca de informaçao para queries.
 
-
+    '''
     ### TESTE ###
     # constroi uma string no formato da mensagem que vai ser transmitida.
-    cache = Cache()
+    #cache = Cache()
     id = 12
     q = query.init_send_query(id, "Q+A", "example.com.", "MX")
     res = query.respond_query(q, confs, databases, cache, log)
@@ -96,7 +95,12 @@ def main(conf):
     #cache.search(id, "example.com.", "MX")
 
     ### FIM ###
+    '''
 
+    # Inicia os pedidos de transferencia de zona dos que são servidores secundários.
+    #tcp_s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    for sp in sp_domains:
+        pass
 
     endereco = '127.0.0.1'
     porta = 3334
@@ -112,14 +116,14 @@ def main(conf):
 
 
     while True:
-        msg, add = s.recvfrom(1024)
+        msg, address = s.recvfrom(1024)
         msg = msg.decode('utf-8')
-        log.qr(time.time(), add, msg) # escrita do evento QR no log
+        log.qr(time.time(), address, msg) # escrita do evento QR no log
         #print(f"Recebi uma mensagem do cliente {add}")
         #print("----------------------")
         answer = query.respond_query(msg, confs, databases, cache, log)
 
-        s.sendto(answer.encode('utf-8'), add)
+        s.sendto(answer.encode('utf-8'), address)
 
 
     s.close()

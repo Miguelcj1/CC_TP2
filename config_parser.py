@@ -1,4 +1,5 @@
 import os
+import auxs
 
 
 # remove o "/" inicial de uma string.
@@ -115,8 +116,8 @@ class Configs:
         self.st_file_path = None
         self.all_log = None
         self.domains = {}
-        #self.sp = [] # nomes do dominios em que o servidor é servidor principal
-        #self.ss = [] # nomes do dominios em que o servidor é servidor secundario
+        #self.sp = [] # nomes do dominios em que o servidor atua como servidor principal
+        #self.ss = [] # nomes do dominios em que o servidor atua como servidor secundario
 
         ## Leitura e análise do ficheiro inicial de configuração.
         try:
@@ -130,9 +131,11 @@ class Configs:
 
             # Verifica se a linha está vazia ou começa por '#'.
             if not line.strip() or arr[0].startswith("#"):
-                continue  # does nothing = nop
+                continue
 
             domain = arr[0]
+            if domain != "all":
+                domain = auxs.add_end_dot(arr[0]) # ADICIONA O "." nas configurações também!
 
             if arr[1] == "DB" and len(arr) == 3:
                 # uso o pop_slash para remover o primeiro "/" de modo a ter a diretoria de maneira correta
@@ -235,11 +238,8 @@ class Configs:
 
     # Retorna o path do ficheiro de base de dados.
     def get_db_path(self, domain):
-        if self.domains[domain].get_db():
-            return self.domains[domain].get_db()
-        else:
-            #print("!get_db_path não obteve nenhuma referencia a base de dados!")
-            return None
+        return self.domains[domain].get_db()
+
 
     # Retorna o path do ficheiro de log de um determinado dominio.
     def get_domain_log_file(self, domain):
@@ -278,7 +278,8 @@ class Configs:
         result = []
         for value in self.domains.values():
             if value.get_sp() is None:
-                result.append(value.get_name())
+                dom = value.get_name()
+                result.append(dom)
         return result
 
     # Retorna uma lista com os nomes dos dominios que tem um servidor principal no DomainInfo.
@@ -286,7 +287,8 @@ class Configs:
         result = []
         for value in self.domains.values():
             if value.get_sp() is not None:
-                result.append(value.get_name())
+                dom = value.get_name()
+                result.append(dom)
         return result
 
 
