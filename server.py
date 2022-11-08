@@ -26,23 +26,36 @@ def secundaryServer(dom, sp):
     # deve receber todas as entradas de base de dados em um determinado tempo
 
 
-def primaryServer(dom, port):
-    ss = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    ss.bind((socket.gethostname(), port))
-    ss.listen()
-
+def primaryServer(dom, port=5000):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind(("", port)) # Recebe conexoes de todos (nao aplica restriçoes)
+    s.listen()
     while True:
-        clienteSocket, address = ss.accept()
-        msg = ss.recv(1024)
-        msg.decode("utf-8") # recebe o dominio e terá de verificar a validade e se aquele address tem permissao para o fazer
-
-        if address in dom.get_ss() and msg == dom.get_name():
-            ss.send()       # envia o nº de entradas das bases de dados
-
-            msg = ss.recv(1024) # nº de entradas que o SS quer receber
-
-            # deve enviar todas as entradas do ficheiro de base de dados numerados sem comentarios
-
+        conn, addr = s.accept() # rececão de uma conexão.
+        with conn:
+            print(f"Connected by {addr}")
+            msg = conn.recv(1024)
+            #msg.decode("utf-8")
+            if addr not in dom.get_ss():
+                # significa que não é um servidor secundário válido
+                print(f"O endereço {addr} não corresponde a nenhum endereço de SS conhecido pelo SP do domínio {dom}!!")
+                conn.close()
+            elif msg != dom.get_name():
+                # O nome do domínio, não é o dominio deste SP
+                print(f"O nome do domínio recebido: {msg}, não é o dominio deste SP: {dom}!!")
+                conn.close()
+            else:
+                # envia o nº de entradas das bases de dados
+                n_lines = 2 #####
+                n_lines = str(n_lines)
+                s.send(n_lines)
+                msg = s.recv(1024)  # nº de entradas que o SS quer receber
+                if msg == n_lines:
+                    # deve enviar todas as entradas do ficheiro de base de dados numerados sem comentarios
+                    pass
+                else:
+                    # O SS não aceitou o nº de linhas para enviar.
+                    pass
 
 
 def main(conf):
@@ -84,7 +97,7 @@ def main(conf):
             return
         databases[auxs.add_end_dot(name)] = db # adiciona o ponto final, para coerencia na busca de informaçao para queries.
 
-
+    '''
     ### TESTE ###
     # constroi uma string no formato da mensagem que vai ser transmitida.
     #cache = Cache()
@@ -92,13 +105,10 @@ def main(conf):
     q = query.init_send_query(id, "Q+A", "example.com.", "MX")
     res = query.respond_query(q, confs, databases, cache, log)
 
-    #cache.search(id, "example.com.", "MX")
-
     ### FIM ###
-
+    '''
 
     # Inicia os pedidos de transferencia de zona dos que são servidores secundários.
-    #tcp_s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     for sp in sp_domains:
         pass
 
@@ -106,8 +116,7 @@ def main(conf):
     porta = 3334
 
 
-
-    # Abertura do socket.
+    # Abertura do socket UDP.
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.bind((endereco, porta))
 
