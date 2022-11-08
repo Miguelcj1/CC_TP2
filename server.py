@@ -11,17 +11,17 @@ import query
 
 def secundaryServer(dom, sp):
     q = dom # nome do domínio, enviado para receber a cópia da base de dados.
-    ss = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    ss.connect(sp)
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect(sp)
 
-    ss.send(dom.encode("utf-8")) # envia o dominio
+    s.send(dom.encode("utf-8")) # envia o dominio
 
-    msg = ss.recv(1024) # espera receber o nº de entradas da base de dados
+    msg = s.recv(1024) # espera receber o nº de entradas da base de dados
     msg.decode("utf-8")
 
     #verifica se pode receber aquilo tudo (não percebo bem qual será o criterio para isto)
 
-    ss.send(msg.encode("utf-8")) #envia o nº de entradas que quer receber
+    s.send(msg.encode("utf-8")) #envia o nº de entradas que quer receber
 
     # deve receber todas as entradas de base de dados em um determinado tempo
 
