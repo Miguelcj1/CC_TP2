@@ -84,7 +84,7 @@ def main(conf):
             return
         databases[auxs.add_end_dot(name)] = db # adiciona o ponto final, para coerencia na busca de informaçao para queries.
 
-    '''
+
     ### TESTE ###
     # constroi uma string no formato da mensagem que vai ser transmitida.
     #cache = Cache()
@@ -95,7 +95,7 @@ def main(conf):
     #cache.search(id, "example.com.", "MX")
 
     ### FIM ###
-    '''
+
 
     # Inicia os pedidos de transferencia de zona dos que são servidores secundários.
     #tcp_s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

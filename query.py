@@ -66,7 +66,6 @@ def respond_query(query, confs, dbs, cache, log):
     # Procura em cache
     result = cache.get_answers(message_id, q_name, q_type)
     if result is not None:
-        result = message_id + result
         return result
 
     # Procura e obtenção de respostas na base de dados.
