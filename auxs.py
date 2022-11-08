@@ -11,7 +11,7 @@ def ends_with_dot(string):
 # Talvez acrescentar isto, nas chaves do dicionário de domains em confs, de maneira a haver uma coerencia nos outros parametros de outras estruturas de dados.
 # Funcao que acrescenta um ponto final na string, se ja nao tiver um.
 def add_end_dot(string):
-    if not string[-1] == ".":
+    if string[-1] != ".":
         string += "."
     return string
 

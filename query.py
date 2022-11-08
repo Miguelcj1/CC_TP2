@@ -82,6 +82,7 @@ def respond_query(query, confs, dbs, cache, log):
     responses_f = ""
     authorities_f = ""
     extras_f = ""
+    data = ""
     n_resp = 0
     arr_resp = []
     n_authorities = 0

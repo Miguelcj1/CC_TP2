@@ -1,6 +1,7 @@
 import os
 import sys
 import time
+import auxs
 from datetime import datetime
 from config_parser import Configs
 
@@ -48,15 +49,16 @@ class Logs:
         check_dir(all_log_file)
         self.log_files = {"all": all_log_file}
         self.stdout = True
-        if mode != "debug":
+        if mode.lower() != "debug":
             self.stdout = False
 
         for domain in confs.get_domain_names():
             diretoria = confs.get_domain_log_file(domain)
+            domain = auxs.add_end_dot(domain) # Adiciona o ponto no final do domínio por questão de coerência com os outros componentes.
             if diretoria is not None:
                 check_dir(diretoria)
                 self.log_files[domain] = diretoria
-            # else todas as funcoes vão escrever no "all".
+            # else todas as funcoes de escrita nos logs vão escrever no "all".
 
     ## talvez juntar estas 4 primeiras funcoes porque fazem o mesmo exceto nas letras do tipo de entrada.
     ## talvez adicionar printf nestes metodos porque vai ser necessario tambem fazer print para o terminal, ou talvez guardar uma flag no objeto para ver se querem que se faça print no terminal.
