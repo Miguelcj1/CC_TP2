@@ -7,61 +7,86 @@ from config_parser import Configs
 from logs import Logs
 from db_parser import Database
 import query
+from cache import Cache
 
 
-def secundaryServer(dom, sp):
-    q = dom # nome do domínio, enviado para receber a cópia da base de dados.
+def send_zone_transfer(log, cache, dom, address_port): # sp é o tuplo (endereço, porta)
+    t_start = time.time()
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect(sp)
+    #s.settimeout(800) # aplica um tempo em que tem de acabar a transferencia de zona.
+    s.connect(address_port)
 
-    s.send(dom.encode("utf-8")) # envia o dominio
+    s.send(dom.encode("utf-8")) # envia o nome do dominio cuja base de dados requisita como maneira de iniciar o pedido.
 
-    msg = s.recv(1024) # espera receber o nº de entradas da base de dados
-    msg.decode("utf-8")
+    try:
+        msg = s.recv(1024) # espera receber o nº de entradas da base de dados
+        lines_to_receive = int(msg.decode("utf-8"))
+        lines_received = 0
+        s.send(msg) # reenvia o nº de linhas como maneira de indicar que quer que se começe a transferencia.
 
-    #verifica se pode receber aquilo tudo (não percebo bem qual será o criterio para isto)
+        # deve receber todas as entradas de base de dados num determinado tempo
+        flag = True
+        while flag:
+            msg = s.recv(1024) # mensagem vem na forma (i;dados)
+            msg = msg.decode("utf-8")
+            arr = msg.split(";")
+            n_line = int(arr[0])
+            data = arr[1]
+            if n_line >= lines_to_receive:
+                flag = False
+            cache.update_with_line(log, data, "SP")
+    except socket.timeout:
+        print("Ocorreu um timeout!") # Fazer algo quando ocorre um timeout.
 
-    s.send(msg.encode("utf-8")) #envia o nº de entradas que quer receber
-
-    # deve receber todas as entradas de base de dados em um determinado tempo
 
 
-def primaryServer(dom, port=5000):
+
+# dom = nome do dominio
+def recv_zone_transfer(log, confs, dbs, port):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind(("", port)) # Recebe conexoes de todos (nao aplica restriçoes)
     s.listen()
     while True:
         conn, addr = s.accept() # rececão de uma conexão.
         with conn:
-            print(f"Connected by {addr}")
+            #print(f"Connected by {addr}")
             msg = conn.recv(1024)
-            #msg.decode("utf-8")
-            if addr not in dom.get_ss():
-                # significa que não é um servidor secundário válido
-                print(f"O endereço {addr} não corresponde a nenhum endereço de SS conhecido pelo SP do domínio {dom}!!")
+            msg = msg.decode("utf-8")
+            if msg not in confs.get_sp_domains():
+                # O nome do domínio, não é um dominio principal neste servidor.
+                print(f"O nome do domínio recebido: {msg}, não é conhecido pelo servidor!!")
                 conn.close()
-            elif msg != dom.get_name():
-                # O nome do domínio, não é o dominio deste SP
-                print(f"O nome do domínio recebido: {msg}, não é o dominio deste SP: {dom}!!")
+            dom = msg
+            if addr not in confs.get_ss(dom): # significa que este endereço não é um endereço de um SS conhecido, negando a conexao.
+                print(f"O endereço {addr} não corresponde a nenhum endereço de SS conhecido pelo SP do domínio {dom}!!")
                 conn.close()
             else:
                 # envia o nº de entradas das bases de dados
-                n_lines = 2 #####
+                db = dbs.get(dom) # isto nunca deve retornar null uma vez que é feita uma verificação similar atras.
+                entry_lines = db.all_db_lines()
+                n_lines = len(entry_lines)
                 n_lines = str(n_lines)
-                s.send(n_lines)
-                msg = s.recv(1024)  # nº de entradas que o SS quer receber
-                if msg == n_lines:
-                    # deve enviar todas as entradas do ficheiro de base de dados numerados sem comentarios
-                    pass
+                conn.send(n_lines.encode("utf-8"))
+                msg = conn.recv(1024)  # nº de entradas que o SS quer receber
+                msg = int(msg.decode("utf-8"))
+                if msg == n_lines: # Envia todas as entradas do ficheiro de base de dados numerados sem comentarios
+                    i = 1
+                    for l in entry_lines:
+                        l = l.encode("utf-8")
+                        msg = f"{i};{l}"
+                        conn.send(msg)
                 else:
                     # O SS não aceitou o nº de linhas para enviar.
                     pass
+        break # para so fazer isto uma vez
+    s.close()
 
 
 def main(conf):
 
     ttl = 200
     mode = "debug"
+
     # Guarda a altura em que o servidor arrancou.
     ts_arranque = time.time()
 
@@ -83,6 +108,7 @@ def main(conf):
     # Reportar no log o arranque do servidor.
     log.st(ts_arranque, porta, ttl, mode)
 
+    # Inicializa a cache com valores nulos.
     cache = Cache()
 
     # Obtençao de um objeto database para cada dominio (que tenha uma database) com a informação sobre o dominio.
@@ -95,7 +121,7 @@ def main(conf):
             log.sp(time.time(), str(exc))
             traceback.print_exc()
             return
-        databases[name] = db # adiciona o ponto final, para coerencia na busca de informaçao para queries.
+        databases[name] = db
 
     '''
     ### TESTE ###
@@ -110,7 +136,12 @@ def main(conf):
 
     # Inicia os pedidos de transferencia de zona dos que são servidores secundários.
     for sp in sp_domains:
+        recv_zone_transfer(log, confs, databases, porta)
         pass
+
+    for ss in ss_domains:
+        add = "127"
+        send_zone_transfer(log, cache, ss, add)
 
     endereco = '127.0.0.1'
     porta = 3334

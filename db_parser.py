@@ -22,6 +22,7 @@ def add_default(name, default):
     return name + "." + default
 
 
+
 class Database:
 
     # Define as diversas variavéis analisadas no ficheiro de base de dados. Também adiciona automaticamente na cache os valores lidos.
@@ -232,3 +233,76 @@ class Database:
         for n in sn:
             ret.append(n[0])
         return ret
+
+    def all_db_lines(self):
+        ret = [] # array de linhas a retornar
+        for k, v in self.SOASP.items():
+            arr = [k, "SOASP"]
+            f = arr + list(v)
+            f = entry_to_line(f)
+            ret.append(f)
+        for k, v in self.SOAADMIN.items():
+            arr = [k, "SOAADMIN"]
+            f = arr + list(v)
+            f = entry_to_line(f)
+            ret.append(f)
+        for k, v in self.SOASERIAL.items():
+            arr = [k, "SOASERIAL"]
+            f = arr + list(v)
+            f = entry_to_line(f)
+            ret.append(f)
+        for k, v in self.SOAREFRESH.items():
+            arr = [k, "SOAREFRESH"]
+            f = arr + list(v)
+            f = entry_to_line(f)
+            ret.append(f)
+        for k, v in self.SOARETRY.items():
+            arr = [k, "SOARETRY"]
+            f = arr + list(v)
+            f = entry_to_line(f)
+            ret.append(f)
+        for k, v in self.SOAEXPIRE.items():
+            arr = [k, "SOAEXPIRE"]
+            f = arr + list(v)
+            f = entry_to_line(f)
+            ret.append(f)
+        for k, v in self.NS.items():
+            arr = [k, "NS"]
+            for vs in v:
+                f = arr + list(vs)
+                f = entry_to_line(f)
+                ret.append(f)
+        for k, v in self.MX.items():
+            arr = [k, "MX"]
+            for vs in v:
+                f = arr + list(vs)
+                f = entry_to_line(f)
+                ret.append(f)
+        for k, v in self.A.items():
+            arr = [k, "A"]
+            for vs in v:
+                f = arr + list(vs)
+                f = entry_to_line(f)
+                ret.append(f)
+        for k, v in self.CNAME.items():
+            arr = [k, "CNAME"]
+            f = arr + list(v)
+            f = entry_to_line(f)
+            ret.append(f)
+        for k, v in self.PTR.items():
+            arr = [k, "PTR"]
+            for vs in v:
+                f = arr + list(vs)
+                f = entry_to_line(f)
+                ret.append(f)
+        #ret = map(entry_to_line, ret)
+        return ret
+
+def entry_to_line(arr): # arr = [name, type_of_value, value, ttl, prio]
+    res = ""
+    res = f"{arr[0]} {arr[1]} {arr[2]} "
+    if len(arr) > 3:
+        res += f"{arr[3]} "
+    if len(arr) > 4 and str(arr[4]) != "-1":
+        res += f"{arr[4]}"
+    return res
