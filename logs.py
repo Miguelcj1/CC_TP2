@@ -259,8 +259,8 @@ class Logs:
             # print(string)
             sys.stdout.write(string)
 
-    # Reporta o arranque do servidor ((Not sure donde virao os valores do ttl e o mode)). NOT SURE ###
-    def st(self, timestamp, port, ttl, mode, domain = "all"):
+    # Reporta o arranque do servidor ((Not sure donde virao os valores do timeout e o mode)). NOT SURE ###
+    def st(self, timestamp, port, timeout, mode, domain = "all"):
         if self.log_files.get(domain) is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         try:
@@ -268,7 +268,7 @@ class Logs:
         except FileNotFoundError:
             print("Logging file not found!!")
             return None
-        string = get_timestamp(timestamp) + " ST 127.0.0.1 " + str(port) + " " + str(ttl) + " " + mode + "\n"
+        string = get_timestamp(timestamp) + " ST 127.0.0.1 " + str(port) + " " + str(timeout) + " " + mode + "\n"
         fp.write(string)
         fp.close()
         # Se for para imprimir no stdout também.

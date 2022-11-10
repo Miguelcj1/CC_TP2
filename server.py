@@ -1,5 +1,6 @@
 import socket
 import time
+import sys
 import traceback
 import auxs
 from cache import Cache
@@ -63,7 +64,7 @@ def send_zone_transfer(log, confs, cache, dom):
         print("Ocorreu um timeout!") # Fazer algo quando ocorre um timeout.
 
 
-# dom = nome do dominio
+
 def recv_zone_transfer(log, confs, dbs, port):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind(("", port)) # Recebe conexoes de todos (nao aplica restriçoes)
@@ -112,23 +113,32 @@ def recv_zone_transfer(log, confs, dbs, port):
     s.close()
 
 
-def main():
-
-    ttl = 200
-    mode = "debug"
-    porta = 5000
-    #conf = "configuração"
-    conf = "confss"
+def main(): # argumentos: nome_do_script  ficheiro_configuraçao  porta*  ((query_timeout*))  modo*
 
     # Guarda a altura em que o servidor arrancou.
     ts_arranque = time.time()
+
+    if len(sys.argv) < 2: # nº de argumentos obrigatorios
+        print("Não foram passados argumentos suficientes.")
+
+    # Path do ficheiro de configuração do servidor.
+    conf = sys.argv[1]
+
+    porta = 5000 # 53
+    timeout = 200
+    mode = "DEBUG"
+    if len(sys.argv) > 2:
+        porta = int(sys.argv[2])
+        timeout = int(sys.argv[3])
+        mode = sys.argv[4]
+
 
     # Obtenção de um objeto que vai conter toda a informação proveniente do config_file.
     try:
         confs = Configs(conf)
     except Exception as exc:
         print(str(exc))
-        print("Inicialização do servidor interrompida!")
+        print("Inicialização do servidor interrompida devido a falha no ficheiro de configuração!")
         return
 
     sp_domains = confs.get_sp_domains()
@@ -138,7 +148,7 @@ def main():
     log = Logs(confs, mode)
 
     # Reportar no log o arranque do servidor.
-    log.st(ts_arranque, porta, ttl, mode)
+    log.st(ts_arranque, porta, timeout, mode)
 
     # Inicializa a cache com valores nulos.
     cache = Cache()
@@ -168,11 +178,11 @@ def main():
 
     # Inicia os pedidos de transferencia de zona dos que são servidores secundários.
     if sp_domains:
-        recv_zone_transfer(log, confs, databases, porta)
+        recv_zone_transfer(log, confs, databases, porta) # talvez fazer aqui a thread
 
 
-    for sd in ss_domains:
-        send_zone_transfer(log, confs, cache, sd)
+    for ss in ss_domains:
+        send_zone_transfer(log, confs, cache, ss)
 
     #endereco = '127.0.0.1'
     endereco = '' # TEST THIS
