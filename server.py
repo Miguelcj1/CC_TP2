@@ -2,6 +2,7 @@ import socket
 import time
 import sys
 import traceback
+import threading
 import auxs
 from cache import Cache
 from config_parser import Configs
@@ -35,6 +36,7 @@ def send_zone_transfer(log, confs, cache, dom):
 
     # Cria o socket TCP.
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    #s.bind(('',)) ### TEST
     #s.settimeout(800) # aplica um tempo em que tem de acabar a transferencia de zona.
 
     # Tenta conectar-se ao endereço do servidor principal especificado no tuplo adress_port.
@@ -53,6 +55,8 @@ def send_zone_transfer(log, confs, cache, dom):
         flag = True
         while flag:
             msg = s.recv(1024) # mensagem vem na forma (i;dados)
+            if not msg:
+                flag = False
             msg = msg.decode("utf-8")
             arr = msg.split(";")
             n_line = int(arr[0])
@@ -97,13 +101,14 @@ def recv_zone_transfer(log, confs, dbs, port):
                 n_lines = str(n_lines)
                 conn.send(n_lines.encode("utf-8"))
                 msg = conn.recv(1024)  # nº de entradas que o SS quer receber
-                msg = int(msg.decode("utf-8"))
+                msg = msg.decode("utf-8")
                 if msg == n_lines: # Envia todas as entradas do ficheiro de base de dados numerados sem comentarios
                     i = 1
                     for l in entry_lines:
-                        l = l.encode("utf-8")
                         msg = f"{i};{l}"
-                        conn.send(msg)
+                        conn.send(msg.encode('utf-8'))
+                        # tenho de atrasar um pouco estes envios pq as mensagens estão a cair no buffer destino em conjunto.
+                        # talvez adicionando uma confirmação por mensagem de um byte, ou testar soluçoes de indicar o tamanho da mensagem.
                 else:
                     # O SS não aceitou o nº de linhas para enviar.
                     log.ez(time.time(), str(addr), "SP", dom)
@@ -112,8 +117,8 @@ def recv_zone_transfer(log, confs, dbs, port):
         break # para so fazer isto uma vez
     s.close()
 
-
-def main(): # argumentos: nome_do_script  ficheiro_configuraçao  porta*  ((query_timeout*))  modo*
+# * -> significa opcional
+def main(): # argumentos: nome_do_script  ficheiro_configuraçao  porta*  timeout*  modo="DEBUG"*
 
     # Guarda a altura em que o servidor arrancou.
     ts_arranque = time.time()
@@ -124,7 +129,7 @@ def main(): # argumentos: nome_do_script  ficheiro_configuraçao  porta*  ((quer
     # Path do ficheiro de configuração do servidor.
     conf = sys.argv[1]
 
-    porta = 5000 # 53
+    porta = 5000 ### 53
     timeout = 200
     mode = "DEBUG"
     if len(sys.argv) > 2:
@@ -132,6 +137,7 @@ def main(): # argumentos: nome_do_script  ficheiro_configuraçao  porta*  ((quer
         timeout = int(sys.argv[3])
         mode = sys.argv[4]
 
+    endereco = ''
 
     # Obtenção de um objeto que vai conter toda a informação proveniente do config_file.
     try:
@@ -178,15 +184,11 @@ def main(): # argumentos: nome_do_script  ficheiro_configuraçao  porta*  ((quer
 
     # Inicia os pedidos de transferencia de zona dos que são servidores secundários.
     if sp_domains:
-        recv_zone_transfer(log, confs, databases, porta) # talvez fazer aqui a thread
+        recv_zone_transfer(log, confs, databases, porta) # fazer aqui a thread
 
 
     for ss in ss_domains:
         send_zone_transfer(log, confs, cache, ss)
-
-    #endereco = '127.0.0.1'
-    endereco = '' # TEST THIS
-    porta = 3334
 
 
     # Abertura do socket UDP.

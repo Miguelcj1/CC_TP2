@@ -233,7 +233,7 @@ class Configs:
     # Retorna o endereço do servidor principal de um determinado domínio, caso não seja ele proprio
     def get_ss(self, domain):
         if self.domains[domain].get_ss():
-            return self.domains[domain].get_sp()
+            return self.domains[domain].get_ss()
         else:
             print("!get_ss não obteve nenhum ss!")
             return None

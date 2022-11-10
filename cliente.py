@@ -13,7 +13,7 @@ def main():
 
     arr = string_adress.split(":")
     endereco = arr[0]
-    porta = 53
+    porta = 5000 ### 53
     if len(arr) > 1:
         porta = int(arr[1])
 
