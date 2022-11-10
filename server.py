@@ -9,12 +9,27 @@ from db_parser import Database
 import query
 from cache import Cache
 
+# addr = (endereço, porta)
+# lstradd = ["endereço:porta" ou "endereco"]
+def check_addr(addr, lstradd):
+    for s in lstradd:
+        arr = s.split(":")
+        if arr[0] == addr[0]:
+            if len(arr) == 2:
+                if arr[1] == addr[1]:
+                    return True
+                else:
+                    return False
+            else:
+                return True
+    return False
+
 
 def send_zone_transfer(log, cache, dom, address_port): # sp é o tuplo (endereço, porta)
     t_start = time.time()
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     #s.settimeout(800) # aplica um tempo em que tem de acabar a transferencia de zona.
-    s.connect(address_port)
+    s.connect(address_port) # (endereço, porta)
 
     s.send(dom.encode("utf-8")) # envia o nome do dominio cuja base de dados requisita como maneira de iniciar o pedido.
 
@@ -32,13 +47,11 @@ def send_zone_transfer(log, cache, dom, address_port): # sp é o tuplo (endereç
             arr = msg.split(";")
             n_line = int(arr[0])
             data = arr[1]
+            cache.update_with_line(log, data, "SP")
             if n_line >= lines_to_receive:
                 flag = False
-            cache.update_with_line(log, data, "SP")
     except socket.timeout:
         print("Ocorreu um timeout!") # Fazer algo quando ocorre um timeout.
-
-
 
 
 # dom = nome do dominio
@@ -54,12 +67,18 @@ def recv_zone_transfer(log, confs, dbs, port):
             msg = msg.decode("utf-8")
             if msg not in confs.get_sp_domains():
                 # O nome do domínio, não é um dominio principal neste servidor.
+                conn.send("erro".encode("utf-8"))
+                # chamar algum metodo de log
                 print(f"O nome do domínio recebido: {msg}, não é conhecido pelo servidor!!")
                 conn.close()
+                break
             dom = msg
-            if addr not in confs.get_ss(dom): # significa que este endereço não é um endereço de um SS conhecido, negando a conexao.
-                print(f"O endereço {addr} não corresponde a nenhum endereço de SS conhecido pelo SP do domínio {dom}!!")
+            ss_addresses_l = confs.get_ss(dom) # ["endereço" ou "endereço:porta"]
+            if not check_addr(addr, ss_addresses_l): # significa que este endereço não é um endereço de um SS conhecido, negando a conexao.
+                conn.send("Erro".encode("utf-8"))
+                log.ez(time.time(), str(addr), "SP", dom)
                 conn.close()
+                break
             else:
                 # envia o nº de entradas das bases de dados
                 db = dbs.get(dom) # isto nunca deve retornar null uma vez que é feita uma verificação similar atras.
@@ -77,7 +96,9 @@ def recv_zone_transfer(log, confs, dbs, port):
                         conn.send(msg)
                 else:
                     # O SS não aceitou o nº de linhas para enviar.
-                    pass
+                    log.ez(time.time(), str(addr), "SP", dom)
+                    conn.close()
+                    break
         break # para so fazer isto uma vez
     s.close()
 
@@ -86,6 +107,7 @@ def main(conf):
 
     ttl = 200
     mode = "debug"
+    porta = 3334
 
     # Guarda a altura em que o servidor arrancou.
     ts_arranque = time.time()
@@ -104,7 +126,6 @@ def main(conf):
     # Obtenção de um objeto que tem informação sobre a escrita nos ficheiros de log e stdout.
     log = Logs(confs, mode)
 
-    porta = 3334
     # Reportar no log o arranque do servidor.
     log.st(ts_arranque, porta, ttl, mode)
 
@@ -137,7 +158,7 @@ def main(conf):
     # Inicia os pedidos de transferencia de zona dos que são servidores secundários.
     for sp in sp_domains:
         recv_zone_transfer(log, confs, databases, porta)
-        pass
+
 
     for ss in ss_domains:
         add = "127"
