@@ -23,6 +23,14 @@ def co_dir(path, mode):
         f = open(path, mode)
     return f
 
+# Retorna None caso não seja indicado a porta do SP
+def str_adress_to_tuple(string):
+    arr = string.split(":")
+    if len(arr) < 2:
+        return None
+    res = (arr[0], int(arr[1]))
+    return res
+
 
 class DomainInfo:
 
@@ -123,7 +131,6 @@ class Configs:
         try:
             fp = open(conf_file, "r")
         except FileNotFoundError:
-            print("Configuration file not found!")
             raise Exception("Configuration file not found!")
 
         for line in fp:
@@ -151,9 +158,12 @@ class Configs:
                 if self.domains.get(domain) is None:
                     self.domains[domain] = DomainInfo()
                 self.domains[domain].set_name(domain)
-                # talvez pudesse mandar um tuplo (endereço, porta) e caso nao houvesse porta, mandava None no lugar da porta.
-                if not self.domains[domain].set_sp(sp):
-                    raise Exception(f"Ocorreu mais que uma definição do servidor principal do dominio {domain}!")
+                # Coloca um tuplo
+                addr = str_adress_to_tuple(sp)  # retorna None caso não seja indicada uma porta.
+                if addr is None:
+                    raise Exception(f"É necessário especificar a porta do servidor primário do domínio {domain}.")
+                if not self.domains[domain].set_sp(addr):
+                    raise Exception(f"Ocorreu mais que uma definição do servidor principal do dominio {domain}.")
 
             elif arr[1] == "SS" and len(arr) == 3:
                 ss = arr[2]

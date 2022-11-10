@@ -25,16 +25,25 @@ def check_addr(addr, lstradd):
     return False
 
 
-def send_zone_transfer(log, cache, dom, address_port): # sp é o tuplo (endereço, porta)
+def send_zone_transfer(log, confs, cache, dom):
+    # Guarda a timestamp do início do processo.
     t_start = time.time()
+
+    # Obtém o (endereço, porta) do servidor principal do dominio "dom".
+    address_port = confs.get_sp(dom)
+
+    # Cria o socket TCP.
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     #s.settimeout(800) # aplica um tempo em que tem de acabar a transferencia de zona.
-    s.connect(address_port) # (endereço, porta)
 
-    s.send(dom.encode("utf-8")) # envia o nome do dominio cuja base de dados requisita como maneira de iniciar o pedido.
+    # Tenta conectar-se ao endereço do servidor principal especificado no tuplo adress_port.
+    s.connect(address_port)
+
+    # Envia o nome do dominio cuja base de dados requisita como maneira de iniciar o pedido.
+    s.send(dom.encode("utf-8"))
 
     try:
-        msg = s.recv(1024) # espera receber o nº de entradas da base de dados
+        msg = s.recv(1024) # Espera receber o nº de entradas da base de dados que vão ser enviadas.
         lines_to_receive = int(msg.decode("utf-8"))
         lines_received = 0
         s.send(msg) # reenvia o nº de linhas como maneira de indicar que quer que se começe a transferencia.
@@ -103,11 +112,13 @@ def recv_zone_transfer(log, confs, dbs, port):
     s.close()
 
 
-def main(conf):
+def main():
 
     ttl = 200
     mode = "debug"
-    porta = 3334
+    porta = 5000
+    #conf = "configuração"
+    conf = "confss"
 
     # Guarda a altura em que o servidor arrancou.
     ts_arranque = time.time()
@@ -156,15 +167,15 @@ def main(conf):
     '''
 
     # Inicia os pedidos de transferencia de zona dos que são servidores secundários.
-    for sp in sp_domains:
+    if sp_domains:
         recv_zone_transfer(log, confs, databases, porta)
 
 
-    for ss in ss_domains:
-        add = "127"
-        send_zone_transfer(log, cache, ss, add)
+    for sd in ss_domains:
+        send_zone_transfer(log, confs, cache, sd)
 
-    endereco = '127.0.0.1'
+    #endereco = '127.0.0.1'
+    endereco = '' # TEST THIS
     porta = 3334
 
 
@@ -190,4 +201,4 @@ def main(conf):
     s.close()
 
 if __name__ == '__main__':
-    main("configuração")
+    main()
