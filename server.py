@@ -26,13 +26,13 @@ def check_addr(addr, lstradd):
                 return True
     return False
 
-
-def send_zone_transfer(log, confs, cache, dom):
+# Utilizada por um SS para pedir pelas entradas de base de dados de um domínio.
+def ask_zone_transfer(log, confs, cache, dom):
     # Guarda a timestamp do início do processo.
     t_start = time.time()
 
     # Obtém o (endereço, porta) do servidor principal do dominio "dom".
-    address_port = confs.get_sp(dom)
+    addr = confs.get_sp(dom)
 
     # Cria o socket TCP.
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -40,7 +40,7 @@ def send_zone_transfer(log, confs, cache, dom):
     #s.settimeout(800) # aplica um tempo em que tem de acabar a transferencia de zona.
 
     # Tenta conectar-se ao endereço do servidor principal especificado no tuplo adress_port.
-    s.connect(address_port)
+    s.connect(addr)
 
     # Envia o nome do dominio cuja base de dados requisita como maneira de iniciar o pedido.
     s.send(dom.encode("utf-8"))
@@ -51,14 +51,16 @@ def send_zone_transfer(log, confs, cache, dom):
         lines_received = 0
         s.send(msg) # reenvia o nº de linhas como maneira de indicar que quer que se começe a transferencia.
 
-        # deve receber todas as entradas de base de dados num determinado tempo
+        buf = ""
         flag = True
         while flag:
             msg = s.recv(1024) # mensagem vem na forma (i;dados)
-            if not msg:
-                flag = False
-            msg = msg.decode("utf-8")
-            arr = msg.split(";")
+            if msg:
+                msg = msg.decode("utf-8")
+                buf += msg
+            camp = buf.split("\n")[0] ###
+            buf = buf.split("\n", 1)[1] ### MAYBE DELETE
+            arr = camp.split(";")
             n_line = int(arr[0])
             data = arr[1]
             cache.update_with_line(log, data, "SP")
@@ -66,10 +68,11 @@ def send_zone_transfer(log, confs, cache, dom):
                 flag = False
     except socket.timeout:
         print("Ocorreu um timeout!") # Fazer algo quando ocorre um timeout.
+        log.ez(time.time(), str(addr), "SS", dom)
 
 
-
-def recv_zone_transfer(log, confs, dbs, port):
+# Utilizada por um SP para responder a pedidos de transferência de zona.
+def resp_zone_transfer(log, confs, dbs, port):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind(("", port)) # Recebe conexoes de todos (nao aplica restriçoes)
     s.listen()
@@ -105,7 +108,7 @@ def recv_zone_transfer(log, confs, dbs, port):
                 if msg == n_lines: # Envia todas as entradas do ficheiro de base de dados numerados sem comentarios
                     i = 1
                     for l in entry_lines:
-                        msg = f"{i};{l}"
+                        msg = f"{i};{l}\n"
                         conn.send(msg.encode('utf-8'))
                         # tenho de atrasar um pouco estes envios pq as mensagens estão a cair no buffer destino em conjunto.
                         # talvez adicionando uma confirmação por mensagem de um byte, ou testar soluçoes de indicar o tamanho da mensagem.
@@ -114,7 +117,7 @@ def recv_zone_transfer(log, confs, dbs, port):
                     log.ez(time.time(), str(addr), "SP", dom)
                     conn.close()
                     break
-        break # para so fazer isto uma vez
+        #break # para so fazer isto uma vez
     s.close()
 
 # * -> significa opcional
@@ -184,11 +187,13 @@ def main(): # argumentos: nome_do_script  ficheiro_configuraçao  porta*  timeou
 
     # Inicia os pedidos de transferencia de zona dos que são servidores secundários.
     if sp_domains:
-        recv_zone_transfer(log, confs, databases, porta) # fazer aqui a thread
+        # Abre uma thread para que possa atender a transferencias de zona.
+        threading.Thread(target=resp_zone_transfer, args=(log, confs, databases, porta)).start()
+        #resp_zone_transfer(log, confs, databases, porta)
 
 
     for ss in ss_domains:
-        send_zone_transfer(log, confs, cache, ss)
+        ask_zone_transfer(log, confs, cache, ss)
 
 
     # Abertura do socket UDP.
