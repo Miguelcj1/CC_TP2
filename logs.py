@@ -148,7 +148,7 @@ class Logs:
         #string = get_timestamp(timestamp) + " ZT " + end_adress + " " + papel
         string = f"{get_timestamp(timestamp)} ZT {end_adress} {papel}"
         if duracao > 0:
-            string += f" {duracao}"
+            string += f" {duracao}ms"
         string += "\n"
         fp.write(string)
         fp.close()

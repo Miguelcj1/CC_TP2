@@ -26,6 +26,17 @@ def check_addr(addr, lstradd):
                 return True
     return False
 
+def get_line_number(string):
+    #lambda l: int(l.split(";")[0])
+    inteiro = int(string.split(";")[0])
+    return inteiro
+
+def is_final_msg(string, last_i):
+    last_line = string.split("\n")[-1]
+    num = get_line_number(last_line)
+    return num == last_i
+
+
 # Utilizada por um SS para pedir pelas entradas de base de dados de um domínio.
 def ask_zone_transfer(log, confs, cache, dom):
     # Guarda a timestamp do início do processo.
@@ -52,25 +63,32 @@ def ask_zone_transfer(log, confs, cache, dom):
         s.send(msg) # reenvia o nº de linhas como maneira de indicar que quer que se começe a transferencia.
 
         buf = ""
-        msg = "1"
         flag = True
         while flag:
-            if msg:
-                msg = s.recv(1024) # mensagem vem na forma (i;dados)
-                msg = msg.decode("utf-8")
-                buf += msg
-            buf_f = buf.split("\n", 1)
-            single_line = buf_f[0]
-            if len(buf_f) > 1:
-                buf = buf_f[1]
+            msg = s.recv(1024) # mensagem vem na forma (i;dados)
+            msg = msg.decode("utf-8")
+            if is_final_msg(msg, lines_to_receive):
+                flag = False
+            buf += msg
+        # 'buf' contém uma string com todas as linhas enviadas, separadas por \n
+
+        # 'lines' é um array das linhas enviadas pelo SP.
+        lines = buf.split("\n")
+
+        # Verificação da ordem das linhas recebidas.
+        lines = sorted(lines, key=get_line_number)
+
+        for single_line in lines:
             arr = single_line.split(";")
-            n_line = int(arr[0]) # talvez adicionar verificação de ordem ((not sure))
+            n_line = int(arr[0])
             data = arr[1]
             cache.update_with_line(log, data, "SP")
-            if n_line >= lines_to_receive:
-                flag = False
-
+        # ENVIAR CONFIRMAÇAO PARA O SP
+        s.close()
         t_end = time.time()
+        duracao = t_end - t_start
+        duracao *= 1000
+        log.zt(time.time(), addr, "SS", duracao=duracao, domain=dom)
     except socket.timeout:
         print("Ocorreu um timeout!") # Fazer algo quando ocorre um timeout.
         log.ez(time.time(), str(addr), "SS", dom)
@@ -105,25 +123,31 @@ def resp_zone_transfer(log, confs, dbs, port):
                 # envia o nº de entradas das bases de dados
                 db = dbs.get(dom) # isto nunca deve retornar null uma vez que é feita uma verificação similar atras.
                 entry_lines = db.all_db_lines()
-                n_lines = len(entry_lines)
-                n_lines = str(n_lines)
+                numb_lines = len(entry_lines)
+                n_lines = str(numb_lines)
                 conn.send(n_lines.encode("utf-8"))
                 msg = conn.recv(1024)  # nº de entradas que o SS quer receber
                 msg = msg.decode("utf-8")
-                if msg == n_lines: # Envia todas as entradas do ficheiro de base de dados numerados sem comentarios
-                    i = 1
-                    for l in entry_lines:
-                        msg = f"{i};{l}\n"
-                        i += 1
-                        conn.send(msg.encode('utf-8'))
-                    ## receçao de alguma mensagem de confirmaçao.
-                    t_end = time.time()
-                    duracao = t_end - t_start
-                else:
+                # Se o número recebido for o mesmo que o enviado, todas as entradas do ficheiro de base de dados numerados sem comentarios.
+                if msg != n_lines:
                     # O SS não aceitou o nº de linhas para enviar.
                     log.ez(time.time(), str(addr), "SP", dom)
                     conn.close()
                     break
+
+                i = 1
+                for l in entry_lines:
+                    msg = f"{i};{l}"
+                    if i != numb_lines:
+                        msg += "\n"
+                    conn.send(msg.encode('utf-8'))
+                    i += 1
+
+                t_end = time.time()
+                duracao = t_end - t_start
+                duracao *= 1000 ## PASSA DURACAO PARA MILISEGUNDOS.
+                log.zt(time.time(), addr, "SP", duracao=duracao, domain=dom)
+
     s.close()
 
 # * -> significa opcional
