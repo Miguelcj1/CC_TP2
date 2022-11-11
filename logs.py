@@ -137,7 +137,7 @@ class Logs:
     #end_adress -> o servidor na outra ponta da transferência
     #papel -> papel do servidor local na transferência (SP ou SS)
     #(OPCIONAL) duracao da transferencia e total de bytes transferidos
-    def zt(self, timestamp, end_adress, papel, domain="all"):
+    def zt(self, timestamp, end_adress, papel, duracao=0, domain="all"):
         if self.log_files.get(domain) is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         try:
@@ -145,7 +145,11 @@ class Logs:
         except FileNotFoundError:
             print("Logging file not found!!")
             return None
-        string = get_timestamp(timestamp) + " ZT " + end_adress + " " + papel + "\n"
+        #string = get_timestamp(timestamp) + " ZT " + end_adress + " " + papel
+        string = f"{get_timestamp(timestamp)} ZT {end_adress} {papel}"
+        if duracao > 0:
+            string += f" {duracao}"
+        string += "\n"
         fp.write(string)
         fp.close()
         # Se for para imprimir no stdout também.

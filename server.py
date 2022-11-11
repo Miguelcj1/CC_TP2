@@ -36,8 +36,8 @@ def ask_zone_transfer(log, confs, cache, dom):
 
     # Cria o socket TCP.
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    #s.bind(('',)) ### TEST
-    #s.settimeout(800) # aplica um tempo em que tem de acabar a transferencia de zona.
+    #s.bind(('', port)) ### TEST
+    s.settimeout(100) # aplica um tempo em que tem de acabar a transferencia de zona.
 
     # Tenta conectar-se ao endereço do servidor principal especificado no tuplo adress_port.
     s.connect(addr)
@@ -52,20 +52,25 @@ def ask_zone_transfer(log, confs, cache, dom):
         s.send(msg) # reenvia o nº de linhas como maneira de indicar que quer que se começe a transferencia.
 
         buf = ""
+        msg = "1"
         flag = True
         while flag:
-            msg = s.recv(1024) # mensagem vem na forma (i;dados)
             if msg:
+                msg = s.recv(1024) # mensagem vem na forma (i;dados)
                 msg = msg.decode("utf-8")
                 buf += msg
-            camp = buf.split("\n")[0] ###
-            buf = buf.split("\n", 1)[1] ### MAYBE DELETE
-            arr = camp.split(";")
-            n_line = int(arr[0])
+            buf_f = buf.split("\n", 1)
+            single_line = buf_f[0]
+            if len(buf_f) > 1:
+                buf = buf_f[1]
+            arr = single_line.split(";")
+            n_line = int(arr[0]) # talvez adicionar verificação de ordem ((not sure))
             data = arr[1]
             cache.update_with_line(log, data, "SP")
             if n_line >= lines_to_receive:
                 flag = False
+
+        t_end = time.time()
     except socket.timeout:
         print("Ocorreu um timeout!") # Fazer algo quando ocorre um timeout.
         log.ez(time.time(), str(addr), "SS", dom)
@@ -78,8 +83,8 @@ def resp_zone_transfer(log, confs, dbs, port):
     s.listen()
     while True:
         conn, addr = s.accept() # rececão de uma conexão.
+        t_start = time.time()
         with conn:
-            #print(f"Connected by {addr}")
             msg = conn.recv(1024)
             msg = msg.decode("utf-8")
             if msg not in confs.get_sp_domains():
@@ -109,15 +114,16 @@ def resp_zone_transfer(log, confs, dbs, port):
                     i = 1
                     for l in entry_lines:
                         msg = f"{i};{l}\n"
+                        i += 1
                         conn.send(msg.encode('utf-8'))
-                        # tenho de atrasar um pouco estes envios pq as mensagens estão a cair no buffer destino em conjunto.
-                        # talvez adicionando uma confirmação por mensagem de um byte, ou testar soluçoes de indicar o tamanho da mensagem.
+                    ## receçao de alguma mensagem de confirmaçao.
+                    t_end = time.time()
+                    duracao = t_end - t_start
                 else:
                     # O SS não aceitou o nº de linhas para enviar.
                     log.ez(time.time(), str(addr), "SP", dom)
                     conn.close()
                     break
-        #break # para so fazer isto uma vez
     s.close()
 
 # * -> significa opcional
@@ -174,24 +180,14 @@ def main(): # argumentos: nome_do_script  ficheiro_configuraçao  porta*  timeou
             return
         databases[name] = db
 
-    '''
-    ### TESTE ###
-    # constroi uma string no formato da mensagem que vai ser transmitida.
-    #cache = Cache()
-    id = 12
-    q = query.init_send_query(id, "Q+A", "example.com.", "MX")
-    res = query.respond_query(q, confs, databases, cache, log)
-
-    ### FIM ###
-    '''
 
     # Inicia os pedidos de transferencia de zona dos que são servidores secundários.
     if sp_domains:
         # Abre uma thread para que possa atender a transferencias de zona.
         threading.Thread(target=resp_zone_transfer, args=(log, confs, databases, porta)).start()
-        #resp_zone_transfer(log, confs, databases, porta)
+        ###resp_zone_transfer(log, confs, databases, porta)
 
-
+    # Para cada dominio secundário, pede ao respetivo servidor principal a sua base de dados.
     for ss in ss_domains:
         ask_zone_transfer(log, confs, cache, ss)
 
@@ -208,8 +204,6 @@ def main(): # argumentos: nome_do_script  ficheiro_configuraçao  porta*  timeou
         msg, address = s.recvfrom(1024)
         msg = msg.decode('utf-8')
         log.qr(time.time(), address, msg) # escrita do evento QR no log
-        #print(f"Recebi uma mensagem do cliente {add}")
-        #print("----------------------")
         answer = query.respond_query(msg, confs, databases, cache, log)
 
         s.sendto(answer.encode('utf-8'), address)

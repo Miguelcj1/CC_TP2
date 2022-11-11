@@ -4,12 +4,22 @@ import threading
 import random
 import socket
 
-endereco = ("127.0.0.1", 54)
-
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind(endereco)
 
 
+
+
+
+
+'''
+    ### TESTE ###
+    # constroi uma string no formato da mensagem que vai ser transmitida.
+    #cache = Cache()
+    id = 12
+    q = query.init_send_query(id, "Q+A", "example.com.", "MX")
+    res = query.respond_query(q, confs, databases, cache, log)
+
+    ### FIM ###
+    '''
 
 '''
 # checks and creates directory
