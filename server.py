@@ -32,9 +32,13 @@ def get_line_number(string):
     return inteiro
 
 def is_final_msg(string, last_i):
-    last_line = string.split("\n")[-1]
-    num = get_line_number(last_line)
-    return num == last_i
+    split_msg = string.split("\n")
+    if split_msg[-1]:
+        last_line = split_msg[-1]
+        num = get_line_number(last_line)
+        return num == last_i
+    else:
+        return False
 
 
 # Utilizada por um SS para pedir pelas entradas de base de dados de um domínio.
@@ -48,7 +52,7 @@ def ask_zone_transfer(log, confs, cache, dom):
     # Cria o socket TCP.
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     #s.bind(('', port)) ### TEST
-    s.settimeout(100) # aplica um tempo em que tem de acabar a transferencia de zona.
+    s.settimeout(20) # aplica um tempo em que tem de acabar a transferencia de zona.
 
     # Tenta conectar-se ao endereço do servidor principal especificado no tuplo adress_port.
     s.connect(addr)
@@ -58,6 +62,10 @@ def ask_zone_transfer(log, confs, cache, dom):
 
     try:
         msg = s.recv(1024) # Espera receber o nº de entradas da base de dados que vão ser enviadas.
+        # VERIFICAR SE MENSAGEM É "ERRO"
+        if msg.decode("utf-8") == "erro":
+            log.ez(time.time(), str(addr), "SP", dom)
+            return
         lines_to_receive = int(msg.decode("utf-8"))
         lines_received = 0
         s.send(msg) # reenvia o nº de linhas como maneira de indicar que quer que se começe a transferencia.
@@ -67,6 +75,7 @@ def ask_zone_transfer(log, confs, cache, dom):
         while flag:
             msg = s.recv(1024) # mensagem vem na forma (i;dados)
             msg = msg.decode("utf-8")
+            ###print(f"Foi recebida a seguinte mensagem:{msg} [DEBUG]")
             if is_final_msg(msg, lines_to_receive):
                 flag = False
             buf += msg
@@ -83,7 +92,10 @@ def ask_zone_transfer(log, confs, cache, dom):
             n_line = int(arr[0])
             data = arr[1]
             cache.update_with_line(log, data, "SP")
-        # ENVIAR CONFIRMAÇAO PARA O SP
+
+        # ENVIA CONFIRMAÇAO PARA O SP
+        s.send("1".encode("utf-8"))  ### Mensagem de confirmação de todas as linhas recebidas.
+
         s.close()
         t_end = time.time()
         duracao = t_end - t_start
@@ -108,17 +120,15 @@ def resp_zone_transfer(log, confs, dbs, port):
             if msg not in confs.get_sp_domains():
                 # O nome do domínio, não é um dominio principal neste servidor.
                 conn.send("erro".encode("utf-8"))
-                # chamar algum metodo de log
-                print(f"O nome do domínio recebido: {msg}, não é conhecido pelo servidor!!")
-                conn.close()
-                break
+                log.ez(time.time(), str(addr), "SP", dom)
+                #print(f"O nome do domínio recebido: {msg}, não é conhecido pelo servidor!!")
+                continue
             dom = msg
             ss_addresses_l = confs.get_ss(dom) # ["endereço" ou "endereço:porta"]
             if not check_addr(addr, ss_addresses_l): # significa que este endereço não é um endereço de um SS conhecido, negando a conexao.
-                conn.send("Erro".encode("utf-8"))
+                conn.send("erro".encode("utf-8"))
                 log.ez(time.time(), str(addr), "SP", dom)
-                conn.close()
-                break
+                continue
             else:
                 # envia o nº de entradas das bases de dados
                 db = dbs.get(dom) # isto nunca deve retornar null uma vez que é feita uma verificação similar atras.
@@ -132,16 +142,21 @@ def resp_zone_transfer(log, confs, dbs, port):
                 if msg != n_lines:
                     # O SS não aceitou o nº de linhas para enviar.
                     log.ez(time.time(), str(addr), "SP", dom)
-                    conn.close()
-                    break
+                    continue
 
                 i = 1
                 for l in entry_lines:
                     msg = f"{i};{l}"
                     if i != numb_lines:
                         msg += "\n"
-                    conn.send(msg.encode('utf-8'))
+                    conn.send(msg.encode('utf-8')) # talvez meter aqui um try
                     i += 1
+                print("Ha espera de confirmaçao [Debug]") ###
+                msg = conn.recv(1024)
+                print("Passei da confirmaçao [Debug]") ###
+                if msg.decode("utf-8") != "1":
+                    log.ez(time.time(), str(addr), "SP", dom)
+                    continue
 
                 t_end = time.time()
                 duracao = t_end - t_start
