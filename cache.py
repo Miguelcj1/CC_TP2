@@ -42,7 +42,9 @@ class Cache:
         responses_f = ""
         authorities_f = ""
         extras_f = ""
+        flags = set() # conjunto de strings que representam flags, adquiridas ao longo da pesquisa.
 
+        # init_line = [Name(0), Type(1), Value(2), TTL(3), Prio(4), origin(5), TimeStamp(6), Index(7), STATUS(8)]
         now = time.time()
         # Obtencao de response_values
         for i in range(self.MAX):
@@ -51,8 +53,10 @@ class Cache:
             if line[8] == "VALID" and line[5] == "OTHERS" and now - line[6] > line[3]:
                 self.table[i][8] = "FREE"
             if line[8] == "VALID" and line[0] == name and line[1] == type_of_value:
+                if line[5] == "FILE":
+                    flags.add("A") # significa que obteve a informação pelo servidor primário.
                 arr_resp.append(line_to_string(line))
-                n_resp +=1
+                n_resp += 1
                 all_values.append(line[2])
         # CASO NÃO HAJA RESPOSTAS RETORNA NONE.
         if n_resp == 0:
@@ -66,6 +70,8 @@ class Cache:
             if line[8] == "VALID" and line[5] == "OTHERS" and time.time() - line[6] > line[3]:
                 self.table[i][8] = "FREE"
             if line[8] == "VALID" and line[0] == name and line[1] == "NS":
+                if line[5] == "FILE":
+                    flags.add("A") # significa que obteve a informação pelo servidor primário.
                 arr_authorities.append(line_to_string(line))
                 n_authorities += 1
                 all_values.append(line[2])
@@ -83,7 +89,8 @@ class Cache:
                 n_extras += 1
         extras_f = ",".join(arr_extras)
 
-        string = f"{id}, ,0,{n_resp},{n_authorities},{n_extras};{name},{type_of_value};"
+        flags = "+".join(flags)
+        string = f"{id},{flags},0,{n_resp},{n_authorities},{n_extras};{name},{type_of_value};"
         data = ";".join((responses_f, authorities_f, extras_f)) + ";"
         return string + data
 

@@ -206,7 +206,7 @@ def main(): # argumentos: nome_do_script  ficheiro_configuraçao  porta*  timeou
     databases = {}
     for name in sp_domains:
         try:
-            db = Database(confs.get_db_path(name), cache, "SP", log)
+            db = Database(confs.get_db_path(name), cache, "FILE", log)
         except Exception as exc:
             log.fl(time.time(), str(exc), name)
             log.sp(time.time(), str(exc))

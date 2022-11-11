@@ -68,7 +68,7 @@ def respond_query(query, confs, dbs, cache, log):
     if result is not None:
         return result
 
-    # Procura e obtenção de respostas na base de dados.
+    # Procura e obtenção de respostas na base de dados. ### PARTE EM BAIXO TECNICAMENTE É INUTIL.
     db = dbs.get(q_name)
     if db is None:
         # O VALOR NAO FOI ENCONTRADO NA BASE DE DADOS E PROSSEGUIR COM O RESPETIVO PROCEDIMENTO.

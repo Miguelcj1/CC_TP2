@@ -5,18 +5,15 @@ import random
 import socket
 
 
-i=0
-while i < 2:
-    try:
-        print("Ola1")
-        raise Exception("ERRROO")
-        print("Ola2")
-    except Exception as exc:
-        print(str(exc))
-    i+=1
+conj = set()
 
+conj.add("Q")
+conj.add("Q")
+#conj.add("A")
 
-print("OlaFIM")
+flags = "+".join(conj)
+
+print(flags)
 
 '''
     ### TESTE ###
