@@ -137,6 +137,7 @@ class Cache:
             prio = int(arr[4])
         self.update(log, name, type_of_value, value, ttl, prio=prio, origin=origin)
 
+
     # atualiza, em todas as entradas da cache com Name igual
     # ao domínio passado como argumento, o campo Status para FREE. Quando o temporizador
     # associado à idade da base de dados dum SS relativo a um domínio atinge o valor de SOAEXPIRE,

@@ -52,7 +52,7 @@ def ask_zone_transfer(log, confs, cache, dom):
     # Cria o socket TCP.
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     #s.bind(('', port)) ### TEST
-    s.settimeout(20) # aplica um tempo em que tem de acabar a transferencia de zona.
+    s.settimeout(5) # tempo que um recv chamada neste socket, esperará.
 
     # Tenta conectar-se ao endereço do servidor principal especificado no tuplo adress_port.
     s.connect(addr)
@@ -62,39 +62,34 @@ def ask_zone_transfer(log, confs, cache, dom):
 
     try:
         msg = s.recv(1024) # Espera receber o nº de entradas da base de dados que vão ser enviadas.
-        # VERIFICAR SE MENSAGEM É "ERRO"
-        if msg.decode("utf-8") == "erro":
+
+        if msg.decode("utf-8") == "erro": # Significa que não foi dada permissão pelo SP o acesso à base de dados.
             log.ez(time.time(), str(addr), "SP", dom)
             return
+
         lines_to_receive = int(msg.decode("utf-8"))
-        lines_received = 0
         s.send(msg) # reenvia o nº de linhas como maneira de indicar que quer que se começe a transferencia.
 
-        buf = ""
-        flag = True
-        while flag:
+        buf = ""  # 'buf' vai conter uma string com todas as linhas enviadas, separadas por \n
+        while True:
             msg = s.recv(1024) # mensagem vem na forma (i;dados)
             msg = msg.decode("utf-8")
-            ###print(f"Foi recebida a seguinte mensagem:{msg} [DEBUG]")
-            if is_final_msg(msg, lines_to_receive):
-                flag = False
             buf += msg
-        # 'buf' contém uma string com todas as linhas enviadas, separadas por \n
+            if is_final_msg(msg, lines_to_receive):
+                break
 
-        # 'lines' é um array das linhas enviadas pelo SP.
-        lines = buf.split("\n")
-
-        # Verificação da ordem das linhas recebidas.
-        lines = sorted(lines, key=get_line_number)
+        lines = buf.split("\n")  # 'lines' é um array das linhas enviadas pelo SP.
+        lines = sorted(lines, key=get_line_number)  # Ordena as linhas recebidas caso tenham vindo desordenadas.
 
         for single_line in lines:
             arr = single_line.split(";")
-            n_line = int(arr[0])
+            #n_line = int(arr[0])
             data = arr[1]
             cache.update_with_line(log, data, "SP")
 
-        # ENVIA CONFIRMAÇAO PARA O SP
-        s.send("1".encode("utf-8"))  ### Mensagem de confirmação de todas as linhas recebidas.
+        # ENVIA CONFIRMAÇAO PARA O SP do término da zona de transferência bem sucedido.
+
+        s.send("1".encode("utf-8"))
 
         s.close()
         t_end = time.time()
@@ -129,39 +124,39 @@ def resp_zone_transfer(log, confs, dbs, port):
                 conn.send("erro".encode("utf-8"))
                 log.ez(time.time(), str(addr), "SP", dom)
                 continue
-            else:
-                # envia o nº de entradas das bases de dados
-                db = dbs.get(dom) # isto nunca deve retornar null uma vez que é feita uma verificação similar atras.
-                entry_lines = db.all_db_lines()
-                numb_lines = len(entry_lines)
-                n_lines = str(numb_lines)
-                conn.send(n_lines.encode("utf-8"))
-                msg = conn.recv(1024)  # nº de entradas que o SS quer receber
-                msg = msg.decode("utf-8")
-                # Se o número recebido for o mesmo que o enviado, todas as entradas do ficheiro de base de dados numerados sem comentarios.
-                if msg != n_lines:
-                    # O SS não aceitou o nº de linhas para enviar.
-                    log.ez(time.time(), str(addr), "SP", dom)
-                    continue
 
-                i = 1
-                for l in entry_lines:
-                    msg = f"{i};{l}"
-                    if i != numb_lines:
-                        msg += "\n"
-                    conn.send(msg.encode('utf-8')) # talvez meter aqui um try
-                    i += 1
-                print("Ha espera de confirmaçao [Debug]") ###
-                msg = conn.recv(1024)
-                print("Passei da confirmaçao [Debug]") ###
-                if msg.decode("utf-8") != "1":
-                    log.ez(time.time(), str(addr), "SP", dom)
-                    continue
+            # envia o nº de entradas das bases de dados
+            db = dbs.get(dom) # isto nunca deve retornar null uma vez que é feita uma verificação similar atras.
+            entry_lines = db.all_db_lines()
+            numb_lines = len(entry_lines)
+            n_lines = str(numb_lines)
+            conn.send(n_lines.encode("utf-8"))
+            msg = conn.recv(1024)  # nº de entradas que o SS quer receber
+            msg = msg.decode("utf-8")
+            # Se o número recebido for o mesmo que o enviado, todas as entradas do ficheiro de base de dados numerados sem comentarios.
+            if msg != n_lines:
+                # O SS não aceitou o nº de linhas para enviar.
+                log.ez(time.time(), str(addr), "SP", dom)
+                continue
+            i = 1
+            for l in entry_lines:
+                msg = f"{i};{l}"
+                if i != numb_lines:
+                    msg += "\n"
+                conn.send(msg.encode('utf-8'))
+                i += 1
+            ###print("Ha espera de confirmaçao [Debug]")
+            #conn.settimeout(10) # Espera 10 segundos pela confirmacao.
+            msg = conn.recv(1024) # Confirmação de conclusão da transferencia de zona pelo outro lado.
+            ###print("Passei da confirmaçao [Debug]") ###
+            if msg.decode("utf-8") != "1":
+                log.ez(time.time(), str(addr), "SP", dom)
+                continue
 
-                t_end = time.time()
-                duracao = t_end - t_start
-                duracao *= 1000 ## PASSA DURACAO PARA MILISEGUNDOS.
-                log.zt(time.time(), addr, "SP", duracao=duracao, domain=dom)
+            t_end = time.time()
+            duracao = t_end - t_start
+            duracao *= 1000 ## PASSA DURACAO PARA MILISEGUNDOS.
+            log.zt(time.time(), addr, "SP", duracao=duracao, domain=dom)
 
     s.close()
 
