@@ -45,9 +45,12 @@ class Cache:
         flags = set() # conjunto de strings que representam flags, adquiridas ao longo da pesquisa.
         name_exists = False
 
-        ### PROCURAR POR ALIASES NAS ENTRADAS CNAME
-        # TO DO
-        pass
+        # Procura por aliases do tipo CNAME em primeiro lugar.
+        for i in range(self.MAX):
+            line = self.table[i]
+            if line[8] == "VALID" and line[1] == "CNAME" and line[2] == q_name:
+                q_name = line[0]
+                break
 
         # init_line = [Name(0), Type(1), Value(2), TTL(3), Prio(4), origin(5), TimeStamp(6), Index(7), STATUS(8)]
         now = time.time()

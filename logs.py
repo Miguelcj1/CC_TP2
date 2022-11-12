@@ -69,7 +69,7 @@ class Logs:
         self.locks[domain].acquire()
         try:
             fp = open(self.log_files[domain], "a")
-            string = f'{get_timestamp(timestamp)} QR {str(adress[0])} "{dados}"\n'
+            string = f'{get_timestamp(timestamp)} QR {adress} "{dados}"\n'
             fp.write(string)
             fp.close()
             if self.stdout:

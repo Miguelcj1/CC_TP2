@@ -4,14 +4,16 @@ import threading
 import random
 import socket
 
-simbols = ["@", "TTL"]
 
-ex = "andre"
+res = "andre"
 
 try:
-    inteiro = int(ex)
+    inteiro = int(res)
 except ValueError:
-    print("apanhado")
+    print("Ola")
+
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s.sendto(res.encode("utf-8"), ("127.0.0.1", 5001))
 
 
 '''

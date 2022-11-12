@@ -1,5 +1,6 @@
 import time
 import random
+import socket
 import auxs
 from db_parser import Database
 from logs import Logs
@@ -18,9 +19,10 @@ def init_send_query(flags, q_name, q_type):
     return string
 
 
-def respond_query(query, socket, address, confs, log, dbs, cache):
+def respond_query(query, address, confs, log, cache):
 
     t_start = time.time()
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     arr = query.split(";")
 
@@ -51,7 +53,7 @@ def respond_query(query, socket, address, confs, log, dbs, cache):
     if len(arr) < 3:
         log.er(time.time(), address, domain=q_name)
         result = f"{message_id},,3,0,0,0;{q_name},{q_type};"  # sendo 3 o código de mensagem não descodificada.
-        socket.sendto(result.encode("utf-8"), address)
+        s.sendto(result.encode("utf-8"), address)
         return
 
     #talvez esta parte seja desnecessaria uma vez que faço isto para queries de perguntas.
@@ -70,15 +72,16 @@ def respond_query(query, socket, address, confs, log, dbs, cache):
         # A resposta irá com o response_code = 2.
         result = f"{message_id},,2,0,0,0;{q_name},{q_type};;"
         log.rp(time.time(), address, result, domain=q_name)
-        socket.sendto(result.encode("utf-8"), address)
+        s.sendto(result.encode("utf-8"), address)
         return
 
     # Procura em cache
     result = cache.get_answers(message_id, q_name, q_type)
 
     # Envio da mensagem para o respetivo endereço
+    #time.sleep(11) ##
     log.rp(time.time(), address, result, domain=q_name)
-    socket.sendto(result.encode("utf-8"), address)
+    s.sendto(result.encode("utf-8"), address)
 
 
 '''

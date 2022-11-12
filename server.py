@@ -42,7 +42,7 @@ def is_final_msg(string, last_i):
 
 
 # Utilizada por um SS para pedir pelas entradas de base de dados de um domínio.
-def ask_zone_transfer(log, confs, cache, dom):
+def ask_zone_transfer(log, confs, cache, dom, timeout):
     # Guarda a timestamp do início do processo.
     t_start = time.time()
 
@@ -52,7 +52,7 @@ def ask_zone_transfer(log, confs, cache, dom):
     # Cria o socket TCP.
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     #s.bind(('', port)) ### TEST
-    s.settimeout(10) # tempo que um recv chamada neste socket, esperará.
+    s.settimeout(timeout) # tempo que um recv chamada neste socket, esperará.
 
     # Tenta conectar-se ao endereço do servidor principal especificado no tuplo adress_port.
     s.connect(addr)
@@ -63,6 +63,7 @@ def ask_zone_transfer(log, confs, cache, dom):
     try:
         msg = s.recv(1024) # Espera receber o nº de entradas da base de dados que vão ser enviadas.
 
+        ### TALVEZ SIMPLESMENTE N DEVA ESPERAR QUE RETORNA ERRO DESISTINDO ATRAVES DO TIMEOUT
         if msg.decode("utf-8") == "erro": # Significa que não foi dada permissão pelo SP o acesso à base de dados.
             log.ez(time.time(), str(addr), "SP", dom)
             return
@@ -113,14 +114,13 @@ def resp_zone_transfer(log, confs, dbs, port):
             msg = msg.decode("utf-8")
             if msg not in confs.get_sp_domains():
                 # O nome do domínio, não é um dominio principal neste servidor.
-                conn.send("erro".encode("utf-8"))
+                conn.send("erro".encode("utf-8")) ### TALVEZ SIMPLESMENTE N DEVA RESPONDER DE VOLTA
                 log.ez(time.time(), str(addr), "SP", dom)
-                #print(f"O nome do domínio recebido: {msg}, não é conhecido pelo servidor!!")
                 continue
             dom = msg
             ss_addresses_l = confs.get_ss(dom) # ["endereço" ou "endereço:porta"]
             if not check_addr(addr, ss_addresses_l): # significa que este endereço não é um endereço de um SS conhecido, negando a conexao.
-                conn.send("erro".encode("utf-8"))
+                conn.send("erro".encode("utf-8")) ### TALVEZ SIMPLESMENTE N DEVA RESPONDER DE VOLTA
                 log.ez(time.time(), str(addr), "SP", dom)
                 continue
 
@@ -179,8 +179,6 @@ def main(): # argumentos: nome_do_script  ficheiro_configuraçao  porta*  timeou
         timeout = int(sys.argv[3])
         mode = sys.argv[4]
 
-    endereco = ''
-
     # Obtenção de um objeto que vai conter toda a informação proveniente do config_file.
     try:
         confs = Configs(conf)
@@ -221,10 +219,11 @@ def main(): # argumentos: nome_do_script  ficheiro_configuraçao  porta*  timeou
 
     # Para cada dominio secundário, pede ao respetivo servidor principal a sua base de dados.
     for ss in ss_domains:
-        ask_zone_transfer(log, confs, cache, ss)
+        ask_zone_transfer(log, confs, cache, ss, timeout)
 
 
     # Abertura do socket UDP.
+    endereco = ''
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.bind((endereco, porta))
 
@@ -237,7 +236,7 @@ def main(): # argumentos: nome_do_script  ficheiro_configuraçao  porta*  timeou
         msg = msg.decode('utf-8')
         ####  ESTOU A ESPERA DE SABER SE A MENSAGEM DE LOG TEM DE SER ESCRITO NO DOMINIO ESPECIFICO OU NAO. ####
         #log.qr(time.time(), address, msg) # Indica o recebimento de uma query no ficheiro de log.
-        threading.Thread(target=query.respond_query, args=(msg, s, address, confs, log, databases, cache)).start()
+        threading.Thread(target=query.respond_query, args=(msg, address, confs, log, cache)).start()
 
     s.close()
 
