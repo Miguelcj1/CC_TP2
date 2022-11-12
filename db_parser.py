@@ -132,7 +132,7 @@ class Database:
         elif arr[1] == "SOAEXPIRE":
             self.SOAEXPIRE[dom] = (name, ttl)
 
-        elif arr[1] == "NS" and len(arr) > 3:  # talvez deva adicionar length restrictions.
+        elif arr[1] == "NS":  # talvez deva adicionar length restrictions.
             if not self.NS.get(dom):
                 self.NS[dom] = []
             self.NS[dom].append((name, ttl, prio))
