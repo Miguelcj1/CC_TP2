@@ -45,6 +45,10 @@ class Cache:
         flags = set() # conjunto de strings que representam flags, adquiridas ao longo da pesquisa.
         name_exists = False
 
+        ### PROCURAR POR ALIASES NAS ENTRADAS CNAME
+        # TO DO
+        pass
+
         # init_line = [Name(0), Type(1), Value(2), TTL(3), Prio(4), origin(5), TimeStamp(6), Index(7), STATUS(8)]
         now = time.time()
         # Obtencao de response_values

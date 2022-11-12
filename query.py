@@ -67,8 +67,7 @@ def respond_query(query, socket, address, confs, log, dbs, cache):
     # Verifica se deve responder a queries deste dominio, relativamente aos DD's.
     respondable_domains = confs.get_all_dd()
     if q_name not in respondable_domains:
-        # Não irá ser respondida a query.
-
+        # A resposta irá com o response_code = 2.
         result = f"{message_id},,2,0,0,0;{q_name},{q_type};;"
         log.rp(time.time(), address, result, domain=q_name)
         socket.sendto(result.encode("utf-8"), address)
