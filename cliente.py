@@ -38,7 +38,8 @@ def main():
             #porta = int(input("Porta: "))
             q_dom = input("Query domain: ")
             q_type = input("Query type: ")
-            q_flags = input("Query flags: ")
+            #q_flags = input("Query flags: ")
+            q_flags = "Q"
             q_id = random.choice(tuple(ids))
 
             msg = query.init_send_query(q_id, q_flags, q_dom, q_type)

@@ -54,18 +54,16 @@ class Logs:
 
         for domain in confs.get_domain_names():
             diretoria = confs.get_domain_log_file(domain)
-            #domain = auxs.add_end_dot(domain) # Adiciona o ponto no final do domínio por questão de coerência com os outros componentes.
             if diretoria is not None:
                 check_dir(diretoria)
                 self.log_files[domain] = diretoria
             # else todas as funcoes de escrita nos logs vão escrever no "all".
 
-    ## talvez juntar estas 4 primeiras funcoes porque fazem o mesmo exceto nas letras do tipo de entrada.
-    ## talvez adicionar printf nestes metodos porque vai ser necessario tambem fazer print para o terminal, ou talvez guardar uma flag no objeto para ver se querem que se faça print no terminal.
+
     # Escreve no log a ocorrencia da receçao de uma query.
     def qr(self, timestamp, adress, dados, domain = "all"):
         if self.log_files.get(domain) is None:
-            domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
+            domain = "all" # caso não haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log.
         try:
             fp = open(self.log_files[domain], "a")
         except FileNotFoundError:
@@ -74,12 +72,10 @@ class Logs:
         string = get_timestamp(timestamp) + " QR " + str(adress[0]) + " [" + dados + "]\n"
         fp.write(string)
         fp.close()
-        # Se for para imprimir no stdout também.
         if self.stdout:
-            #print(string)
             sys.stdout.write(string)
 
-    # Escreve no log a ocorrencia do envio de uma query
+    # Escreve no log a ocorrencia do envio de uma query.
     def qe(self, timestamp, adress, dados, domain = "all"):
         if self.log_files.get(domain) is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
@@ -92,12 +88,10 @@ class Logs:
         string = get_timestamp(timestamp) + " QE " + str(adress[0]) + " [" + dados + "]\n"
         fp.write(string)
         fp.close()
-        # Se for para imprimir no stdout também.
         if self.stdout:
-            # print(string)
             sys.stdout.write(string)
 
-    # Escreve no log a ocorrencia do envio de uma query
+    # Escreve no log a ocorrencia do envio de uma resposta.
     def rp(self, timestamp, adress, dados, domain = "all"):
         if self.log_files.get(domain) is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
@@ -106,16 +100,14 @@ class Logs:
         except FileNotFoundError:
             print("Logging file not found!!")
             return None
-        #                                          Not sure desta indicaçao do adress.
+        #                                          So vai o endereço sem a porta.
         string = get_timestamp(timestamp) + " RP " + str(adress[0]) + " [" + dados + "]\n"
         fp.write(string)
         fp.close()
-        # Se for para imprimir no stdout também.
         if self.stdout:
-            # print(string)
             sys.stdout.write(string)
 
-    # Escreve no log a ocorrencia do envio de uma query
+    # Escreve no log a ocorrencia da rececão de uma resposta.
     def rr(self, timestamp, adress, dados, domain = "all"):
         if self.log_files.get(domain) is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
@@ -130,7 +122,6 @@ class Logs:
         fp.close()
         # Se for para imprimir no stdout também.
         if self.stdout:
-            # print(string)
             sys.stdout.write(string)
 
     # Reporta a conclusao correta de um processo de transferencia de zona.
@@ -148,13 +139,13 @@ class Logs:
         #string = get_timestamp(timestamp) + " ZT " + end_adress + " " + papel
         string = f"{get_timestamp(timestamp)} ZT {end_adress} {papel}"
         if duracao > 0:
+            duracao = round(duracao, 3)
             string += f" {duracao}ms"
         string += "\n"
         fp.write(string)
         fp.close()
         # Se for para imprimir no stdout também.
         if self.stdout:
-            # print(string)
             sys.stdout.write(string)
 
     # Reporta um determinado evento.
@@ -168,16 +159,14 @@ class Logs:
         except FileNotFoundError:
             print("Logging file not found!!")
             return None
-        #                                          Not sure desta indicaçao do adress.
         string = get_timestamp(timestamp) + " EV @ " + info + "\n"
         fp.write(string)
         fp.close()
         # Se for para imprimir no stdout também.
         if self.stdout:
-            # print(string)
             sys.stdout.write(string)
 
-    # (ERRO) Reporta a impossibilidade de descodificar um PDU corretamente.
+    # Reporta a impossibilidade de descodificar um PDU corretamente.
     #Outras opcionalidades
     def er(self, timestamp, from_adress, domain="all"):
         if self.log_files.get(domain) is None:
@@ -190,12 +179,10 @@ class Logs:
         string = get_timestamp(timestamp) + " ER " + from_adress + "\n"
         fp.write(string)
         fp.close()
-        # Se for para imprimir no stdout também.
         if self.stdout:
-            # print(string)
             sys.stdout.write(string)
 
-    # (ERRO DE ZONA) Reporta a conclusao incorreta de um processo de transferencia de zona.
+    # Reporta a conclusao incorreta de um processo de transferencia de zona (ERRO DE ZONA).
     def ez(self, timestamp, end_adress, papel, domain="all"):
         if self.log_files.get(domain) is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
@@ -207,9 +194,7 @@ class Logs:
         string = get_timestamp(timestamp) + " ZT " + end_adress + " " + papel + "\n"
         fp.write(string)
         fp.close()
-        # Se for para imprimir no stdout também.
         if self.stdout:
-            # print(string)
             sys.stdout.write(string)
 
     # Reporta um erro do funcionamento interno de um componente.
@@ -224,9 +209,7 @@ class Logs:
         string = get_timestamp(timestamp) + " FL 127.0.0.1 " + info + "\n"
         fp.write(string)
         fp.close()
-        # Se for para imprimir no stdout também.
         if self.stdout:
-            # print(string)
             sys.stdout.write(string)
 
     # Deteção de um timeout na interaçao com o servidor no endereço indicado.
@@ -241,12 +224,10 @@ class Logs:
         string = get_timestamp(timestamp) + " TO " + adress + " " + info + "\n"
         fp.write(string)
         fp.close()
-        # Se for para imprimir no stdout também.
         if self.stdout:
-            # print(string)
             sys.stdout.write(string)
 
-    # (SERVIDOR PAROU) Reporta que a execução do componente foi parado.
+    # Reporta que a execução do componente foi parado (SERVIDOR PAROU).
     def sp(self, timestamp, info, domain="all"):
         if self.log_files.get(domain) is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
@@ -258,12 +239,10 @@ class Logs:
         string = get_timestamp(timestamp) + " SP 127.0.0.1 " + info + "\n"
         fp.write(string)
         fp.close()
-        # Se for para imprimir no stdout também.
         if self.stdout:
-            # print(string)
             sys.stdout.write(string)
 
-    # Reporta o arranque do servidor ((Not sure donde virao os valores do timeout e o mode)). NOT SURE ###
+    # Reporta o arranque do servidor.
     def st(self, timestamp, port, timeout, mode, domain = "all"):
         if self.log_files.get(domain) is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
@@ -275,8 +254,6 @@ class Logs:
         string = get_timestamp(timestamp) + " ST 127.0.0.1 " + str(port) + " " + str(timeout) + " " + mode + "\n"
         fp.write(string)
         fp.close()
-        # Se for para imprimir no stdout também.
         if self.stdout:
-            # print(string)
             sys.stdout.write(string)
 

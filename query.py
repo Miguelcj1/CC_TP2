@@ -14,8 +14,8 @@ def init_send_query(id, flag, dom, tipo):
     string = f"{id},{flag},0,0,0,0;{dom},{tipo};"
     return string
 
-# raises exception in which is caused by a problem in decoding the received string (ER ou FL)
-def respond_query(query, address, confs, log, dbs, cache):
+
+def respond_query(query, socket, address, confs, log, dbs, cache):
 
     log.qr(time.time(), address, query)  # Indica o recebimento de uma query no ficheiro de log.
 
@@ -43,10 +43,10 @@ def respond_query(query, address, confs, log, dbs, cache):
     q_type = qi_fields[1]
 
     if len(arr) < 3:
-        log.er(time.time(), address, )
-        return f"{message_id},,3,0,0,0;{q_name},{q_type};" # sendo 3 o código de mensagem não descodificada.
-        #raise Exception(f"Sintaxe desconhecida da seguinte mensagem: {query}")
-
+        log.er(time.time(), address, domain=q_name)
+        result = f"{message_id},,3,0,0,0;{q_name},{q_type};"  # sendo 3 o código de mensagem não descodificada.
+        socket.sendto(result.encode("utf-8"), address)
+        return
 
     #talvez esta parte seja desnecessaria uma vez que faço isto para queries de perguntas.
     # Terceira parte da mensagem onde vem informaçao de resposta
@@ -58,20 +58,25 @@ def respond_query(query, address, confs, log, dbs, cache):
         for r in resp_fields:
             responses.append(r)
 
-
     # Verifica se deve responder a queries deste dominio, relativamente aos DD's.
     respondable_domains = confs.get_all_dd()
     if q_name not in respondable_domains:
         # Não irá ser respondida a query.
-        return f"{message_id},,2,0,0,0;{q_name},{q_type};;"
+
+        result = f"{message_id},,2,0,0,0;{q_name},{q_type};;"
+        log.rp(time.time(), address, result, domain=q_name)
+        socket.sendto(result.encode("utf-8"), address)
+        return
 
     # Procura em cache
     result = cache.get_answers(message_id, q_name, q_type)
-    if result is not None:
-        return result
 
-    print("[DEBUG DEBUG DEBUG] PASSEI DA PARTE DE VERIFICAÇÃO NA CACHE INDEVIDAMENTE!!!!!") #####
+    # Envio da mensagem para o respetivo endereço
+    log.rp(time.time(), address, result, domain=q_name)
+    socket.sendto(result.encode("utf-8"), address)
 
+
+'''
     # Procura e obtenção de respostas na base de dados. ### PARTE EM BAIXO TECNICAMENTE É INUTIL.
     db = dbs.get(q_name)
     if db is None:
@@ -231,4 +236,5 @@ def respond_query(query, address, confs, log, dbs, cache):
     result += ";" + q_name + "," + q_type + ";"
     result += data
     return result
+    '''
 
