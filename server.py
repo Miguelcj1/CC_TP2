@@ -52,7 +52,7 @@ def ask_zone_transfer(log, confs, cache, dom):
     # Cria o socket TCP.
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     #s.bind(('', port)) ### TEST
-    s.settimeout(5) # tempo que um recv chamada neste socket, esperará.
+    s.settimeout(10) # tempo que um recv chamada neste socket, esperará.
 
     # Tenta conectar-se ao endereço do servidor principal especificado no tuplo adress_port.
     s.connect(addr)
@@ -88,7 +88,6 @@ def ask_zone_transfer(log, confs, cache, dom):
             cache.update_with_line(log, data, "SP")
 
         # ENVIA CONFIRMAÇAO PARA O SP do término da zona de transferência bem sucedido.
-
         s.send("1".encode("utf-8"))
 
         s.close()
