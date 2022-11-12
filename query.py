@@ -1,4 +1,5 @@
 import time
+import random
 import auxs
 from db_parser import Database
 from logs import Logs
@@ -9,9 +10,11 @@ def pop_end_dot(string):
         return string[:-1]
     return string
 
-# Talvez passar a escolha do ID para dentro desta função.
-def init_send_query(id, flag, dom, tipo):
-    string = f"{id},{flag},0,0,0,0;{dom},{tipo};"
+# Dado uma flag, o nome do dominio e o tipo de valor a procurar, constroi uma query.
+def init_send_query(flags, q_name, q_type):
+    ids = set(range(1, 65535))
+    id = random.choice(tuple(ids))
+    string = f"{id},{flags},0,0,0,0;{q_name},{q_type};"
     return string
 
 
@@ -77,7 +80,8 @@ def respond_query(query, socket, address, confs, log, dbs, cache):
 
 
 '''
-    # Procura e obtenção de respostas na base de dados. ### PARTE EM BAIXO TECNICAMENTE É INUTIL.
+    ### PARTE EM BAIXO TECNICAMENTE É INUTIL.
+    # Procura e obtenção de respostas na base de dados.
     db = dbs.get(q_name)
     if db is None:
         # O VALOR NAO FOI ENCONTRADO NA BASE DE DADOS E PROSSEGUIR COM O RESPETIVO PROCEDIMENTO.

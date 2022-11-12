@@ -69,7 +69,7 @@ class Logs:
         except FileNotFoundError:
             print("Logging file not found!!")
             return None
-        string = get_timestamp(timestamp) + " QR " + str(adress[0]) + " [" + dados + "]\n"
+        string = f'{get_timestamp(timestamp)} QR {str(adress[0])} "{dados}"\n'
         fp.write(string)
         fp.close()
         if self.stdout:
@@ -84,8 +84,8 @@ class Logs:
         except FileNotFoundError:
             print("Logging file not found!!")
             return None
-        #                                          Not sure desta indicaçao do adress.
-        string = get_timestamp(timestamp) + " QE " + str(adress[0]) + " [" + dados + "]\n"
+        #                                        Not sure desta indicaçao do adress.
+        string = f'{get_timestamp(timestamp)} QE {str(adress[0])} "{dados}"\n'
         fp.write(string)
         fp.close()
         if self.stdout:
@@ -100,8 +100,8 @@ class Logs:
         except FileNotFoundError:
             print("Logging file not found!!")
             return None
-        #                                          So vai o endereço sem a porta.
-        string = get_timestamp(timestamp) + " RP " + str(adress[0]) + " [" + dados + "]\n"
+        #                                        So vai o endereço sem a porta.
+        string = f'{get_timestamp(timestamp)} RP {str(adress[0])} "{dados}"\n'
         fp.write(string)
         fp.close()
         if self.stdout:
@@ -116,8 +116,8 @@ class Logs:
         except FileNotFoundError:
             print("Logging file not found!!")
             return None
-        #                                          Not sure desta indicaçao do adress.
-        string = get_timestamp(timestamp) + " RR " + str(adress[0]) + " [" + dados + "]\n"
+        #                                        Not sure desta indicaçao do adress.
+        string = f'{get_timestamp(timestamp)} RR {str(adress[0])} "{dados}"\n'
         fp.write(string)
         fp.close()
         # Se for para imprimir no stdout também.

@@ -1,5 +1,4 @@
 import socket
-import random
 import query
 import sys
 
@@ -13,19 +12,17 @@ def main():
 
     arr = string_adress.split(":")
     endereco = arr[0]
-    porta = 5000 ### 53
+    porta = 5000
     if len(arr) > 1:
         porta = int(arr[1])
 
     destination = (endereco, porta)
-
-
     print("Enviarei as queries para o seguinte endereço: " + str(destination))
+
+
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-    ids = set(range(1,65535)) # talvez enviar a logica de ids para o init_query
-
-    inp = "1" # Inicializo o inp para entrar no seguinte ciclo while.
+    inp = "1"
     while inp != "0":
         print("--------------------")
         print("0: Sair do programa")
@@ -40,9 +37,8 @@ def main():
             q_type = input("Query type: ")
             #q_flags = input("Query flags: ")
             q_flags = "Q"
-            q_id = random.choice(tuple(ids))
 
-            msg = query.init_send_query(q_id, q_flags, q_dom, q_type)
+            msg = query.init_send_query(q_flags, q_dom, q_type)
             s.sendto(msg.encode('utf-8'), destination)
 
             print("Há espera da resposta..")
@@ -52,8 +48,7 @@ def main():
 
         elif inp == "a" or inp == "A":
             for i in range(1):
-                q_id = random.choice(tuple(ids))
-                q = query.init_send_query(q_id, "Q", "example.com.", "MX")
+                q = query.init_send_query("Q", "example.com.", "MX")
                 print("Foi enviada a seguinte query: " + q)
                 s.sendto(q.encode('utf-8'), destination)
                 msg, add = s.recvfrom(1024)
