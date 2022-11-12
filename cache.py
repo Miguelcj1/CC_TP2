@@ -30,8 +30,8 @@ class Cache:
                 break
         return res # retorna o primeiro indice que faz match com (name, type)
 
-    # Retorna a resposta ou None, caso nada seja encontrado.
-    def get_answers(self, id, name, type_of_value):
+    # Retorna a resposta final.
+    def get_answers(self, message_id, q_name, q_type):
         all_values = []
         n_resp = 0
         arr_resp = []
@@ -43,24 +43,26 @@ class Cache:
         authorities_f = ""
         extras_f = ""
         flags = set() # conjunto de strings que representam flags, adquiridas ao longo da pesquisa.
+        name_exists = False
 
         # init_line = [Name(0), Type(1), Value(2), TTL(3), Prio(4), origin(5), TimeStamp(6), Index(7), STATUS(8)]
         now = time.time()
         # Obtencao de response_values
         for i in range(self.MAX):
             line = self.table[i]
-            # Libertação de espaços
             if line[8] == "VALID" and line[5] == "OTHERS" and now - line[6] > line[3]:
-                self.table[i][8] = "FREE"
-            if line[8] == "VALID" and line[0] == name and line[1] == type_of_value:
+                self.table[i][8] = "FREE" # Libertação de espaços
+
+            if line[8] == "VALID" and line[0] == q_name: ### NAO SEI SE É REALMENTE NECESSARIO ESTA VERIFICAÇAO
+                name_exists = True
+
+            if line[8] == "VALID" and line[0] == q_name and line[1] == q_type:
                 if line[5] == "FILE":
                     flags.add("A") # significa que obteve a informação pelo servidor primário.
                 arr_resp.append(line_to_string(line))
                 n_resp += 1
                 all_values.append(line[2])
-        # CASO NÃO HAJA RESPOSTAS RETORNA NONE.
-        if n_resp == 0:
-            return None
+
         responses_f = ",".join(arr_resp)
 
         # Obtencao de authority_values
@@ -69,13 +71,17 @@ class Cache:
             # Libertação de espaços
             if line[8] == "VALID" and line[5] == "OTHERS" and time.time() - line[6] > line[3]:
                 self.table[i][8] = "FREE"
-            if line[8] == "VALID" and line[0] == name and line[1] == "NS":
+            if line[8] == "VALID" and line[0] == q_name and line[1] == "NS":
                 if line[5] == "FILE":
                     flags.add("A") # significa que obteve a informação pelo servidor primário.
                 arr_authorities.append(line_to_string(line))
                 n_authorities += 1
                 all_values.append(line[2])
         authorities_f = ",".join(arr_authorities)
+
+        # CASO NÃO HAJA RESPOSTAS, não irá procurar extra_values.
+        if n_resp == 0 and n_authorities == 0:
+            return f"{message_id},A,2,0,0,0;{q_name},{q_type};;"
 
         # init_line = [Name(0), Type(1), Value(2), TTL(3), Prio(4), origin(5), TimeStamp(6), Index(7), STATUS(8)]
         # Obtencao de extra_values
@@ -89,8 +95,15 @@ class Cache:
                 n_extras += 1
         extras_f = ",".join(arr_extras)
 
+        # Tratamento da resposta final.
         flags = "+".join(flags)
-        string = f"{id},{flags},0,{n_resp},{n_authorities},{n_extras};{name},{type_of_value};"
+        response_code = 0
+        if n_resp == 0 and name_exists:
+            response_code = 1
+        elif not name_exists:
+            response_code = 2
+
+        string = f"{message_id},{flags},{response_code},{n_resp},{n_authorities},{n_extras};{q_name},{q_type};"
         data = ";".join((responses_f, authorities_f, extras_f)) + ";"
         return string + data
 

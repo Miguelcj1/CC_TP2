@@ -172,7 +172,7 @@ def main(): # argumentos: nome_do_script  ficheiro_configuraçao  porta*  timeou
     # Path do ficheiro de configuração do servidor.
     conf = sys.argv[1]
 
-    porta = 5000 ### 53
+    porta = 5000
     timeout = 200
     mode = "DEBUG"
     if len(sys.argv) > 2:
@@ -219,7 +219,6 @@ def main(): # argumentos: nome_do_script  ficheiro_configuraçao  porta*  timeou
     if sp_domains:
         # Abre uma thread para que possa atender a transferencias de zona.
         threading.Thread(target=resp_zone_transfer, args=(log, confs, databases, porta)).start()
-        ###resp_zone_transfer(log, confs, databases, porta)
 
     # Para cada dominio secundário, pede ao respetivo servidor principal a sua base de dados.
     for ss in ss_domains:
@@ -237,8 +236,10 @@ def main(): # argumentos: nome_do_script  ficheiro_configuraçao  porta*  timeou
     while True:
         msg, address = s.recvfrom(1024)
         msg = msg.decode('utf-8')
-        log.qr(time.time(), address, msg) # escrita do evento QR no log
-        answer = query.respond_query(msg, confs, databases, cache, log)
+        ####  ESTOU A ESPERA DE SABER SE A MENSAGEM DE LOG TEM DE SER ESCRITO NO DOMINIO ESPECIFICO OU NAO. ####
+        #log.qr(time.time(), address, msg) # Indica o recebimento de uma query no ficheiro de log.
+        answer = query.respond_query(msg, address, confs, log, databases, cache)
+
 
         s.sendto(answer.encode('utf-8'), address)
 

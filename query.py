@@ -15,17 +15,14 @@ def init_send_query(id, flag, dom, tipo):
     return string
 
 # raises exception in which is caused by a problem in decoding the received string (ER ou FL)
-def respond_query(query, confs, dbs, cache, log):
+def respond_query(query, address, confs, log, dbs, cache):
+
+    log.qr(time.time(), address, query)  # Indica o recebimento de uma query no ficheiro de log.
 
     arr = query.split(";")
-    if len(arr) < 3:
-        raise Exception(f"Sintaxe desconhecida da seguinte mensagem: {query}")
-
-    header = arr[0]
-    data_qi = arr[1]
-    response_qi = arr[2]
 
     # Header
+    header = arr[0]
     h_fields = header.split(",")
     if len(h_fields) != 6:
         raise Exception(f"Sintaxe desconhecida da seguinte mensagem no header field: {query}")
@@ -36,17 +33,25 @@ def respond_query(query, confs, dbs, cache, log):
     num_authorities = h_fields[4]
     num_extra = h_fields[5]
 
+
     # Data: Query Info
+    data_qi = arr[1]
     qi_fields = data_qi.split(",")
     if len(qi_fields) != 2:
         raise Exception(f"Sintaxe desconhecida da seguinte mensagem no Query Info field: {query}")
     q_name = qi_fields[0]
     q_type = qi_fields[1]
 
+    if len(arr) < 3:
+        log.er(time.time(), address, )
+        return f"{message_id},,3,0,0,0;{q_name},{q_type};" # sendo 3 o código de mensagem não descodificada.
+        #raise Exception(f"Sintaxe desconhecida da seguinte mensagem: {query}")
+
 
     #talvez esta parte seja desnecessaria uma vez que faço isto para queries de perguntas.
     # Terceira parte da mensagem onde vem informaçao de resposta
     # Data: List of Response, Authorities and Extra Values
+    response_qi = arr[2]
     if response_qi:
         resp_fields = response_qi.split(",")
         responses = []
@@ -56,26 +61,23 @@ def respond_query(query, confs, dbs, cache, log):
 
     # Verifica se deve responder a queries deste dominio, relativamente aos DD's.
     respondable_domains = confs.get_all_dd()
-    respondable_domains = map(auxs.add_end_dot, respondable_domains) # acrescenta o ponto final para haver coerencia nos nomes.
     if q_name not in respondable_domains:
         # Não irá ser respondida a query.
-        result = ",".join((str(message_id), "A", "2", "0", "0", "0"))
-        result += ";" + q_name + "," + q_type + ";" + ";" # campo de dados vai vazio
-        return result
+        return f"{message_id},,2,0,0,0;{q_name},{q_type};;"
 
     # Procura em cache
     result = cache.get_answers(message_id, q_name, q_type)
     if result is not None:
         return result
 
+    print("[DEBUG DEBUG DEBUG] PASSEI DA PARTE DE VERIFICAÇÃO NA CACHE INDEVIDAMENTE!!!!!") #####
+
     # Procura e obtenção de respostas na base de dados. ### PARTE EM BAIXO TECNICAMENTE É INUTIL.
     db = dbs.get(q_name)
     if db is None:
         # O VALOR NAO FOI ENCONTRADO NA BASE DE DADOS E PROSSEGUIR COM O RESPETIVO PROCEDIMENTO.
         # Não irá ser respondida a query.
-        result = ",".join((str(message_id), "A", "2", "0", "0", "0"))
-        result += ";" + q_name + "," + q_type + ";" + ";"  # campo de dados vai vazio
-        return result
+        return f"{message_id},A,2,0,0,0;{q_name},{q_type};;"
 
     all_values = []
     responses_f = ""
