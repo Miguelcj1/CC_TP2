@@ -20,7 +20,7 @@ def init_send_query(flags, q_name, q_type):
 
 def respond_query(query, socket, address, confs, log, dbs, cache):
 
-    log.qr(time.time(), address, query)  # Indica o recebimento de uma query no ficheiro de log.
+    t_start = time.time()
 
     arr = query.split(";")
 
@@ -44,6 +44,9 @@ def respond_query(query, socket, address, confs, log, dbs, cache):
         raise Exception(f"Sintaxe desconhecida da seguinte mensagem no Query Info field: {query}")
     q_name = qi_fields[0]
     q_type = qi_fields[1]
+
+    # Indica o recebimento de uma query no ficheiro de log.
+    log.qr(t_start, address, query, domain=q_name)
 
     if len(arr) < 3:
         log.er(time.time(), address, domain=q_name)

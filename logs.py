@@ -1,6 +1,7 @@
 import os
 import sys
 import time
+import threading
 import auxs
 from datetime import datetime
 from config_parser import Configs
@@ -49,6 +50,7 @@ class Logs:
         check_dir(all_log_file)
         self.log_files = {"all": all_log_file}
         self.stdout = True
+        self.locks = {"all": threading.Lock()}  # "domain": Lock
         if mode.lower() != "debug":
             self.stdout = False
 
@@ -57,72 +59,73 @@ class Logs:
             if diretoria is not None:
                 check_dir(diretoria)
                 self.log_files[domain] = diretoria
-            # else todas as funcoes de escrita nos logs vão escrever no "all".
+                self.locks[domain] = threading.Lock()
 
 
     # Escreve no log a ocorrencia da receçao de uma query.
     def qr(self, timestamp, adress, dados, domain = "all"):
         if self.log_files.get(domain) is None:
             domain = "all" # caso não haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log.
+        self.locks[domain].acquire()
         try:
             fp = open(self.log_files[domain], "a")
-        except FileNotFoundError:
-            print("Logging file not found!!")
-            return None
-        string = f'{get_timestamp(timestamp)} QR {str(adress[0])} "{dados}"\n'
-        fp.write(string)
-        fp.close()
-        if self.stdout:
-            sys.stdout.write(string)
+            string = f'{get_timestamp(timestamp)} QR {str(adress[0])} "{dados}"\n'
+            fp.write(string)
+            fp.close()
+            if self.stdout:
+                sys.stdout.write(string)
+        finally:
+            self.locks[domain].release()
 
     # Escreve no log a ocorrencia do envio de uma query.
     def qe(self, timestamp, adress, dados, domain = "all"):
         if self.log_files.get(domain) is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
+        self.locks[domain].acquire()
         try:
             fp = open(self.log_files[domain], "a")
-        except FileNotFoundError:
-            print("Logging file not found!!")
-            return None
-        #                                        Not sure desta indicaçao do adress.
-        string = f'{get_timestamp(timestamp)} QE {str(adress[0])} "{dados}"\n'
-        fp.write(string)
-        fp.close()
-        if self.stdout:
-            sys.stdout.write(string)
+            #                                        Not sure desta indicaçao do adress.
+            string = f'{get_timestamp(timestamp)} QE {str(adress[0])} "{dados}"\n'
+            fp.write(string)
+            fp.close()
+            if self.stdout:
+                sys.stdout.write(string)
+        finally:
+            self.locks[domain].release()
 
     # Escreve no log a ocorrencia do envio de uma resposta.
     def rp(self, timestamp, adress, dados, domain = "all"):
         if self.log_files.get(domain) is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
+        self.locks[domain].acquire()
         try:
             fp = open(self.log_files[domain], "a")
-        except FileNotFoundError:
-            print("Logging file not found!!")
-            return None
-        #                                        So vai o endereço sem a porta.
-        string = f'{get_timestamp(timestamp)} RP {str(adress[0])} "{dados}"\n'
-        fp.write(string)
-        fp.close()
-        if self.stdout:
-            sys.stdout.write(string)
+            #                                        So vai o endereço sem a porta.
+            string = f'{get_timestamp(timestamp)} RP {str(adress[0])} "{dados}"\n'
+            fp.write(string)
+            fp.close()
+            if self.stdout:
+                sys.stdout.write(string)
+        finally:
+            self.locks[domain].release()
 
     # Escreve no log a ocorrencia da rececão de uma resposta.
     def rr(self, timestamp, adress, dados, domain = "all"):
         if self.log_files.get(domain) is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
+        self.locks[domain].acquire()
         try:
             fp = open(self.log_files[domain], "a")
-        except FileNotFoundError:
-            print("Logging file not found!!")
-            return None
-        #                                        Not sure desta indicaçao do adress.
-        string = f'{get_timestamp(timestamp)} RR {str(adress[0])} "{dados}"\n'
-        fp.write(string)
-        fp.close()
-        # Se for para imprimir no stdout também.
-        if self.stdout:
-            sys.stdout.write(string)
+
+            #                                        Not sure desta indicaçao do adress.
+            string = f'{get_timestamp(timestamp)} RR {str(adress[0])} "{dados}"\n'
+            fp.write(string)
+            fp.close()
+            # Se for para imprimir no stdout também.
+            if self.stdout:
+                sys.stdout.write(string)
+        finally:
+            self.locks[domain].release()
 
     # Reporta a conclusao correta de um processo de transferencia de zona.
     #end_adress -> o servidor na outra ponta da transferência
@@ -131,22 +134,23 @@ class Logs:
     def zt(self, timestamp, end_adress, papel, duracao=0, domain="all"):
         if self.log_files.get(domain) is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
+        self.locks[domain].acquire()
         try:
             fp = open(self.log_files[domain], "a")
-        except FileNotFoundError:
-            print("Logging file not found!!")
-            return None
-        #string = get_timestamp(timestamp) + " ZT " + end_adress + " " + papel
-        string = f"{get_timestamp(timestamp)} ZT {end_adress} {papel}"
-        if duracao > 0:
-            duracao = round(duracao, 3)
-            string += f" {duracao}ms"
-        string += "\n"
-        fp.write(string)
-        fp.close()
-        # Se for para imprimir no stdout também.
-        if self.stdout:
-            sys.stdout.write(string)
+
+            #string = get_timestamp(timestamp) + " ZT " + end_adress + " " + papel
+            string = f"{get_timestamp(timestamp)} ZT {end_adress} {papel}"
+            if duracao > 0:
+                duracao = round(duracao, 3)
+                string += f" {duracao}ms"
+            string += "\n"
+            fp.write(string)
+            fp.close()
+            # Se for para imprimir no stdout também.
+            if self.stdout:
+                sys.stdout.write(string)
+        finally:
+            self.locks[domain].release()
 
     # Reporta um determinado evento.
     def ev(self, timestamp, info, domain = "all"):
@@ -154,106 +158,113 @@ class Logs:
             return
         if self.log_files.get(domain) is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
+        self.locks[domain].acquire()
         try:
             fp = open(self.log_files[domain], "a")
-        except FileNotFoundError:
-            print("Logging file not found!!")
-            return None
-        string = get_timestamp(timestamp) + " EV @ " + info + "\n"
-        fp.write(string)
-        fp.close()
-        # Se for para imprimir no stdout também.
-        if self.stdout:
-            sys.stdout.write(string)
+
+            string = get_timestamp(timestamp) + " EV @ " + info + "\n"
+            fp.write(string)
+            fp.close()
+            # Se for para imprimir no stdout também.
+            if self.stdout:
+                sys.stdout.write(string)
+        finally:
+            self.locks[domain].release()
 
     # Reporta a impossibilidade de descodificar um PDU corretamente.
     #Outras opcionalidades
     def er(self, timestamp, from_adress, domain="all"):
         if self.log_files.get(domain) is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
+        self.locks[domain].acquire()
         try:
             fp = open(self.log_files[domain], "a")
-        except FileNotFoundError:
-            print("Logging file not found!!")
-            return None
-        string = get_timestamp(timestamp) + " ER " + from_adress + "\n"
-        fp.write(string)
-        fp.close()
-        if self.stdout:
-            sys.stdout.write(string)
+
+            string = get_timestamp(timestamp) + " ER " + from_adress + "\n"
+            fp.write(string)
+            fp.close()
+            if self.stdout:
+                sys.stdout.write(string)
+        finally:
+            self.locks[domain].release()
 
     # Reporta a conclusao incorreta de um processo de transferencia de zona (ERRO DE ZONA).
     def ez(self, timestamp, end_adress, papel, domain="all"):
         if self.log_files.get(domain) is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
+        self.locks[domain].acquire()
         try:
             fp = open(self.log_files[domain], "a")
-        except FileNotFoundError:
-            print("Logging file not found!!")
-            return None
-        string = get_timestamp(timestamp) + " ZT " + end_adress + " " + papel + "\n"
-        fp.write(string)
-        fp.close()
-        if self.stdout:
-            sys.stdout.write(string)
+
+            string = get_timestamp(timestamp) + " ZT " + end_adress + " " + papel + "\n"
+            fp.write(string)
+            fp.close()
+            if self.stdout:
+                sys.stdout.write(string)
+        finally:
+            self.locks[domain].release()
 
     # Reporta um erro do funcionamento interno de um componente.
     def fl(self, timestamp, info, domain="all"):
         if self.log_files.get(domain) is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
+        self.locks[domain].acquire()
         try:
             fp = open(self.log_files[domain], "a")
-        except FileNotFoundError:
-            print("Logging file not found!!")
-            return None
-        string = get_timestamp(timestamp) + " FL 127.0.0.1 " + info + "\n"
-        fp.write(string)
-        fp.close()
-        if self.stdout:
-            sys.stdout.write(string)
+
+            string = get_timestamp(timestamp) + " FL 127.0.0.1 " + info + "\n"
+            fp.write(string)
+            fp.close()
+            if self.stdout:
+                sys.stdout.write(string)
+        finally:
+            self.locks[domain].release()
 
     # Deteção de um timeout na interaçao com o servidor no endereço indicado.
     def to(self, timestamp, adress, info, domain="all"):
         if self.log_files.get(domain) is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
+        self.locks[domain].acquire()
         try:
             fp = open(self.log_files[domain], "a")
-        except FileNotFoundError:
-            print("Logging file not found!!")
-            return None
-        string = get_timestamp(timestamp) + " TO " + adress + " " + info + "\n"
-        fp.write(string)
-        fp.close()
-        if self.stdout:
-            sys.stdout.write(string)
+
+            string = get_timestamp(timestamp) + " TO " + adress + " " + info + "\n"
+            fp.write(string)
+            fp.close()
+            if self.stdout:
+                sys.stdout.write(string)
+        finally:
+            self.locks[domain].release()
 
     # Reporta que a execução do componente foi parado (SERVIDOR PAROU).
     def sp(self, timestamp, info, domain="all"):
         if self.log_files.get(domain) is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
+        self.locks[domain].acquire()
         try:
             fp = open(self.log_files[domain], "a")
-        except FileNotFoundError:
-            print("Logging file not found!!")
-            return None
-        string = get_timestamp(timestamp) + " SP 127.0.0.1 " + info + "\n"
-        fp.write(string)
-        fp.close()
-        if self.stdout:
-            sys.stdout.write(string)
+
+            string = get_timestamp(timestamp) + " SP 127.0.0.1 " + info + "\n"
+            fp.write(string)
+            fp.close()
+            if self.stdout:
+                sys.stdout.write(string)
+        finally:
+            self.locks[domain].release()
 
     # Reporta o arranque do servidor.
     def st(self, timestamp, port, timeout, mode, domain = "all"):
         if self.log_files.get(domain) is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
+        self.locks[domain].acquire()
         try:
             fp = open(self.log_files[domain], "a")
-        except FileNotFoundError:
-            print("Logging file not found!!")
-            return None
-        string = get_timestamp(timestamp) + " ST 127.0.0.1 " + str(port) + " " + str(timeout) + " " + mode + "\n"
-        fp.write(string)
-        fp.close()
-        if self.stdout:
-            sys.stdout.write(string)
+
+            string = get_timestamp(timestamp) + " ST 127.0.0.1 " + str(port) + " " + str(timeout) + " " + mode + "\n"
+            fp.write(string)
+            fp.close()
+            if self.stdout:
+                sys.stdout.write(string)
+        finally:
+            self.locks[domain].release()
 
