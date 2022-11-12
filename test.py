@@ -4,16 +4,15 @@ import threading
 import random
 import socket
 
+simbols = ["@", "TTL"]
 
-conj = set()
+ex = "andre"
 
-conj.add("Q")
-conj.add("Q")
-#conj.add("A")
+try:
+    inteiro = int(ex)
+except ValueError:
+    print("apanhado")
 
-flags = "+".join(conj)
-
-print(flags)
 
 '''
     ### TESTE ###

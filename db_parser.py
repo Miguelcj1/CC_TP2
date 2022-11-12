@@ -55,19 +55,24 @@ class Database:
 
     # Parses an individual line of a DB File for the database and also caches it.
     def add_db_line(self, line, cache, origin, log):
-        arr = line.split()
 
         # Verifica se a linha está vazia ou começa por '#'.
         if not line.strip() or line.startswith("#"):
             return
 
+        arr = line.split() # Divide a string em campos separados por espaço.
+        if len(arr) < 3:
+            raise Exception(f"A seguinte linha não está de acordo com os pre-requisitos do ficheiro: {line}")
+
         # Verifica se é usado algum símbolo definido em DEFAULT.
-        dom = self.DEFAULT.get(arr[0])
-        if dom is None:
-            dom = arr[0]
-        name = self.DEFAULT.get(arr[2])
-        if name is None:
-            name = arr[2]
+        dom = arr[0]
+        name = arr[2]
+        simbols = self.DEFAULT.keys()
+        for s in simbols:
+            if s in dom:
+                dom = dom.replace(s, self.DEFAULT[s])
+            if s in name:
+                name = name.replace(s, self.DEFAULT[s])
 
         # Verificação da terminação com "." dos nomes completos dos dominios.
         if arr[1] != "DEFAULT" and not auxs.ends_with_dot(dom):
@@ -87,15 +92,20 @@ class Database:
             ttl = self.DEFAULT.get(arr[3])
             if ttl is None:
                 ttl = arr[3]
-            ttl = int(ttl)
+            try:
+                ttl = int(ttl)
+            except ValueError:
+                raise Exception(f"O campo TTL da seguinte linha não representa um inteiro: {line}")
 
         prio = -1  # para caso não seja indicada prioridade.
-        if len(arr) == 5:
+        if len(arr) > 4:
             prio = self.DEFAULT.get(arr[4])
             if prio is None:
                 prio = arr[4]
-            prio = int(prio)
-
+            try:
+                prio = int(prio)
+            except ValueError:
+                raise Exception(f"O campo prioridade da seguinte linha não representa um inteiro: {line}")
 
         # Adição dos valores à base de dados.
         if arr[1] == "DEFAULT":  ### talvez devesse percorrer o ficheiro, primeiro por DEFAULTs e depois é que percorria tudo o resto, para valores default que estejam depois de uma utilização serem validos.
@@ -149,7 +159,7 @@ class Database:
             self.PTR[dom].append((name, ttl))
 
         # Adição dos valores na cache.
-        if arr[1] != "DEFAULT": # SE O TYPE_OF_VALUE == DEFAULT, N É COLOCADA NA CACHE ### NOT SURE ###
+        if arr[1] != "DEFAULT": # se o type_of_value == DEFAULT, não é colocado em cache.
             cache.update(log, dom, arr[1], name, ttl, prio=prio, origin=origin)
 
 
