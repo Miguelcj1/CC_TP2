@@ -51,6 +51,7 @@ def main():
 
             msg = query.init_send_query(q_flags, q_dom, q_type)
             s.sendto(msg.encode('utf-8'), destination)
+            print("Foi enviada a seguinte query: " + msg)
 
             print("Há espera da resposta..")
             try:
