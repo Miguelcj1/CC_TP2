@@ -1,0 +1,32 @@
+# DNS database file for domain parede
+# It also includes a pointer to the primary server
+# of the gesso.parede subdomain
+
+@ DEFAULT parede.
+TTL DEFAULT 86400
+@ SOASP ns1.parede. TTL
+@ SOAADMIN dns\.admin.parede. TTL
+@ SOASERIAL 0117102022 TTL
+@ SOAREFRESH 14400 TTL
+@ SOARETRY 3600 TTL
+@ SOAEXPIRE 604800 TTL
+@ NS ns1.parede. TTL
+@ NS ns2.parede. TTL
+@ NS ns3.parede. TTL
+gesso.@ NS sp.gesso.parede.
+@ MX mx1.parede TTL 10
+@ MX mx2.parede TTL 20
+ns1 A 10.2.2.2 TTL
+ns2 A 10.3.3.2 TTL
+ns3 A 10.4.4.2 TTL
+sp.gesso A 10.2.2.2 TTL
+mx1 A 10.1.1.1 TTL
+mx2 A 10.1.1.2 TTL
+www A 193.136.130.80 TTL 200
+www A 193.136.130.81 TTL 200
+ftp A 193.136.130.20 TTL
+sp CNAME ns1 TTL
+ss1 CNAME ns2 TTL
+ss2 CNAME ns3 TTL
+mail1 CNAME mx1 TTL
+mail2 CNAME mx2 TTL 

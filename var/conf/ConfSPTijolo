@@ -1,0 +1,8 @@
+# Configuration file for primary server for tijolo.muro
+
+tijolo.muro DB /var/dns/tijolo-muro.db
+tijolo.muro SS 10.3.3.3
+tijolo.muro SS 10.4.4.3:5353
+tijolo.muro LG /var/dns/tijolo-muro.log
+all LG /var/dns/all.log
+root ST /var/dns/rootservers.db

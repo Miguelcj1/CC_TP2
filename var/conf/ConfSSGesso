@@ -1,0 +1,7 @@
+# Configuration file for secundary server for gesso.parede
+
+gesso.parede SP 10.2.2.2
+gesso.parede DD 10.1.1.3
+gesso.parede LG /var/dns/gesso-parede.log
+all LG /var/dns/all.log
+root ST /var/dns/rootservers.db
