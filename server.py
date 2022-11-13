@@ -98,6 +98,7 @@ def ask_zone_transfer(log, confs, cache, dom, timeout):
         duracao *= 1000
         log.zt(time.time(), addr, "SS", duracao=duracao, domain=dom)
     except socket.timeout:
+        s.close()
         print("Ocorreu um timeout!") # Fazer algo quando ocorre um timeout.
         log.ez(time.time(), str(addr), "SS", dom)
 
