@@ -4,6 +4,9 @@ import sys
 
 
 def main():
+    """
+    Recebe como argumento na linha de comandos o endereço para o qual deve enviar a query (se a porta não for especificada, assume a porta 5000) e o timeout, mas se o timeout não for especificado assume um timeout de 10 segundos.
+    """
     if len(sys.argv) < 2:
         print("Não foi passado o endereço para onde enviar a query.")
         return

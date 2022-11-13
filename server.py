@@ -238,7 +238,7 @@ def main(): # argumentos: nome_do_script  ficheiro_configuraçao  porta*  timeou
         msg = msg.decode('utf-8')
         ####  ESTOU A ESPERA DE SABER SE A MENSAGEM DE LOG TEM DE SER ESCRITO NO DOMINIO ESPECIFICO OU NAO. ####
         #log.qr(time.time(), address, msg) # Indica o recebimento de uma query no ficheiro de log.
-        threading.Thread(target=query.respond_query, args=(msg, address, confs, log, cache)).start()
+        threading.Thread(target=query.respond_query, args=(msg, s, address, confs, log, cache)).start()
 
     s.close()
 
