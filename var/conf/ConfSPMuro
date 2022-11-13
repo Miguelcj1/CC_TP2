@@ -3,6 +3,7 @@
 muro DB /var/dns/muro.db
 muro SS 10.3.3.2
 muro SS 10.4.4.3:5353
+muro DD 127.0.0.1
 muro LG /var/dns/muro.log
 all LG /var/dns/all.log
 root ST /var/dns/rootservers.db
