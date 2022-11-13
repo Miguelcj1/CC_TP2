@@ -31,7 +31,9 @@ def respond_query(query, address, confs, log, cache):
     header = arr[0]
     h_fields = header.split(",")
     if len(h_fields) != 6:
-        raise Exception(f"Sintaxe desconhecida da seguinte mensagem no header field: {query}")
+        log.er(time.time(), address, dados=query)
+        #raise Exception(f"Sintaxe desconhecida da seguinte mensagem no header field: {query}")
+        return
     message_id = h_fields[0]
     flags = h_fields[1]
     response_code = h_fields[2]
@@ -44,7 +46,9 @@ def respond_query(query, address, confs, log, cache):
     data_qi = arr[1]
     qi_fields = data_qi.split(",")
     if len(qi_fields) != 2:
-        raise Exception(f"Sintaxe desconhecida da seguinte mensagem no Query Info field: {query}")
+        log.er(time.time(), address, dados=query)
+        #raise Exception(f"Sintaxe desconhecida da seguinte mensagem no Query Info field: {query}")
+        return
     q_name = qi_fields[0]
     q_type = qi_fields[1]
 
@@ -52,7 +56,7 @@ def respond_query(query, address, confs, log, cache):
     log.qr(t_start, address, query, domain=q_name)
 
     if len(arr) < 3:
-        log.er(time.time(), address, domain=q_name)
+        log.er(time.time(), address, dados=query, domain=q_name)
         result = f"{message_id},,3,0,0,0;{q_name},{q_type};"  # sendo 3 o código de mensagem não descodificada.
         s.sendto(result.encode("utf-8"), address)
         return

@@ -173,14 +173,15 @@ class Logs:
 
     # Reporta a impossibilidade de descodificar um PDU corretamente.
     #Outras opcionalidades
-    def er(self, timestamp, from_adress, domain="all"):
+    def er(self, timestamp, from_adress, dados="", domain="all"):
         if self.log_files.get(domain) is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         self.locks[domain].acquire()
         try:
             fp = open(self.log_files[domain], "a")
 
-            string = get_timestamp(timestamp) + " ER " + from_adress + "\n"
+            #string = get_timestamp(timestamp) + " ER " + from_adress + "\n"
+            string = f'{get_timestamp(timestamp)} ER {from_adress} "{dados}"\n'
             fp.write(string)
             fp.close()
             if self.stdout:
