@@ -23,6 +23,7 @@ def respond_query(query, address, confs, log, cache):
 
     t_start = time.time()
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    #s.bind() ### SE TIVER DE TER UMA PORTA ESPECIFICA.
 
     arr = query.split(";")
 
