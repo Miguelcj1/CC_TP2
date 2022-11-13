@@ -51,7 +51,8 @@ def ask_zone_transfer(log, confs, cache, dom, timeout):
 
     # Cria o socket TCP.
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    #s.bind(('', port)) ### TEST
+    #port = 5001
+    #s.bind(('', port)) ### Especificaria a porta usada para envio.
     s.settimeout(timeout) # tempo que um recv chamada neste socket, esperará.
 
     # Tenta conectar-se ao endereço do servidor principal especificado no tuplo adress_port.

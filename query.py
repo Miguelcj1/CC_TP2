@@ -71,7 +71,7 @@ def respond_query(query, address, confs, log, cache):
         for r in resp_fields:
             responses.append(r)
 
-    # Verifica se deve responder a queries deste dominio, relativamente aos DD's.
+    # Verifica se deve responder a queries deste dominio, relativamente aos DD's. ### CONFIRMAR SE ESTA RESTRIÇÃO É VALIDA.
     respondable_domains = confs.get_all_dd()
     if q_name not in respondable_domains:
         # A resposta irá com o response_code = 2.
@@ -81,7 +81,7 @@ def respond_query(query, address, confs, log, cache):
         return
 
     # Procura em cache
-    result = cache.get_answers(message_id, q_name, q_type)
+    result = cache.get_answers(log, message_id, q_name, q_type)
 
     # Envio da mensagem para o respetivo endereço
     #time.sleep(11) ##

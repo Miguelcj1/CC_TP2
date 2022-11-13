@@ -23,11 +23,12 @@ def co_dir(path, mode):
         f = open(path, mode)
     return f
 
-# Retorna None caso não seja indicado a porta do SP
-def str_adress_to_tuple(string):
+# Dado um "endereço" ou "endereço:porta" retorna o tuplo (endereco, porta)
+def str_adress_to_tuple(string, default_port = 5000):
     arr = string.split(":")
     if len(arr) < 2:
-        return None
+        res = (arr[0], default_port)
+        return res
     res = (arr[0], int(arr[1]))
     return res
 
@@ -142,7 +143,7 @@ class Configs:
 
             domain = arr[0]
             if domain != "all":
-                domain = auxs.add_end_dot(arr[0]) # ADICIONA O "." nas configurações também!
+                domain = auxs.add_end_dot(arr[0]) # Adiciona o "." nas configurações também.
 
             if arr[1] == "DB" and len(arr) == 3:
                 # uso o pop_slash para remover o primeiro "/" de modo a ter a diretoria de maneira correta
@@ -158,12 +159,10 @@ class Configs:
                 if self.domains.get(domain) is None:
                     self.domains[domain] = DomainInfo()
                 self.domains[domain].set_name(domain)
-                # Coloca um tuplo
-                addr = str_adress_to_tuple(sp)  # retorna None caso não seja indicada uma porta.
-                if addr is None:
-                    raise Exception(f"É necessário especificar a porta do servidor primário do domínio {domain}.")
+                # Transforma num tuplo ao qual se deve conectar.
+                addr = str_adress_to_tuple(sp)
                 if not self.domains[domain].set_sp(addr):
-                    raise Exception(f"Ocorreu mais que uma definição do servidor principal do dominio {domain}.")
+                    raise Exception(f"Ocorreu mais que uma definição do servidor principal do dominio {domain}")
 
             elif arr[1] == "SS" and len(arr) == 3:
                 ss = arr[2]
