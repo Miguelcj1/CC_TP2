@@ -11,9 +11,23 @@ from db_parser import Database
 import query
 from cache import Cache
 
-# addr = (endereço, porta)
-# lstradd = ["endereço:porta" ou "endereco"]
+"""
+Server.py:
+    Módulo de implementação dos servidores do sistema DNS.
+    Data de criação: 27/10/2022
+    Data da última atualização: 13/11/2022
+"""
+
 def check_addr(addr, lstradd):
+    """
+    Esta função verifica se o endereço addr faz parte da lista de endereços recebida lstradd, verificando o ip e a porta.
+
+    Autor: Pedro Martins.
+
+    :param addr: Tuple (endereço, porta)
+    :param lstradd: Arr[String] ["endereço:porta" ou "endereco"]
+    :return: Boolean
+    """
     for s in lstradd:
         arr = s.split(":")
         if arr[0] == addr[0]:
@@ -27,11 +41,29 @@ def check_addr(addr, lstradd):
     return False
 
 def get_line_number(string):
+    """
+    Esta função recebe uma linha da base de dados numerada e devolve o número dessa linha.
+    Exemplo: 10;TTL DEFAULT 86400 , retorna 10.
+
+    Autor: Miguel Pinto.
+
+    :param string: String
+    :return: Int
+    """
     #lambda l: int(l.split(";")[0])
     inteiro = int(string.split(";")[0])
     return inteiro
 
 def is_final_msg(string, last_i):
+    """
+    Esta função verifica se o número da string é o mesmo do que last_i.
+
+    Autor: Miguel Pinto.
+
+    :param string: String
+    :param last_i: Int
+    :return: Boolean
+    """
     split_msg = string.split("\n")
     if split_msg[-1]:
         last_line = split_msg[-1]
@@ -43,6 +75,19 @@ def is_final_msg(string, last_i):
 
 # Utilizada por um SS para pedir pelas entradas de base de dados de um domínio.
 def ask_zone_transfer(log, confs, cache, dom, timeout):
+    """
+    Esta função faz a parte do SS na transferencia de zona estabelecendo uma conexão TCP com o SP do dominio recebido.
+    A informação recebida é guardada na cache, e os ficheiros de logs são atualizados com o que acontece neste processo.
+
+    Autor: Miguel Pinto e Pedro Martins.
+
+    :param log: Logs
+    :param confs: Configs
+    :param cache: Cache
+    :param dom: String
+    :param timeout: Int
+    :return: Void
+    """
     # Guarda a timestamp do início do processo.
     t_start = time.time()
 
@@ -53,7 +98,7 @@ def ask_zone_transfer(log, confs, cache, dom, timeout):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     #port = 5001
     #s.bind(('', port)) ### Especificaria a porta usada para envio.
-    s.settimeout(timeout) # tempo que um recv chamada neste socket, esperará.
+    s.settimeout(timeout)  # tempo que um recv chamada neste socket, esperará.
 
     # Tenta conectar-se ao endereço do servidor principal especificado no tuplo adress_port.
     s.connect(addr)
@@ -62,7 +107,7 @@ def ask_zone_transfer(log, confs, cache, dom, timeout):
     s.send(dom.encode("utf-8"))
 
     try:
-        msg = s.recv(1024) # Espera receber o nº de entradas da base de dados que vão ser enviadas.
+        msg = s.recv(1024)  # Espera receber o nº de entradas da base de dados que vão ser enviadas.
 
         ### TALVEZ SIMPLESMENTE N DEVA ESPERAR QUE RETORNA ERRO DESISTINDO ATRAVES DO TIMEOUT
         if msg.decode("utf-8") == "erro": # Significa que não foi dada permissão pelo SP o acesso à base de dados.
@@ -70,11 +115,11 @@ def ask_zone_transfer(log, confs, cache, dom, timeout):
             return
 
         lines_to_receive = int(msg.decode("utf-8"))
-        s.send(msg) # reenvia o nº de linhas como maneira de indicar que quer que se começe a transferencia.
+        s.send(msg)  # reenvia o nº de linhas como maneira de indicar que quer que se começe a transferencia.
 
         buf = ""  # 'buf' vai conter uma string com todas as linhas enviadas, separadas por \n
         while True:
-            msg = s.recv(1024) # mensagem vem na forma (i;dados)
+            msg = s.recv(1024)  # mensagem vem na forma (i;dados)
             msg = msg.decode("utf-8")
             buf += msg
             if is_final_msg(msg, lines_to_receive):
@@ -85,7 +130,7 @@ def ask_zone_transfer(log, confs, cache, dom, timeout):
 
         for single_line in lines:
             arr = single_line.split(";")
-            #n_line = int(arr[0])
+            # n_line = int(arr[0])
             data = arr[1]
             cache.update_with_line(log, data, "SP")
 
@@ -99,14 +144,27 @@ def ask_zone_transfer(log, confs, cache, dom, timeout):
         log.zt(time.time(), addr, "SS", duracao=duracao, domain=dom)
     except socket.timeout:
         s.close()
-        print("Ocorreu um timeout!") # Fazer algo quando ocorre um timeout.
+        print("Ocorreu um timeout!")  # Fazer algo quando ocorre um timeout.
         log.ez(time.time(), str(addr), "SS", dom)
 
 
 # Utilizada por um SP para responder a pedidos de transferência de zona.
 def resp_zone_transfer(log, confs, dbs, port):
+    """
+    Esta função faz a parte do SP na transferencia de zona recebendo conexões de SS.
+    O SP so responderá a SS autorizados e apenas responde a transferencias sobre o dominio ao qual é SP.
+    Os ficheiros de logs são atualizados com o que acontece nestes processo.
+
+    Autor: Miguel Pinto e Pedro Martins.
+
+    :param log: Logs
+    :param confs: Confs
+    :param dbs: Database
+    :param port: Int
+    :return: Void
+    """
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind(("", port)) # Recebe conexoes de todos (nao aplica restriçoes)
+    s.bind(("", port))  # Recebe conexoes de todos (nao aplica restriçoes)
     s.listen()
     while True:
         conn, addr = s.accept() # rececão de uma conexão.
@@ -127,7 +185,7 @@ def resp_zone_transfer(log, confs, dbs, port):
                 continue
 
             # envia o nº de entradas das bases de dados
-            db = dbs.get(dom) # isto nunca deve retornar null uma vez que é feita uma verificação similar atras.
+            db = dbs.get(dom)  # isto nunca deve retornar null uma vez que é feita uma verificação similar atras.
             entry_lines = db.all_db_lines()
             numb_lines = len(entry_lines)
             n_lines = str(numb_lines)
@@ -163,11 +221,30 @@ def resp_zone_transfer(log, confs, dbs, port):
 
 # * -> significa opcional
 def main(): # argumentos: nome_do_script  ficheiro_configuraçao  porta*  timeout*  modo="DEBUG"*
+    """
+    Esta função implementa o comportamento dos servidores no sistema DNS.
+    A função recebe um ficheiro de configuração como argumento onde obtem toda a informação que necessita.
+    Cada servidor irá possuir um objeto Logs e Cache onde poderá atualizar os ficheiros de log e guardar as informações necessarias em cache.
 
+    Dependendo do ficheiro de configuração o servidor poderá ser SP ou SS:
+        Se for SP o servidor lança uma thread que executa a função resp_zone_transfer e responde a pedidos de transferencia de zona.
+        Se for SS o servidor inicia um pedido de transferencia de zona ao SP do seu dominio.
+
+    Depois de feito as transferencias de zona o servidor abre um socket UDP e espera a receção de querys de clientes.
+    Ao receber uma query lança uma thread para responder a essa query e volta a ficar a escuta de mais querys.
+
+    Autor: Miguel Pinto e Pedro Martins.
+
+    argument conf: Configs
+    argument porta : Int (Optional) 5000
+    argument timeout : Int (Optional) 200
+    argument mode : String (Optional) "Debug"
+    :return: void
+    """
     # Guarda a altura em que o servidor arrancou.
     ts_arranque = time.time()
 
-    if len(sys.argv) < 2: # nº de argumentos obrigatorios
+    if len(sys.argv) < 2:  # nº de argumentos obrigatorios
         print("Não foram passados argumentos suficientes.")
 
     # Path do ficheiro de configuração do servidor.
