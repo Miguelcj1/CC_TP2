@@ -73,7 +73,6 @@ def is_final_msg(string, last_i):
         return False
 
 
-# Utilizada por um SS para pedir pelas entradas de base de dados de um domínio.
 def ask_zone_transfer(log, confs, cache, dom, timeout):
     """
     Esta função faz a parte do SS na transferencia de zona estabelecendo uma conexão TCP com o SP do dominio recebido.
@@ -148,7 +147,6 @@ def ask_zone_transfer(log, confs, cache, dom, timeout):
         log.ez(time.time(), str(addr), "SS", dom)
 
 
-# Utilizada por um SP para responder a pedidos de transferência de zona.
 def resp_zone_transfer(log, confs, dbs, port):
     """
     Esta função faz a parte do SP na transferencia de zona recebendo conexões de SS.
@@ -219,8 +217,7 @@ def resp_zone_transfer(log, confs, dbs, port):
 
     s.close()
 
-# * -> significa opcional
-def main(): # argumentos: nome_do_script  ficheiro_configuraçao  porta*  timeout*  modo="DEBUG"*
+def main():
     """
     Esta função implementa o comportamento dos servidores no sistema DNS.
     A função recebe um ficheiro de configuração como argumento onde obtem toda a informação que necessita.
