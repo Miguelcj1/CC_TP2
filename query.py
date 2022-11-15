@@ -7,12 +7,30 @@ from logs import Logs
 from cache import Cache
 
 def pop_end_dot(string):
+    """
+    Esta função remove o "." do fim da string ou devolve a string inalterada no caso de não existir "." no fim da string.
+
+    Autor: Pedro Martins
+
+    :param string: String
+    :return: String
+    """
     if string[-1] == ".":
         return string[:-1]
     return string
 
-# Dado uma flag, o nome do dominio e o tipo de valor a procurar, constroi uma query.
 def init_send_query(flags, q_name, q_type):
+    """
+    Esta função recebe os dados necessários para criar uma query.
+    Com esses dados é criada uma string com o formato correto para ser enviada ao servidor e ser respondida.
+
+    Autor: Pedro Martins
+
+    :param flags: String
+    :param q_name: String
+    :param q_type: String
+    :return: String
+    """
     ids = set(range(1, 65535))
     id = random.choice(tuple(ids))
     string = f"{id},{flags},0,0,0,0;{q_name},{q_type};"
@@ -20,7 +38,23 @@ def init_send_query(flags, q_name, q_type):
 
 
 def respond_query(query, s, address, confs, log, cache):
+    """
+    Esta função recebe uma query e envia uma resposta a essa mesma query.
+    A função recebe o socket e o endereço para o qual deverá enviar a resposta o que permite a esta função ser executada por uma thread de forma independente ao servidor.
+    A função também recebe o ficheiro de configuração para saber se o dominio descrito na query é um dominio para o qual o servidor opera.
+    Os ficheiros de logs também são atualizados dependendo da do que aconteça na resposta da query.
+    A resposta à query é depois procurada na cache.
 
+    Autor: Miguel Pinto e Pedro Martins
+
+    :param query: String
+    :param s: Socket
+    :param address: Tuple (endereço, porta)
+    :param confs: Configs
+    :param log: Logs
+    :param cache: Cache
+    :return: Void
+    """
     t_start = time.time()
     #s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     #s.bind() ### SE TIVER DE TER UMA PORTA ESPECIFICA.
