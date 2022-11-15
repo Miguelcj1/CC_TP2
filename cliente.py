@@ -2,10 +2,23 @@ import socket
 import query
 import sys
 
+"""
+Cliente.py:
+    Módulo de implementação dos clientes do sistema DNS.
+    Data de criação: 27/10/2022
+    Data da última atualização: 13/11/2022
+"""
 
 def main():
     """
-    Recebe como argumento na linha de comandos o endereço para o qual deve enviar a query (se a porta não for especificada, assume a porta 5000) e o timeout, mas se o timeout não for especificado assume um timeout de 10 segundos.
+    Esta função implementa o comportamento dos clientes no sistema DNS.
+    A função recebe o endereço para o qual irá enviar querys como argumento.
+    O programa também dispõe de um pequena interface gráfica que permite ao utilizador enviar querys de forma mais simples.
+    O programa também permite o envio de uma query automática para casos de teste.
+
+    argument adress: String "endereco:porta" ou "endereco"
+    argument timeout : Int (Optional) 10
+    :return: Void
     """
     if len(sys.argv) < 2:
         print("Não foi passado o endereço para onde enviar a query.")

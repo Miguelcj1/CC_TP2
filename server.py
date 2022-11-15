@@ -232,9 +232,9 @@ def main():
 
     Autor: Miguel Pinto e Pedro Martins.
 
-    argument conf: Configs
+    argument conf: String (config path)
     argument porta : Int (Optional) 5000
-    argument timeout : Int (Optional) 200
+    argument timeout : Int (Optional) 20
     argument mode : String (Optional) "Debug"
     :return: void
     """
@@ -248,7 +248,7 @@ def main():
     conf = sys.argv[1]
 
     porta = 5000
-    timeout = 200
+    timeout = 20
     mode = "DEBUG"
     if len(sys.argv) > 2:
         porta = int(sys.argv[2])
