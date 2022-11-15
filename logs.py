@@ -7,8 +7,16 @@ from datetime import datetime
 from config_parser import Configs
 
 
-# checks and creates directory
 def check_dir(path_arg):
+    """
+    Esta função verifica a existencia de um ficheiro.
+    No caso de o ficheiro não existir, cria o ficheiro e as diretorias onde o ficheiro deverá estar.
+
+    Autor: Pedro Martins.
+
+    :param path_arg: String
+    :return: Void
+    """
     str = path_arg
     str = str.split("/")[:-1]
     joined_str = "/".join(str)
@@ -28,8 +36,16 @@ def check_dir(path_arg):
         pass
 
 
-# Função que retorna a string formatada do tempo atual. Pode receber uma timestamp como argumento, caso contrário, irá ser calculado relativamente ao tempo atual.
 def get_timestamp(timestamp = time.time()):
+    """
+    Esta função recebe um timestamp e devolve uma string formatada do tempo indicado no timestamp.
+    No caso de não receber um timestamp será devolvido a formatação do tempo atual.
+
+    Autor: Pedro Martins.
+
+    :param timestamp: Float
+    :return: String
+    """
     # convert to datetime
     date_time = datetime.fromtimestamp(timestamp)
 
@@ -40,11 +56,22 @@ def get_timestamp(timestamp = time.time()):
     return str_date_time[:-3]
 
 
-# esta classe escreve os logs no ficheiro de log indicado na sua variavel de instância.
 class Logs:
+    """
+    Esta classe é responsavel pela escrita de todos os logs.
+    """
 
-    # Verifica a diretoria do ficheiro de log e define o caminho na sua variavel de instancia.
     def __init__(self, confs, mode):
+        """
+        Esta classe armazena todas as paths para os ficheiros de logs descritos na configuração.
+        Para além de escrever nos ficheiros de log existe também o modo "Debug" que permite a visualização do que será escrito no log apartir do terminal.
+        A cada dominio também terá de possuir um lock que impedirá problemas de concorrência na escrita dos ficheiros.
+
+        Autor : Miguel Pinto e Pedro Martins.
+
+        :param confs: Configs
+        :param mode: String
+        """
         # Verifica a existencia do file e caso não exista, cria-o.
         all_log_file = confs.get_all_log_file()
         check_dir(all_log_file)
@@ -62,8 +89,19 @@ class Logs:
                 self.locks[domain] = threading.Lock()
 
 
-    # Escreve no log a ocorrencia da receçao de uma query.
     def qr(self, timestamp, adress, dados, domain = "all"):
+        """
+        Esta função escreve no log a receção de uma query de um certo domínio.
+        Todas as escritas nos ficheiros necessitam da obtenção do lock e no caso de estar em modo "Debug" o log será escrito também no stdout.
+
+        Autor: Pedro Martins.
+
+        :param timestamp: Float
+        :param adress: Tuple (endereço, porta)
+        :param dados: String
+        :param domain: String
+        :return: Void
+        """
         if self.log_files.get(domain) is None:
             domain = "all" # caso não haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log.
         self.locks[domain].acquire()
@@ -77,8 +115,19 @@ class Logs:
         finally:
             self.locks[domain].release()
 
-    # Escreve no log a ocorrencia do envio de uma query.
     def qe(self, timestamp, adress, dados, domain = "all"):
+        """
+        Esta função escreve no log o envio de uma query de um certo domínio.
+        Todas as escritas nos ficheiros necessitam da obtenção do lock e no caso de estar em modo "Debug" o log será escrito também no stdout.
+
+        Autor: Miguel Pinto.
+
+        :param timestamp: Float
+        :param adress: Tuple (endereço, porta)
+        :param dados: String
+        :param domain: String
+        :return: Void
+        """
         if self.log_files.get(domain) is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         self.locks[domain].acquire()
@@ -95,6 +144,18 @@ class Logs:
 
     # Escreve no log a ocorrencia do envio de uma resposta.
     def rp(self, timestamp, adress, dados, domain = "all"):
+        """
+        Esta função escreve no log o envio de uma resposta de um certo domínio.
+        Todas as escritas nos ficheiros necessitam da obtenção do lock e no caso de estar em modo "Debug" o log será escrito também no stdout.
+
+        Autor: Pedro Martins.
+
+        :param timestamp: Float
+        :param adress: Tuple (endereço, porta)
+        :param dados: String
+        :param domain: String
+        :return: Void
+        """
         if self.log_files.get(domain) is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         self.locks[domain].acquire()
@@ -111,6 +172,18 @@ class Logs:
 
     # Escreve no log a ocorrencia da rececão de uma resposta.
     def rr(self, timestamp, adress, dados, domain = "all"):
+        """
+        Esta função escreve no log a receção de uma resposta de um certo domínio.
+        Todas as escritas nos ficheiros necessitam da obtenção do lock e no caso de estar em modo "Debug" o log será escrito também no stdout.
+
+        Autor: Miguel Pinto.
+
+        :param timestamp: Float
+        :param adress: Tuple (endereço, porta)
+        :param dados: String
+        :param domain: String
+        :return: Void
+        """
         if self.log_files.get(domain) is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         self.locks[domain].acquire()
@@ -121,17 +194,25 @@ class Logs:
             string = f'{get_timestamp(timestamp)} RR {str(adress[0])} "{dados}"\n'
             fp.write(string)
             fp.close()
-            # Se for para imprimir no stdout também.
             if self.stdout:
                 sys.stdout.write(string)
         finally:
             self.locks[domain].release()
 
-    # Reporta a conclusao correta de um processo de transferencia de zona.
-    #end_adress -> o servidor na outra ponta da transferência
-    #papel -> papel do servidor local na transferência (SP ou SS)
-    #(OPCIONAL) duracao da transferencia e total de bytes transferidos
     def zt(self, timestamp, end_adress, papel, duracao=0, domain="all"):
+        """
+        Esta função escreve no log a conclusão correta de um processo de transferencia de zona de um certo domínio.
+        Todas as escritas nos ficheiros necessitam da obtenção do lock e no caso de estar em modo "Debug" o log será escrito também no stdout.
+
+        Autor: Pedro Martins.
+
+        :param timestamp: Float
+        :param end_adress: String
+        :param papel: String
+        :param duracao: Float
+        :param domain: String
+        :return: Void
+        """
         if self.log_files.get(domain) is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         self.locks[domain].acquire()
@@ -154,6 +235,17 @@ class Logs:
 
     # Reporta um determinado evento.
     def ev(self, timestamp, info, domain = "all"):
+        """
+        Esta função escreve no log um determinado evento de um certo domínio.
+        Todas as escritas nos ficheiros necessitam da obtenção do lock e no caso de estar em modo "Debug" o log será escrito também no stdout.
+
+        Autor: Miguel Pinto.
+
+        :param timestamp: Float
+        :param info: String
+        :param domain: String
+        :return: Void
+        """
         if info is None:
             return
         if self.log_files.get(domain) is None:
@@ -174,6 +266,18 @@ class Logs:
     # Reporta a impossibilidade de descodificar um PDU corretamente.
     #Outras opcionalidades
     def er(self, timestamp, from_adress, dados="", domain="all"):
+        """
+        Esta função escreve no log a receção de uma query de um certo domínio.
+        Todas as escritas nos ficheiros necessitam da obtenção do lock e no caso de estar em modo "Debug" o log será escrito também no stdout.
+
+        Autor: Pedro Martins.
+
+        :param timestamp: Float
+        :param adress: Tuple (endereço, porta)
+        :param dados: String
+        :param domain: String
+        :return: Void
+        """
         if self.log_files.get(domain) is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         self.locks[domain].acquire()
@@ -191,6 +295,18 @@ class Logs:
 
     # Reporta a conclusao incorreta de um processo de transferencia de zona (ERRO DE ZONA).
     def ez(self, timestamp, end_adress, papel, domain="all"):
+        """
+        Esta função escreve no log a receção de uma query de um certo domínio.
+        Todas as escritas nos ficheiros necessitam da obtenção do lock e no caso de estar em modo "Debug" o log será escrito também no stdout.
+
+        Autor: Pedro Martins.
+
+        :param timestamp: Float
+        :param adress: Tuple (endereço, porta)
+        :param dados: String
+        :param domain: String
+        :return: Void
+        """
         if self.log_files.get(domain) is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         self.locks[domain].acquire()
@@ -207,6 +323,18 @@ class Logs:
 
     # Reporta um erro do funcionamento interno de um componente.
     def fl(self, timestamp, info, domain="all"):
+        """
+        Esta função escreve no log a receção de uma query de um certo domínio.
+        Todas as escritas nos ficheiros necessitam da obtenção do lock e no caso de estar em modo "Debug" o log será escrito também no stdout.
+
+        Autor: Pedro Martins.
+
+        :param timestamp: Float
+        :param adress: Tuple (endereço, porta)
+        :param dados: String
+        :param domain: String
+        :return: Void
+        """
         if self.log_files.get(domain) is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         self.locks[domain].acquire()
@@ -223,6 +351,18 @@ class Logs:
 
     # Deteção de um timeout na interaçao com o servidor no endereço indicado.
     def to(self, timestamp, adress, info, domain="all"):
+        """
+        Esta função escreve no log a receção de uma query de um certo domínio.
+        Todas as escritas nos ficheiros necessitam da obtenção do lock e no caso de estar em modo "Debug" o log será escrito também no stdout.
+
+        Autor: Pedro Martins.
+
+        :param timestamp: Float
+        :param adress: Tuple (endereço, porta)
+        :param dados: String
+        :param domain: String
+        :return: Void
+        """
         if self.log_files.get(domain) is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         self.locks[domain].acquire()
@@ -239,6 +379,18 @@ class Logs:
 
     # Reporta que a execução do componente foi parado (SERVIDOR PAROU).
     def sp(self, timestamp, info, domain="all"):
+        """
+        Esta função escreve no log a receção de uma query de um certo domínio.
+        Todas as escritas nos ficheiros necessitam da obtenção do lock e no caso de estar em modo "Debug" o log será escrito também no stdout.
+
+        Autor: Pedro Martins.
+
+        :param timestamp: Float
+        :param adress: Tuple (endereço, porta)
+        :param dados: String
+        :param domain: String
+        :return: Void
+        """
         if self.log_files.get(domain) is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         self.locks[domain].acquire()
@@ -255,6 +407,18 @@ class Logs:
 
     # Reporta o arranque do servidor.
     def st(self, timestamp, port, timeout, mode, domain = "all"):
+        """
+        Esta função escreve no log a receção de uma query de um certo domínio.
+        Todas as escritas nos ficheiros necessitam da obtenção do lock e no caso de estar em modo "Debug" o log será escrito também no stdout.
+
+        Autor: Pedro Martins.
+
+        :param timestamp: Float
+        :param adress: Tuple (endereço, porta)
+        :param dados: String
+        :param domain: String
+        :return: Void
+        """
         if self.log_files.get(domain) is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         self.locks[domain].acquire()
