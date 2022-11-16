@@ -201,7 +201,7 @@ class Logs:
 
     def zt(self, timestamp, end_adress, papel, duracao=0, domain="all"):
         """
-        Esta função escreve no log a conclusão correta de um processo de transferencia de zona de um certo domínio.
+        Esta função escreve no log a conclusão correta de um processo de transferencia de zona.
         Todas as escritas nos ficheiros necessitam da obtenção do lock e no caso de estar em modo "Debug" o log será escrito também no stdout.
 
         Autor: Pedro Martins.
@@ -233,7 +233,6 @@ class Logs:
         finally:
             self.locks[domain].release()
 
-    # Reporta um determinado evento.
     def ev(self, timestamp, info, domain = "all"):
         """
         Esta função escreve no log um determinado evento de um certo domínio.
@@ -263,17 +262,15 @@ class Logs:
         finally:
             self.locks[domain].release()
 
-    # Reporta a impossibilidade de descodificar um PDU corretamente.
-    #Outras opcionalidades
     def er(self, timestamp, from_adress, dados="", domain="all"):
         """
-        Esta função escreve no log a receção de uma query de um certo domínio.
+        Esta função escreve no log que não foi possivel descodificar um PDU corretamente.
         Todas as escritas nos ficheiros necessitam da obtenção do lock e no caso de estar em modo "Debug" o log será escrito também no stdout.
 
         Autor: Pedro Martins.
 
         :param timestamp: Float
-        :param adress: Tuple (endereço, porta)
+        :param from_adress: String
         :param dados: String
         :param domain: String
         :return: Void
@@ -293,17 +290,16 @@ class Logs:
         finally:
             self.locks[domain].release()
 
-    # Reporta a conclusao incorreta de um processo de transferencia de zona (ERRO DE ZONA).
     def ez(self, timestamp, end_adress, papel, domain="all"):
         """
-        Esta função escreve no log a receção de uma query de um certo domínio.
+        Esta função escreve no log que o precesso de transferência de zona não foi concluida corretamente.
         Todas as escritas nos ficheiros necessitam da obtenção do lock e no caso de estar em modo "Debug" o log será escrito também no stdout.
 
-        Autor: Pedro Martins.
+        Autor: Miguel Pinto.
 
         :param timestamp: Float
-        :param adress: Tuple (endereço, porta)
-        :param dados: String
+        :param end_adress: String
+        :param papel: String
         :param domain: String
         :return: Void
         """
@@ -321,17 +317,15 @@ class Logs:
         finally:
             self.locks[domain].release()
 
-    # Reporta um erro do funcionamento interno de um componente.
     def fl(self, timestamp, info, domain="all"):
         """
-        Esta função escreve no log a receção de uma query de um certo domínio.
+        Esta função escreve no log que ocurreu um erro no funcionamento interno de um componente.
         Todas as escritas nos ficheiros necessitam da obtenção do lock e no caso de estar em modo "Debug" o log será escrito também no stdout.
 
         Autor: Pedro Martins.
 
         :param timestamp: Float
-        :param adress: Tuple (endereço, porta)
-        :param dados: String
+        :param info: String
         :param domain: String
         :return: Void
         """
@@ -349,17 +343,16 @@ class Logs:
         finally:
             self.locks[domain].release()
 
-    # Deteção de um timeout na interaçao com o servidor no endereço indicado.
     def to(self, timestamp, adress, info, domain="all"):
         """
-        Esta função escreve no log a receção de uma query de um certo domínio.
+        Esta função escreve no log a ocurrência de um timeout na interação com um servidor.
         Todas as escritas nos ficheiros necessitam da obtenção do lock e no caso de estar em modo "Debug" o log será escrito também no stdout.
 
-        Autor: Pedro Martins.
+        Autor: Miguel Pinto.
 
         :param timestamp: Float
-        :param adress: Tuple (endereço, porta)
-        :param dados: String
+        :param adress: String
+        :param info: String
         :param domain: String
         :return: Void
         """
@@ -377,17 +370,15 @@ class Logs:
         finally:
             self.locks[domain].release()
 
-    # Reporta que a execução do componente foi parado (SERVIDOR PAROU).
     def sp(self, timestamp, info, domain="all"):
         """
-        Esta função escreve no log a receção de uma query de um certo domínio.
+        Esta função escreve no log que a execução de um componente parou.
         Todas as escritas nos ficheiros necessitam da obtenção do lock e no caso de estar em modo "Debug" o log será escrito também no stdout.
 
         Autor: Pedro Martins.
 
         :param timestamp: Float
-        :param adress: Tuple (endereço, porta)
-        :param dados: String
+        :param info: String
         :param domain: String
         :return: Void
         """
@@ -408,14 +399,15 @@ class Logs:
     # Reporta o arranque do servidor.
     def st(self, timestamp, port, timeout, mode, domain = "all"):
         """
-        Esta função escreve no log a receção de uma query de um certo domínio.
+        Esta função escreve no log que a execução de um componente foi iniciado.
         Todas as escritas nos ficheiros necessitam da obtenção do lock e no caso de estar em modo "Debug" o log será escrito também no stdout.
 
-        Autor: Pedro Martins.
+        Autor: Miguel Pinto.
 
         :param timestamp: Float
-        :param adress: Tuple (endereço, porta)
-        :param dados: String
+        :param port: Int
+        :param timeout: Int
+        :param mode: String
         :param domain: String
         :return: Void
         """
