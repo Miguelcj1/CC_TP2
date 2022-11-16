@@ -1,23 +1,52 @@
 import time
 from logs import Logs
 
+
 def line_to_string(arr):
+    """
+    Esta função devolve uma string com os campos (Name(0), Type(1), Value(2), TTL(3), Prio(4) (se for != -1))
+
+    Autor: Pedro Martins.
+
+    :param arr: Array [String]
+    :return: String
+    """
     string = f"{arr[0]} {arr[1]} {arr[2]} {arr[3]} "
     if arr[4] != -1:
         string += str(arr[4])
     return string
 
+
 class Cache:
+    """
+    Esta classe é responsável por implementar a cache que será usada por vários componentes do sistema.
+    """
 
     def __init__(self):
+        """
+        Esta classe possui um array de arrays com tamanho MAX.
+        Cada linha desse Array segue o sequinte formato:
+        [Name(0), Type(1), Value(2), TTL(3), Prio(4), origin(5), TimeStamp(6), Index(7), STATUS(8)]
+
+        Autor: Miguel Pinto e Pedro Martins.
+        """
         self.COL = 9 # nº de colunas
         self.MAX = 50 # nº maximo de entradas
 
         #init_line = [Name(0), Type(1), Value(2), TTL(3), Prio(4), origin(5), TimeStamp(6), Index(7), STATUS(8)]
         self.table = [[0, 0, 0, 0, 0, 0, 0, y, "FREE"] for y in range(self.MAX)]
 
-
     def search(self, name, type_of_value, ind=0):
+        """
+        Esta função recebe o nome e um tipo de valor e procura na cache o primeiro indice que faz match com esses valores.
+
+        Autor: Miguel Pinto e Pedro Martins.
+
+        :param name: String
+        :param type_of_value: String
+        :param ind: Int
+        :return: Int
+        """
         res = None
         now = time.time()
         for i in range(ind, self.MAX):
@@ -30,8 +59,18 @@ class Cache:
                 break
         return res # retorna o primeiro indice que faz match com (name, type)
 
-    # Retorna a resposta final.
     def get_answers(self, log, message_id, q_name, q_type):
+        """
+        Esta função faz a procura na cache para obter os valores necessários para a criação de uma resposta.
+
+        Autor: Miguel Pinto e Pedro Martins.
+
+        :param log: Logs
+        :param message_id: Int
+        :param q_name: String
+        :param q_type: String
+        :return: String
+        """
         all_values = []
         n_resp = 0
         arr_resp = []
@@ -117,9 +156,22 @@ class Cache:
         data = ";".join((responses_f, authorities_f, extras_f)) + ";"
         return string + data
 
-
-    # Atualiza a cache com os respetivos valores.
     def update(self, log, name, type_of_value, value, ttl, prio = -1, origin = "OTHERS"):
+        """
+        Esta função atualiza a cache com os valores recebidos.
+        No caso de os valores ja estarem na cache apena será alterado o timestamp é atualizado.
+
+        Autor: Miguel Pinto e Pedro Martins.
+
+        :param log: Logs
+        :param name: String
+        :param type_of_value: String
+        :param value: String
+        :param ttl: Float
+        :param prio: Float
+        :param origin: String
+        :return: Void
+        """
         now = time.time()
         last_free = 0
         i = 0
@@ -151,8 +203,17 @@ class Cache:
         log.ev(now, f"Foi criada uma entrada na cache dos seguintes valores: {name} {type_of_value} {value} {ttl} origem:{origin}", name)
 
 
-    # Faz o mesmo que a função anterior (UPDATE) mas faz recebe como argumento uma linha do género do ficheiro de base de dados.
     def update_with_line(self, log, line, origin):
+        """
+        Esta função faz update a cache mas recebe como argumento uma linha do ficheiro de base de dados.
+
+        Autor: Pedro Martins.
+
+        :param log: Logs
+        :param line: String
+        :param origin: String
+        :return: Void
+        """
         # Verifica se a linha está vazia ou começa por '#'.
         if not line.strip() or line.startswith("#"):
             return
@@ -167,13 +228,16 @@ class Cache:
             prio = int(arr[4])
         self.update(log, name, type_of_value, value, ttl, prio=prio, origin=origin)
 
-
-    # atualiza, em todas as entradas da cache com Name igual
-    # ao domínio passado como argumento, o campo Status para FREE. Quando o temporizador
-    # associado à idade da base de dados dum SS relativo a um domínio atinge o valor de SOAEXPIRE,
-    # então o SS deve executar esta função para esse domínio. Esta função é exclusiva dos servidores
-    # do tipo secundário.
     def free_domain(self, domain):
+        """
+        Esta função atualiza todas as entradas da cache com o Name igual ao dominio recebido para o status "FREE".
+        Esta função é usada por um SS quando o temporizador associado à base de dados atinge o valor de SOAEXPIRE.
+
+        Autor: Pedro Martins.
+
+        :param domain: String
+        :return: Void
+        """
         for line in self.table:
             if line[0] == domain:
                 line[8] = "FREE"
