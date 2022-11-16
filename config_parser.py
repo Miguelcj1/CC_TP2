@@ -2,8 +2,15 @@ import os
 import auxs
 
 
-# remove o "/" inicial de uma string.
 def pop_slash(string):
+    """
+    Esta função remove o "/" inicial de uma string.
+
+    Autor Pedro Martins.
+
+    :param string: String
+    :return: String
+    """
     if string[0] == "/":
         final = string.replace('/', '', 1)
     else:
@@ -11,8 +18,16 @@ def pop_slash(string):
     return final
 
 
-# Create/Open directory
 def co_dir(path, mode):
+    """
+    Esta função abre um ficheiro. No caso de não existir a path para esse ficheiro são criadas as diretorias descritas na path.
+
+    Autor: Pedro Martins.
+
+    :param path: String
+    :param mode: String
+    :return: File
+    """
     str = path
     str = str.split("/")[:-1]
     joined_str = "/".join(str)
@@ -25,6 +40,15 @@ def co_dir(path, mode):
 
 # Dado um "endereço" ou "endereço:porta" retorna o tuplo (endereco, porta)
 def str_adress_to_tuple(string, default_port = 5000):
+    """
+    Esta função recebe um endereço e uma porta e cria um tuplo (endereço, porta).
+
+    Autor: Pedro Martins.
+
+    :param string: String
+    :param default_port: Int
+    :return: Tuple (endereço, porta)
+    """
     arr = string.split(":")
     if len(arr) < 2:
         res = (arr[0], default_port)
@@ -34,8 +58,18 @@ def str_adress_to_tuple(string, default_port = 5000):
 
 
 class DomainInfo:
+    """
+    Esta classe é responsável por armazenar os dados de uma base de dados.
+    """
 
     def __init__(self):
+        """
+        Esta classe possui o nome, path da base de dados e a path do ficheiro de log de um certo dominio.
+        Possui também os endereços relativos ao SP, SS, e SR pertencentes a esse dominio.
+
+        Autor: Miguel Pinto e Pedro Martins.
+
+        """
         self.name = None
         self.database_path = None
         self.log_file = None
@@ -45,73 +79,157 @@ class DomainInfo:
 
 
     def set_name(self, name):
+        """
+        Função de set do nome do dominio.
+
+        Autor: Pedro Martins.
+
+        :param name: String
+        :return: Void
+        """
         self.name = name
 
     def get_name(self):
+        """
+        Função de get do nome do dominio.
+
+        Autor: Pedro Martins
+
+        :return: String
+        """
         return self.name
 
-    # Se já houver uma referência de base de dados para este dominio, retorna falso para indicar uma incoerencia no ficheiro.
     def set_db(self, db_path):
+        """
+        Função de set da path da base de dados do dominio.
+        Retorna falso caso já exista uma path para uma base de dados deste dominio.
+
+        Autor: Pedro Martins.
+
+
+        :param db_path: String
+        :return: Boolean
+        """
         if self.database_path is None:
             self.database_path = db_path
             return True
         else:
             return False
 
-    # Get the domain info database
     def get_db(self):
+        """
+        Função de get da path da base de dados do dominio.
+
+        Autor: Pedro Martins.
+
+        :return: String
+        """
         if self.database_path:
             return self.database_path
         else:
             return None
 
-    # Se já houver uma referência de ficheiro de log para este dominio, retorna falso para indicar uma incoerencia no ficheiro.
     def set_log_file(self, log_path):
+        """
+        Função de set da path do ficheiro de log do dominio.
+        Retorna false caso já exista uma path para um ficheiro de log deste dominio.
+
+        Autor: Pedro Martins.
+
+        :param log_path: String
+        :return: Boolean
+        """
         if self.log_file is None:
             self.log_file = log_path
             return True
         else:
             return False
 
-    # Get the domain info log_file
     def get_log_file(self):
+        """
+        Função de get da path do ficheiro de log do dominio.
+
+        Autor: Pedro Martins.
+
+        :return: String
+        """
         if self.log_file:
             return self.log_file
         else:
             return None
 
-    # Se já houver uma referência de SP para este dominio, retorna falso para indicar uma incoerencia no ficheiro.
     def set_sp(self, sp):
+        """
+        Função de set do SP do dominio.
+        Retorna false caso ja exista um SP deste dominio.
+
+        Autor: Pedro Martins.
+
+        :param sp:
+        :return: Boolean
+        """
         if self.sp is None:
             self.sp = sp
             return True
         else:
             return False
 
-    # Get the domain info SP
     def get_sp(self):
+        """
+        Função de get do SP do dominio.
+
+        Autor: Pedro Martins.
+
+        :return: String
+        """
         if self.sp:
             return self.sp
         else:
             return None
 
-    # Adiciona à lista de SS's, o argumento passado.
     def add_ss(self, ss):
+        """
+        Função de que adiciona um SS à lista de SS deste dominio.
+
+        Autor: Pedro Martins.
+
+        :param ss: String
+        :return: Void
+        """
         self.ss.append(ss)
 
-    # Get the domain info SS
     def get_ss(self):
+        """
+        Função que retorna a lista de SS deste dominio.
+
+        Autor: Pedro Martins.
+
+        :return: [String]
+        """
         if self.ss:
             return self.ss
         else:
             return None
 
-    # Adiciona à lista de DD's, o argumento passado.
     def add_dd(self, dd):
+        """
+        Função de que adiciona um SR à lista de SR deste dominio.
+
+        Autor: Pedro Martins.
+
+        :param dd: String
+        :return: Void
+        """
         self.dd.append(dd)
 
-    # Get the domain info DD
     def get_dd(self):
+        """
+        Função que retorna a lista de SR deste dominio.
+
+        Autor: Pedro Martins.
+
+        :return: [String]
+        """
         if self.dd:
             return self.dd
         else:
@@ -119,9 +237,18 @@ class DomainInfo:
 
 
 class Configs:
-
-    # Define as diversas variavéis analisadas no ficheiro de configuração.
+    """
+    Esta classe é responsável por armazenar os dados de um ficheiro de configuração.
+    """
     def __init__(self, conf_file):
+        """
+        Esta classe possui a path para o ficheiro de base de dados "root", para o ficheiro de log universal "all" e
+        um dicionárico com todos os domínios do ficheiro de configuração.
+
+        Autor: Miguel Pinto e Pedro Martins.
+
+        :param conf_file: String
+        """
         self.st_file_path = None
         self.all_log = None
         self.domains = {}
