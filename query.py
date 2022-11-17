@@ -109,7 +109,7 @@ def respond_query(query, s, address, confs, log, cache):
     respondable_domains = confs.get_all_dd()
     if q_name not in respondable_domains:
         # A resposta irá com o response_code = 2.
-        result = f"{message_id},,2,0,0,0;{q_name},{q_type};;"
+        result = f"{message_id},,2,0,0,0;{q_name},{q_type};;" ### IGNORAR A MENSAGEM.
         log.rp(time.time(), address, result, domain=q_name)
         s.sendto(result.encode("utf-8"), address)
         return
