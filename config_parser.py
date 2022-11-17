@@ -41,7 +41,7 @@ def co_dir(path, mode):
 # Dado um "endereço" ou "endereço:porta" retorna o tuplo (endereco, porta)
 def str_adress_to_tuple(string, default_port = 5000):
     """
-    Esta função recebe um endereço e uma porta e cria um tuplo (endereço, porta).
+    Esta função recebe um endereço e opcionalmente uma porta e cria um tuplo (endereço, porta).
 
     Autor: Pedro Martins.
 
@@ -59,7 +59,7 @@ def str_adress_to_tuple(string, default_port = 5000):
 
 class DomainInfo:
     """
-    Esta classe é responsável por armazenar os dados de uma base de dados.
+    Esta classe é responsável por armazenar os dados vindos do ficheiro de configuração, relativos a um determinado domínio.
     """
 
     def __init__(self):
