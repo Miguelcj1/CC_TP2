@@ -86,11 +86,6 @@ def ask_zone_transfer(dom, soarefresh=-1):
     :return: Void
     """
 
-    #global log
-    #global confs
-    #global cache
-    #global timeout
-
     # Para que haja uma verificação de atualização da base de dados, é passada esta variavel.
     if soarefresh > 0:
         time.sleep(soarefresh)
@@ -179,9 +174,6 @@ def resp_zone_transfer(dbs, port):
     :param port: Int
     :return: Void
     """
-
-    #global log
-    #global confs
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind(("", port))  # Recebe conexoes de todos (nao aplica restriçoes)
