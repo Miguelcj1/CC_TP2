@@ -25,7 +25,7 @@ def check_addr(addr, lstradd):
     Autor: Pedro Martins.
 
     :param addr: Tuple (endereço, porta)
-    :param lstradd: Arr[String] ["endereço:porta" ou "endereco"]
+    :param lstradd: list(String) ["endereço:porta" ou "endereco"]
     :return: Boolean
     """
     for s in lstradd:

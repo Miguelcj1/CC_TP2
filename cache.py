@@ -8,7 +8,7 @@ def line_to_string(arr):
 
     Autor: Pedro Martins.
 
-    :param arr: Array [String]
+    :param arr: list(String)
     :return: String
     """
     string = f"{arr[0]} {arr[1]} {arr[2]} {arr[3]} "

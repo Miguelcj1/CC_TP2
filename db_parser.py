@@ -39,11 +39,25 @@ def add_default(name, default):
     return name + "." + default
 
 
-
 class Database:
-
+    """
+    Esta classe é responsável por armazenar os dados de um ficheiro de base de dados.
+    """
     # Define as diversas variavéis analisadas no ficheiro de base de dados. Também adiciona automaticamente na cache os valores lidos.
     def __init__(self, db_file, cache, origin, log):
+        """
+        Esta classe possui a path do ficheiro de base de dados,
+        um objeto Cache onde serão guardados todos os dados da base de dados,
+        uma string com a origem da base de dados "FILE", "SP", etc.,
+        e um objeto Log que será usado para escrever nos ficheiros de logs os eventos que ocorram.
+
+        Autor: Miguel Pinto e Pedro Martins.
+
+        :param db_file: String
+        :param cache: Cache
+        :param origin: String
+        :param log: Logs
+        """
         self.DEFAULT = {} # simbolo: valor
         self.SOASP = {} # dominio: nome completo do SP do dominio
         self.SOAADMIN = {} # dominio: endereço de email do admin do dominio
@@ -70,9 +84,19 @@ class Database:
                 raise Exception(str(exc))
 
 
-    # Parses an individual line of a DB File for the database and also caches it.
     def add_db_line(self, line, cache, origin, log):
+        """
+        Esta função faz o parse da base de dados e armazena todos os seus valores.
+        Os dados são também armazenados em cache.
 
+        Autor: Miguel Pinto e Pedro Martins.
+
+        :param line: String
+        :param cache: Cache
+        :param origin: String
+        :param log: Logs
+        :return: Void
+        """
         # Verifica se a linha está vazia ou começa por '#'.
         if not line.strip() or line.startswith("#"):
             return
@@ -179,30 +203,94 @@ class Database:
         if arr[1] != "DEFAULT": # se o type_of_value == DEFAULT, não é colocado em cache.
             cache.update(log, dom, arr[1], name, ttl, prio=prio, origin=origin)
 
-
-
     def get_DEFAULT(self):
+        """
+        Esta função retorna o campo Default da base de dados.
+
+        Autor: Miguel Pinto.
+
+        :return: Dict{String}
+        """
         return self.DEFAULT
 
     def get_SOASP(self, dom):
+        """
+        Esta função retorna o nome completo do SP de um certo dominio.
+
+        Autor: Miguel Pinto.
+
+        :param dom: String
+        :return: Tuple (Name, TTL)
+        """
         return self.SOASP.get(dom)
 
     def get_SOAADMIN(self, dom):
+        """
+        Esta função retorna o valor do endereço de e-mail completo do administrador do domínio.
+
+        Autor: Miguel Pinto.
+
+        :param dom: String
+        :return: Tuple (Name, TTL)
+        """
         return self.SOAADMIN.get(dom)
 
     def get_SOASERIAL(self, dom):
+        """
+        Esta função retorna o número de série da base de dados do SP de um certo dominio.
+
+        Autor: Miguel Pinto.
+
+        :param dom: String
+        :return: Tuple (Name, TTL)
+        """
         return self.SOASERIAL.get(dom)
 
     def get_SOAREFRESH(self, dom):
+        """
+        Esta função retorna o valor do intervalo temporal para um SS voltar a perguntar ao SP de um certo dominio o
+        número de série da base de dados.
+
+        Autor: Miguel Pinto.
+
+        :param dom: String
+        :return: Tuple (Name, TTL)
+        """
         return self.SOAREFRESH.get(dom)
 
     def get_SOARETRY(self, dom):
+        """
+        Esta função retorna o valor do intervalo temporal para um SS voltar a perguntar ao SP de um certo dominio o
+        número de série da base de dados após um timeout.
+
+        Autor: Miguel Pinto.
+
+        :param dom: String
+        :return: Tuple (Name, TTL)
+        """
         return self.SOARETRY.get(dom)
 
     def get_SOAEXPIRE(self, dom):
+        """
+        Esta função retorna o valor do intervalo temporal para um SS deixar de considerar a sua réplica da base de dados de um certo dominio válida.
+
+        Autor: Miguel Pinto.
+
+        :param dom: String
+        :return: Tuple (Name, TTL)
+        """
         return self.SOAEXPIRE.get(dom)
 
     def get_SOA_(self, param, dom):
+        """
+        Esta função retorna o qualquer campo do tipo "SOA" descrito em "param"
+
+        Autor: Miguel Pinto.
+
+        :param param: String
+        :param dom: String
+        :return: Tuple (Name, TTL)
+        """
         if param == "SOASP":
             return self.SOASP.get(dom)
         elif param == "SOAADMIN":
@@ -216,9 +304,15 @@ class Database:
         elif param == "SOAEXPIRE":
             return self.SOAEXPIRE.get(dom)
 
-
-    # returns [(name, ttl, prio)]
     def get_NS(self, dom):
+        """
+        Esta função retorna a lista de os servidores que são autoricativos a um certo dominio.
+
+        Autor: Miguel Pinto.
+
+        :param dom: String
+        :return: list(Tuple (Name, TTL, Prio))
+        """
         ret = []
         sn = self.NS.get(dom)
         if sn is None:
@@ -227,8 +321,15 @@ class Database:
             ret.append(n)
         return ret
 
-    # returns [(ip adress, ttl, prio)]
     def get_A(self, name):
+        """
+        Esta função retorna os endereços IP do host/servidor.
+
+        Autor: Miguel Pinto.
+
+        :param name: String
+        :return: list(Tuple (IP Address, TTL, Prio))
+        """
         ret = []
         sn = self.A.get(name)
         if sn is None:
@@ -237,12 +338,26 @@ class Database:
             ret.append(n)
         return ret
 
-    # returns (name, ttl)
     def get_CNAME(self, key):
+        """
+        Esta função retorna o nome canónico do nome indicado no parâmetro key.
+
+        Autor: Miguel Pinto.
+
+        :param key: String
+        :return: Tuple (Name, TTL)
+        """
         return self.CNAME.get(key)
 
-    # returns [(name, ttl, prio)]
     def get_MX(self, name):
+        """
+        Esta função retorna os nomes dos servidores de email para o dominio indicado no parâmetro name.
+
+        Autor: Miguel Pinto.
+
+        :param name: String
+        :return: list(Tuple (Name, TTL, Prio))
+        """
         ret = []
         sn = self.MX.get(name)
         if sn is None:
@@ -253,6 +368,15 @@ class Database:
 
     # returns [(name, ttl)]
     def get_PTR(self, name):
+        """
+        Esta função retorna os nomes dos servidores que usam endereços IPv4.
+        A indicação do IPv4 é feita como nos domínios de DNS reverso (rDNS).
+
+        Autor: Miguel Pinto.
+
+        :param name: String
+        :return: list(Tuple (Name, TTL))
+        """
         ret = []
         sn = self.PTR.get(name)
         if sn is None:
@@ -262,6 +386,13 @@ class Database:
         return ret
 
     def all_db_lines(self):
+        """
+        Esta função retorna uma lista com todas as linhas da base de dados.
+
+        Autor: Pedro Martins
+
+        :return: list(String)
+        """
         ret = [] # array de linhas a retornar
         for k, v in self.SOASP.items():
             arr = [k, "SOASP"]
@@ -325,7 +456,18 @@ class Database:
         #ret = map(entry_to_line, ret)
         return ret
 
-def entry_to_line(arr): # arr = [name, type_of_value, value, ttl, prio]
+
+def entry_to_line(arr):
+    """
+    Esta função recebe um array com o seguinte formato:
+        arr = [name, type_of_value, value, ttl, prio]
+    A partir desse array é criado uma string com esses valores.
+
+    Autor: Pedro Martins.
+
+    :param arr: Array
+    :return: String
+    """
     res = ""
     res = f"{arr[0]} {arr[1]} {arr[2]} "
     if len(arr) > 3:
