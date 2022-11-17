@@ -165,7 +165,7 @@ class DomainInfo:
 
         Autor: Pedro Martins.
 
-        :param sp:
+        :param sp: String
         :return: Boolean
         """
         if self.sp is None:
@@ -204,7 +204,7 @@ class DomainInfo:
 
         Autor: Pedro Martins.
 
-        :return: [String]
+        :return: list(String)
         """
         if self.ss:
             return self.ss
@@ -228,7 +228,7 @@ class DomainInfo:
 
         Autor: Pedro Martins.
 
-        :return: [String]
+        :return: list(String)
         """
         if self.dd:
             return self.dd
@@ -377,7 +377,7 @@ class Configs:
         Autor: Miguel Pinto e Pedro Martins.
 
         :param domain: String
-        :return: [String]
+        :return: list(String)
         """
         if self.domains[domain].get_ss():
             return self.domains[domain].get_ss()
@@ -392,7 +392,7 @@ class Configs:
         Autor: Miguel Pinto e Pedro Martins.
 
         :param domain: String
-        :return: [String]
+        :return: list(String)
         """
         if self.domains[domain].get_dd():
             return self.domains[domain].get_dd()
@@ -443,7 +443,7 @@ class Configs:
 
         Autor: Miguel Pinto e Pedro Martins.
 
-        :return: [String]
+        :return: list(String)
         """
         ret = []
         for key in self.domains:
@@ -457,7 +457,7 @@ class Configs:
 
         Autor: Pedro Martins.
 
-        :return: [String]
+        :return: list(String)
         """
         ret = []
         for key in self.domains:
@@ -482,7 +482,7 @@ class Configs:
 
         Autor: Pedro Martins.
 
-        :return: [String]
+        :return: list(String)
         """
         result = []
         for value in self.domains.values():
@@ -499,7 +499,7 @@ class Configs:
 
         Autor: Pedro Martins.
 
-        :return: [String]
+        :return: list(String)
         """
         result = []
         for value in self.domains.values():
