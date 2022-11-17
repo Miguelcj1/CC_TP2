@@ -341,44 +341,85 @@ class Configs:
             if self.domains[key].get_log_file is None:
                 raise Exception(f"O domínio {key} não tem log file!!")'''
 
-    # Verifica se o server é Principal para um determinado domínio.
     def is_sp(self, domain):
+        """
+        Esta função retorna true se o servidor é principal para um determinado dominio.
+
+        Autor: Miguel Pinto e Pedro Martins.
+
+        :param domain: String
+        :return: Boolean
+        """
         if self.domains[domain].get_sp() is None:
             return True
         else:
             return False
 
-    # Retorna o endereço do servidor principal de um determinado domínio, caso não seja ele proprio
     def get_sp(self, domain):
+        """
+        Esta função retorna o endereço do servidor principal para um determinado dominio, caso não seja ele próprio.
+
+        Autor: Miguel Pinto e Pedro Martins.
+
+        :param domain: String
+        :return: String
+        """
         if self.domains[domain].get_sp():
             return self.domains[domain].get_sp()
         else:
             print("!get_sp não obteve nenhum sp!")
             return None
 
-    # Retorna o endereço do servidor principal de um determinado domínio, caso não seja ele proprio
     def get_ss(self, domain):
+        """
+        Esta função retorna os endereços dos servidores secundários de um determinado dominio, caso não seja ele próprio.
+
+        Autor: Miguel Pinto e Pedro Martins.
+
+        :param domain: String
+        :return: [String]
+        """
         if self.domains[domain].get_ss():
             return self.domains[domain].get_ss()
         else:
             print("!get_ss não obteve nenhum ss!")
             return None
 
-    # Retorna o endereço do servidor principal de um determinado domínio, caso não seja ele proprio
     def get_dd(self, domain):
+        """
+        Esta função retorna os endereços dos servidores resolver de um determinado dominio, caso não seja ele próprio.
+
+        Autor: Miguel Pinto e Pedro Martins.
+
+        :param domain: String
+        :return: [String]
+        """
         if self.domains[domain].get_dd():
             return self.domains[domain].get_dd()
         else:
             print("!get_dd não obteve nenhum dd!")
             return None
 
-    # Retorna o path do ficheiro de base de dados.
     def get_db_path(self, domain):
+        """
+        Esta função retorna a path para o ficheiro de base de dados de um determinado dominio.
+
+        AUtor: Miguel Pinto e Pedro Martins.
+
+        :param domain: String
+        :return: String
+        """
         return self.domains[domain].get_db()
 
-
-    # Retorna o path do ficheiro de log de um determinado dominio.
     def get_domain_log_file(self, domain):
+        """
+        Esta função retorna a path para o ficheiro de logs de um determinado dominio.
+
+        Autor: Miguel Pinto e Pedro Martins.
+
+        :param domain: String
+        :return: String
+        """
         if self.domains[domain].get_log_file():
             return self.domains[domain].get_log_file()
         else:

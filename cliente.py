@@ -95,6 +95,8 @@ def main():
         elif inp != "0":
             print("Input inválido!")
 
+        input("Press a key to continue!")
+
     s.close()
 
 
