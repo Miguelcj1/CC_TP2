@@ -33,9 +33,11 @@ class Cache:
         self.COL = 9 # nº de colunas
         self.MAX = 50 # nº maximo de entradas
 
-        #init_line = [Name(0), Type(1), Value(2), TTL(3), Prio(4), origin(5), TimeStamp(6), Index(7), STATUS(8)]
+        # Inicializa todas as entradas da cache com valores FREE.
         self.table = [[0, 0, 0, 0, 0, 0, 0, y, "FREE"] for y in range(self.MAX)]
 
+
+    #info_line = [Name(0), Type(1), Value(2), TTL(3), Prio(4), origin(5), TimeStamp(6), Index(7), STATUS(8)]
     def search(self, name, type_of_value, ind=0):
         """
         Esta função recebe o nome e um tipo de valor e procura na cache o primeiro indice que faz match com esses valores.
@@ -44,7 +46,7 @@ class Cache:
 
         :param name: String
         :param type_of_value: String
-        :param ind: Int
+        :param ind: Int (indice pelo qual começa a procura)
         :return: Int
         """
         res = None
@@ -59,9 +61,10 @@ class Cache:
                 break
         return res # retorna o primeiro indice que faz match com (name, type)
 
+
     def get_answers(self, log, message_id, q_name, q_type):
         """
-        Esta função faz a procura na cache para obter os valores necessários para a criação de uma resposta.
+        Esta função faz a procura na cache para obter os valores necessários e cria a resposta.
 
         Autor: Miguel Pinto e Pedro Martins.
 
@@ -243,75 +246,17 @@ class Cache:
                 line[8] = "FREE"
 
 
-'''
-table = Cache()
-table.update("example.com.", "MX", "ns1", 30, origin = "OTHERS")
-index = table.search("example.com.", "MX")
-t=0
-'''
+    def get_soarefresh(self, domain):
+        """
+        Esta função é usada para obter o valor de soarefresh de um determinado domínio para ser usado pelo ask_zone_transfer.
 
+        Autor: Pedro Martins.
 
-
-
-'''
-# sug: lista de strings que sao a resposta e têm ja toda a informaçao necessaria.
-class Cache:
-
-    def __init__(self):
-        self.cache = {} # NAME: {TYPE_OF_VALUE: (resposta, timestamp)}
-
-    def add_to_cache(self, name, type_of_value, resposta):
-        if self.cache.get(name) is None:
-            self.cache[name] = {}
-        if self.cache[name].get(type_of_value) is None:
-            self.cache[name][type_of_value] = [] # vai ter uma lista do tipo (resposta, timestamp)
-        timestamp = time.time()
-        self.cache[name][type_of_value].append((resposta, timestamp))
-
-
-    def search(self, message_id, name, type_of_value):
-        all_values = []
-        responses_f = ""
-        authorities_f = ""
-        extras_f = ""
-        n_resp = 0
-        arr_resp = []
-        n_authorities = 0
-        arr_authorities = []
-        n_extras = 0
-        arr_extras = []
-        if self.cache.get(name) is None:
+        :param domain: String
+        :return: Void
+        """
+        ind = self.search(domain, "SOAREFRESH")
+        if ind is None:
             return None
-
-        if self.cache[name].get(type_of_value) is None:
-            lista = []
-        else:
-            lista = self.cache[name].get(type_of_value)
-
-        # Obtenção dos response values
-        for i in range(len(lista)):
-            r = self.cache[name][type_of_value][i]
-            resp = r[0] # obtençao da resposta
-            ts = r[1]
-            ttl = int (resp.split()[3]) # obtenção do ttl da entrada
-            now = time.time()
-            # Verificação da validade do timestamp, relativamente ao ttl.
-            if now - ts > ttl:
-                del self.cache[name][type_of_value][i]
-                continue
-
-            self.cache[name][type_of_value][i] = (resp, now)
-            n_resp += 1
-            arr_resp.append(resp)
-        responses_f = ",".join(arr_resp)
-
-        # Obtenção do resto dos valores (NS, A)
-        # ...
-
-        data = ";".join((responses_f, authorities_f, extras_f))
-
-        result = ",".join((str(message_id), "", "0", str(n_resp), str(n_authorities), str(n_extras)))
-        result += ";" + name  + "," + type_of_value + ";"
-        result += data
-        return result'''
-
+        res = self.table[ind][2]
+        return int(res)

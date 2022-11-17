@@ -115,6 +115,7 @@ class Logs:
         finally:
             self.locks[domain].release()
 
+
     def qe(self, timestamp, adress, dados, domain = "all"):
         """
         Esta função escreve no log o envio de uma query de um certo domínio.
@@ -141,6 +142,7 @@ class Logs:
                 sys.stdout.write(string)
         finally:
             self.locks[domain].release()
+
 
     # Escreve no log a ocorrencia do envio de uma resposta.
     def rp(self, timestamp, adress, dados, domain = "all"):
@@ -169,6 +171,7 @@ class Logs:
                 sys.stdout.write(string)
         finally:
             self.locks[domain].release()
+
 
     # Escreve no log a ocorrencia da rececão de uma resposta.
     def rr(self, timestamp, adress, dados, domain = "all"):
@@ -199,6 +202,7 @@ class Logs:
         finally:
             self.locks[domain].release()
 
+
     def zt(self, timestamp, end_adress, papel, duracao=0, domain="all"):
         """
         Esta função escreve no log a conclusão correta de um processo de transferencia de zona.
@@ -227,11 +231,12 @@ class Logs:
             string += "\n"
             fp.write(string)
             fp.close()
-            # Se for para imprimir no stdout também.
+
             if self.stdout:
                 sys.stdout.write(string)
         finally:
             self.locks[domain].release()
+
 
     def ev(self, timestamp, info, domain = "all"):
         """
@@ -262,6 +267,7 @@ class Logs:
         finally:
             self.locks[domain].release()
 
+
     def er(self, timestamp, from_adress, dados="", domain="all"):
         """
         Esta função escreve no log que não foi possivel descodificar um PDU corretamente.
@@ -290,10 +296,11 @@ class Logs:
         finally:
             self.locks[domain].release()
 
+
     def ez(self, timestamp, end_adress, papel, domain="all"):
         """
         Esta função escreve no log que o precesso de transferência de zona não foi concluida corretamente.
-        Todas as escritas nos ficheiros necessitam da obtenção do lock e no caso de estar em modo "Debug" o log será escrito também no stdout.
+        Todas as escritas nos ficheiros necessitam da obtenção do lock e no caso de estar em modo "Debug", o log será também escrito para o stdout.
 
         Autor: Miguel Pinto.
 
@@ -308,14 +315,15 @@ class Logs:
         self.locks[domain].acquire()
         try:
             fp = open(self.log_files[domain], "a")
-
-            string = get_timestamp(timestamp) + " ZT " + end_adress + " " + papel + "\n"
+            #string = get_timestamp(timestamp) + " EZ " + end_adress + " " + papel + "\n"
+            string = f"{get_timestamp(timestamp)} EZ {end_adress} {papel}\n"
             fp.write(string)
             fp.close()
             if self.stdout:
                 sys.stdout.write(string)
         finally:
             self.locks[domain].release()
+
 
     def fl(self, timestamp, info, domain="all"):
         """
@@ -343,6 +351,7 @@ class Logs:
         finally:
             self.locks[domain].release()
 
+
     def to(self, timestamp, adress, info, domain="all"):
         """
         Esta função escreve no log a ocurrência de um timeout na interação com um servidor.
@@ -362,13 +371,15 @@ class Logs:
         try:
             fp = open(self.log_files[domain], "a")
 
-            string = get_timestamp(timestamp) + " TO " + adress + " " + info + "\n"
+            #string = get_timestamp(timestamp) + " TO " + adress + " " + info + "\n"
+            string = f"{get_timestamp(timestamp)} TO {adress} {info}\n"
             fp.write(string)
             fp.close()
             if self.stdout:
                 sys.stdout.write(string)
         finally:
             self.locks[domain].release()
+
 
     def sp(self, timestamp, info, domain="all"):
         """
@@ -396,7 +407,7 @@ class Logs:
         finally:
             self.locks[domain].release()
 
-    # Reporta o arranque do servidor.
+
     def st(self, timestamp, port, timeout, mode, domain = "all"):
         """
         Esta função escreve no log que a execução de um componente foi iniciado.
