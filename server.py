@@ -221,18 +221,18 @@ def main():
     """
     Esta função implementa o comportamento dos servidores no sistema DNS.
     A função recebe um ficheiro de configuração como argumento onde obtem toda a informação que necessita.
-    Cada servidor irá possuir um objeto Logs e Cache onde poderá atualizar os ficheiros de log e guardar as informações necessarias em cache.
+    Cada servidor irá possuir um objeto Logs e Cache onde poderá atualizar os ficheiros de log e guardar as informações necessarias em cache, respetivamente.
 
     Dependendo do ficheiro de configuração o servidor poderá ser SP ou SS:
-        Se for SP o servidor lança uma thread que executa a função resp_zone_transfer e responde a pedidos de transferencia de zona.
+        Se for SP o servidor lança uma thread que executa a função resp_zone_transfer e fica à escuta de pedidos de transferencia de zona.
         Se for SS o servidor inicia um pedido de transferencia de zona ao SP do seu dominio.
 
-    Depois de feito as transferencias de zona o servidor abre um socket UDP e espera a receção de querys de clientes.
-    Ao receber uma query lança uma thread para responder a essa query e volta a ficar a escuta de mais querys.
+    Depois de concluídas os respetivos processos de transferências de zona o servidor abre um socket UDP e espera a receção de queries de clientes.
+    Ao receber uma query lança uma thread para responder a essa query e volta a ficar a escuta de mais queries.
 
     Autor: Miguel Pinto e Pedro Martins.
 
-    argument conf: String (config path)
+    argument conf: String (config_file path)
     argument porta : Int (Optional) 5000
     argument timeout : Int (Optional) 20
     argument mode : String (Optional) "Debug"
@@ -288,7 +288,7 @@ def main():
         databases[name] = db
 
 
-    # Inicia os pedidos de transferencia de zona dos que são servidores secundários.
+    # Inicia o atendimento a pedidos de transferencia de zona de servidores secundários.
     if sp_domains:
         # Abre uma thread para que possa atender a transferencias de zona.
         threading.Thread(target=resp_zone_transfer, args=(log, confs, databases, porta)).start()
