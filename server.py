@@ -86,15 +86,14 @@ def ask_zone_transfer(dom, soarefresh=-1):
     :return: Void
     """
 
-    global log
-    global confs
-    global cache
-    global timeout
+    #global log
+    #global confs
+    #global cache
+    #global timeout
 
     # Para que haja uma verificação de atualização da base de dados, é passada esta variavel.
     if soarefresh > 0:
         time.sleep(soarefresh)
-
 
     # Guarda a timestamp do início do processo.
     t_start = time.time()
@@ -157,6 +156,8 @@ def ask_zone_transfer(dom, soarefresh=-1):
         duracao = t_end - t_start
         duracao *= 1000
         log.zt(time.time(), addr, "SS", duracao=duracao, domain=dom)
+
+        # Começo o processo de espera para fazer refresh às suas informações.
         soarefresh = cache.get_soarefresh(dom)
         threading.Thread(target=ask_zone_transfer, args=(dom, soarefresh)).start()
 
@@ -179,8 +180,8 @@ def resp_zone_transfer(dbs, port):
     :return: Void
     """
 
-    global log
-    global confs
+    #global log
+    #global confs
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind(("", port))  # Recebe conexoes de todos (nao aplica restriçoes)
