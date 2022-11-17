@@ -43,7 +43,7 @@ def check_addr(addr, lstradd):
 def get_line_number(string):
     """
     Esta função recebe uma linha da base de dados numerada e devolve o número dessa linha.
-    Exemplo: 10;TTL DEFAULT 86400 , retorna 10.
+    Exemplo: '10; TTL DEFAULT 86400' , retorna 10.
 
     Autor: Miguel Pinto.
 
@@ -73,7 +73,7 @@ def is_final_msg(string, last_i):
         return False
 
 
-def ask_zone_transfer(log, confs, cache, dom, timeout, soarefresh=-1):
+def ask_zone_transfer(dom, soarefresh=-1):
     """
     Esta função faz a parte do SS na transferencia de zona estabelecendo uma conexão TCP com o SP do dominio recebido.
     A informação recebida é guardada na cache, e os ficheiros de logs são atualizados com o que acontece neste processo.
@@ -81,18 +81,20 @@ def ask_zone_transfer(log, confs, cache, dom, timeout, soarefresh=-1):
 
     Autor: Miguel Pinto e Pedro Martins.
 
-    :param log: Logs
-    :param confs: Configs
-    :param cache: Cache
     :param dom: String (nome do domínio)
-    :param timeout: Int
     :param soarefresh: Float (intervalo de espera após ser chamada a função)
     :return: Void
     """
 
+    global log
+    global confs
+    global cache
+    global timeout
+
     # Para que haja uma verificação de atualização da base de dados, é passada esta variavel.
     if soarefresh > 0:
         time.sleep(soarefresh)
+
 
     # Guarda a timestamp do início do processo.
     t_start = time.time()
@@ -156,8 +158,7 @@ def ask_zone_transfer(log, confs, cache, dom, timeout, soarefresh=-1):
         duracao *= 1000
         log.zt(time.time(), addr, "SS", duracao=duracao, domain=dom)
         soarefresh = cache.get_soarefresh(dom)
-        threading.Thread(target=ask_zone_transfer, args=(log, confs, cache, dom, timeout, soarefresh)).start()
-        cache = Cache()
+        threading.Thread(target=ask_zone_transfer, args=(dom, soarefresh)).start()
 
     except socket.timeout:
         s.close()
@@ -165,7 +166,7 @@ def ask_zone_transfer(log, confs, cache, dom, timeout, soarefresh=-1):
         log.ez(time.time(), addr, "SS", dom)
 
 
-def resp_zone_transfer(log, confs, dbs, port):
+def resp_zone_transfer(dbs, port):
     """
     Esta função faz a parte do SP na transferencia de zona recebendo conexões de SS.
     O SP so responderá a SS autorizados e apenas responde a transferencias sobre o dominio ao qual é SP.
@@ -173,12 +174,14 @@ def resp_zone_transfer(log, confs, dbs, port):
 
     Autor: Miguel Pinto e Pedro Martins.
 
-    :param log: Logs
-    :param confs: Confs
     :param dbs: Database
     :param port: Int
     :return: Void
     """
+
+    global log
+    global confs
+
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind(("", port))  # Recebe conexoes de todos (nao aplica restriçoes)
     s.listen()
@@ -236,6 +239,7 @@ def resp_zone_transfer(log, confs, dbs, port):
     s.close()
 
 
+
 """
 Esta função implementa o comportamento dos servidores principais/secundários no sistema DNS.
 A função recebe um ficheiro de configuração como argumento onde obtém toda a informação que necessita.
@@ -252,7 +256,7 @@ Autor: Miguel Pinto e Pedro Martins.
 
 argument conf : String (config_file path)
 argument porta : Int (Optional) 5000
-argument timeout : Int (Optional) 20
+argument timeout : Int (Optional) 10
 argument mode : String (Optional) "Debug"
 :return: void
 """
@@ -266,7 +270,7 @@ if len(sys.argv) < 2:  # nº de argumentos obrigatorios
 conf = sys.argv[1]
 
 porta = 5000
-timeout = 20
+timeout = 10
 mode = "DEBUG"
 if len(sys.argv) > 2:
     porta = int(sys.argv[2])
@@ -278,8 +282,8 @@ try:
     confs = Configs(conf)
 except Exception as exc:
     print(str(exc))
-    print("Inicialização do servidor interrompida devido a falha no ficheiro de configuração!")
-    sys.exit("Error message")
+    #print("Inicialização do servidor interrompida devido a falha no ficheiro de configuração!")
+    sys.exit("Ocorreu um erro na leitura do ficheiro de configuração!")
 
 sp_domains = confs.get_sp_domains()
 ss_domains = confs.get_ss_domains()
@@ -291,7 +295,6 @@ log = Logs(confs, mode)
 log.st(ts_arranque, porta, timeout, mode)
 
 # Inicializa a cache com valores nulos.
-global cache
 cache = Cache()
 
 # Obtençao de um objeto database para cada dominio (que tenha uma database) com a informação sobre o dominio.
@@ -303,18 +306,18 @@ for name in sp_domains:
         log.fl(time.time(), str(exc), name)
         log.sp(time.time(), str(exc))
         traceback.print_exc()
-        sys.exit("Error message")
+        sys.exit("Ocorreu um erro no parsing da base de dados!")
     databases[name] = db
 
 
 # Inicia o atendimento a pedidos de transferencia de zona de servidores secundários.
 if sp_domains:
     # Abre uma thread para que possa atender a transferencias de zona.
-    threading.Thread(target=resp_zone_transfer, args=(log, confs, databases, porta)).start()
+    threading.Thread(target=resp_zone_transfer, args=(databases, porta)).start()
 
 # Para cada dominio secundário, pede ao respetivo servidor principal a sua base de dados.
 for ss in ss_domains:
-    ask_zone_transfer(log, confs, cache, ss, timeout)
+    ask_zone_transfer(ss)
 
 # Abertura do socket UDP.
 endereco = ''
@@ -325,7 +328,8 @@ while True:
     msg, address = s.recvfrom(1024)
     msg = msg.decode('utf-8')
     # Irá criar uma nova thread para atender a query recebida.
-    threading.Thread(target=query.respond_query, args=(msg, s, address, confs, log, cache)).start()
+    #threading.Thread(target=query.respond_query, args=(msg, s, address, confs, log, cache)).start()
+    threading.Thread(target=cache.get_answers, args=(confs, log, msg, s, address)).start()
 
 s.close()
 

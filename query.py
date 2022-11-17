@@ -34,7 +34,7 @@ def init_send_query(flags, q_name, q_type):
     string = f"{id},{flags},0,0,0,0;{q_name},{q_type};"
     return string
 
-
+# Passou a estar inutilizada.
 def respond_query(query, s, address, confs, log, cache):
     """
     Esta função recebe uma query e envia uma resposta a essa mesma query.

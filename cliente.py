@@ -17,7 +17,7 @@ def main():
     O programa também permite o envio de uma query automática para casos de teste.
 
     argument adress: String "endereco:porta" ou "endereco"
-    argument timeout : Int (Optional) 10
+    argument timeout : Int (Optional) 5
     :return: Void
     """
     if len(sys.argv) < 2:
@@ -32,7 +32,7 @@ def main():
     if len(arr) > 1:
         porta = int(arr[1])
 
-    timeout = 10
+    timeout = 5
     if len(sys.argv) > 2:
         if sys.argv[2].isnumeric() and sys.argv[2][0] != "-":
             timeout = int(sys.argv[2])
