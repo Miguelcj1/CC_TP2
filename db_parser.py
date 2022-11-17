@@ -2,8 +2,15 @@ import os
 import time
 import auxs
 
-# Nem sei se vai ser util.
 def email_translator(string):
+    """
+    Esta função transforma o formato de email que aparece no ficheiro de base de dados para o formato normal.
+
+    Autor: Pedro Martins.
+
+    :param string: String
+    :return: String
+    """
     arr = string.split("\.")
     last = arr[-1].split(".")[0]
     after = arr[-1].split(".")[1:]
@@ -17,6 +24,16 @@ def email_translator(string):
 
 
 def add_default(name, default):
+    """
+    Esta função junta as strings name e default com um "." no meio.
+    A função é usada para a implementaçao de dominios default onde não é direto a obtenção do dominio.
+
+    Autor: Pedro Martins.
+
+    :param name: String
+    :param default: String
+    :return: String
+    """
     if default is None:
         raise Exception(f"There is no DEFAULT value to add to this name: {name}!")
     return name + "." + default
