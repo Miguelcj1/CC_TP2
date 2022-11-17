@@ -427,31 +427,63 @@ class Configs:
             return None
 
     def get_all_log_file(self):
+        """
+        Esta função retorna a path do ficheiro geral de logs "all"
+
+        Autor Miguel Pinto e Pedro Martins.
+
+        :return: String
+        """
         return self.all_log
 
     # talvez isto fosse verificar as entradas DD se for um SP ou SS, para ver quais os dominios que pode responder. ### TALVEZ A FUNCAO DE BAIXO INUTILIZE ESTA
-    # Obtem todos os dominios mencionados no ficheiro de configuração
     def get_domain_names(self):
+        """
+        Esta função retorna uma lista com todos os nomes dos dominios no ficheiro de configuração.
+
+        Autor: Miguel Pinto e Pedro Martins.
+
+        :return: [String]
+        """
         ret = []
         for key in self.domains:
             if key != "all":
                 ret.append(key)
         return ret
 
-    # Retorna todos os dominios que têm uma entrada DD, ou seja, todos os dominios que o server pode responder.
     def get_all_dd(self):
+        """
+        Esta função retorna todos os dominios que têm uma entrada DD, ou seja todos os dominios que o servidor pode responder.
+
+        Autor: Pedro Martins.
+
+        :return: [String]
+        """
         ret = []
         for key in self.domains:
             if key != "all" and self.domains[key].get_dd():
                 ret.append(key)
         return ret
 
-    # Retorna o path do ficheiro dos servidores de topo.
     def get_st_file(self):
+        """
+        Esta função retorna a path do ficheirod e servidores de topo.
+
+        Autor: Miguel Pinto e Pedro Martins.
+
+        :return: String
+        """
         return self.st_file_path
 
-    # Retorna uma lista com os nomes dos dominios que não tem um servidor principal no DomainInfo.
     def get_sp_domains(self):
+        """
+        Esta função retorna uma lista com os nomes dos dominios que não têm um servidor Principal no DomainInfo.
+        O servidor toma o comportamento de SP.
+
+        Autor: Pedro Martins.
+
+        :return: [String]
+        """
         result = []
         for value in self.domains.values():
             if value.get_sp() is None:
@@ -461,6 +493,14 @@ class Configs:
 
     # Retorna uma lista com os nomes dos dominios que tem um servidor principal no DomainInfo.
     def get_ss_domains(self):
+        """
+        Esta função retorna uma lista com os nomes dos dominios que têm um servidor Principal no DomainInfo.
+        O servidor toma o comportamento de SS.
+
+        Autor: Pedro Martins.
+
+        :return: [String]
+        """
         result = []
         for value in self.domains.values():
             if value.get_sp() is not None:
