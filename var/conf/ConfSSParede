@@ -1,6 +1,6 @@
 # Configuration file for secundary server for parede
 
-parede SP 10.2.2.2
+parede SP 10.0.3.10
 parede DD 127.0.0.1
 parede LG /var/dns/parede.log
 all LG /var/dns/all.log
