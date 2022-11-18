@@ -322,7 +322,7 @@ while True:
     msg = msg.decode('utf-8')
     # Irá criar uma nova thread para atender a query recebida.
     #threading.Thread(target=query.respond_query, args=(msg, s, address, confs, log, cache)).start()
-    threading.Thread(target=cache.get_answers, args=(confs, log, msg, s, address)).start()
+    threading.Thread(target=query.respond_query, args=(msg, s, address, confs, log, cache)).start()
 
 s.close()
 
