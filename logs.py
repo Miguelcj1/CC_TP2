@@ -447,7 +447,8 @@ class Logs:
         try:
             fp = open(self.log_files[domain], "a")
 
-            string = get_timestamp(timestamp) + " ST 127.0.0.1 " + str(port) + " " + str(timeout) + " " + mode + "\n"
+            timeout *= 1000
+            string = f"{get_timestamp(timestamp)} ST 127.0.0.1 {port} {timeout} {mode}\n"
             fp.write(string)
             fp.close()
             if self.stdout:

@@ -9,6 +9,27 @@ Cliente.py:
     Data da última atualização: 18/11/2022
 """
 
+def pretty_response(msg):
+    """
+    Esta função transforma a mensagem recebida num formato mais legível.
+    Autor: Pedro Martins
+
+    :param msg: String
+    :return: String
+    """
+    buf = ""
+    arr = msg.split(";")
+    if len(arr) == 1:
+        return msg
+    buf = arr[0] + ";" + arr[1] + ";\n"
+    if len(arr) > 2:
+        string = ";".join(arr[2:])
+        string = string.replace(",", ",\n")
+        string = string.replace(";", ";\n")
+        buf += string
+
+    return buf
+
 def main():
     """
     Esta função implementa o comportamento dos clientes no sistema DNS.
@@ -18,6 +39,7 @@ def main():
 
     argument adress: String "endereco:porta" ou "endereco"
     argument timeout : Int (Optional) 5
+
     :return: Void
     """
     if len(sys.argv) < 2:
@@ -53,7 +75,6 @@ def main():
         print("--------------------")
         print("0: Sair do programa")
         print("1: Enviar query")
-        print("a: [DEBUG] AUTOMATIC")
         inp = input("Opção: ")
 
         if inp == "1":
@@ -70,35 +91,21 @@ def main():
             try:
                 msg, add = s.recvfrom(1024)
                 msg = msg.decode('utf-8')
+                msg = pretty_response(msg)
                 print(f"Mensagem recebida: \n{msg}\nVinda deste endereço: {add}")
             except socket.timeout:
                 print(f"O tempo de espera pela resposta ultrapassou o timeout estabelecido de {timeout} segundos!")
+                # Reinicio do socket, para não receber eventual informação atrasada.
                 s.close()
                 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
                 s.settimeout(timeout)
 
-        elif inp == "a" or inp == "A":
-            for i in range(1):
-                q = query.init_send_query("Q", "example.com.", "MX")
-                print("Foi enviada a seguinte query: " + q)
-                s.sendto(q.encode('utf-8'), destination)
-                try:
-                    msg, add = s.recvfrom(1024)
-                    msg = msg.decode('utf-8')
-                    print(f"Mensagem recebida: \n{msg}\nVinda deste endereço: {add}")
-                except socket.timeout:
-                    print(f"O tempo de espera pela resposta ultrapassou o timeout estabelecido de {timeout} segundos!")
-                    s.close()
-                    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                    s.settimeout(timeout)
-
         elif inp != "0":
             print("Input inválido!")
 
-        input("Press a key to continue!")
+        input("Press Enter to continue!")
 
     s.close()
-
 
 
 

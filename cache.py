@@ -11,9 +11,9 @@ def line_to_string(arr):
     :param arr: list(String)
     :return: String
     """
-    string = f"{arr[0]} {arr[1]} {arr[2]} {arr[3]} "
+    string = f"{arr[0]} {arr[1]} {arr[2]} {arr[3]}"
     if arr[4] != -1:
-        string += str(arr[4])
+        string += f" {arr[4]}"
     return string
 
 
