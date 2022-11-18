@@ -6,7 +6,7 @@ import sys
 Cliente.py:
     Módulo de implementação dos clientes do sistema DNS.
     Data de criação: 27/10/2022
-    Data da última atualização: 13/11/2022
+    Data da última atualização: 18/11/2022
 """
 
 def main():
