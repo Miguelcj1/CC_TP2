@@ -1,0 +1,25 @@
+# DNS database file for domain tijolo.muro
+
+@ DEFAULT tijolo.muro.
+TTL DEFAULT 86400
+@ SOASP SP-Tijolo-Muro.tijolo.muro. TTL
+@ SOAADMIN dns\.admin.tijolo.muro. TTL
+@ SOASERIAL 1 TTL
+@ SOAREFRESH 14400 TTL
+@ SOARETRY 3600 TTL
+@ SOAEXPIRE 604800 TTL
+@ NS SP-Tijolo-Muro.tijolo.muro. TTL
+@ NS SS-Tijolo-Muro.tijolo.muro. TTL
+@ NS SS-Tijolo-Muro2.tijolo.muro. TTL
+@ MX cliente.tijolo.muro. TTL 10
+SP-Tijolo-Muro A 10.0.5.12 TTL
+SS-Tijolo.Muro1 A 10.0.6.11 TTL
+SS-Tijolo-Muro2 A 10.0.4.12 TTL
+cliente A 10.0.2.20 TTL
+www A 193.136.130.80 TTL 200
+www A 193.136.130.81 TTL 200
+ftp A 193.136.130.20 TTL
+sp CNAME SP-Tijolo-Muro TTL
+ss1 CNAME SS-Tijolo-Muro1 TTL
+ss2 CNAME SS-Tijolo-Muro2 TTL
+mail1 CNAME cliente TTL

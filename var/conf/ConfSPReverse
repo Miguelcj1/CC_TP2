@@ -1,8 +1,6 @@
 # Configuration file for primary server for reverse
 
 reverse DB /var/dns/reverse.db
-reverse SS 10.3.3.3
-reverse SS 10.4.4.3:5353
 reverse DD 127.0.0.1
 reverse LG /var/dns/reverse.log
 all LG /var/dns/all.log
