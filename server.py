@@ -110,6 +110,9 @@ def ask_zone_transfer(dom, soarefresh=-1):
     s.send(req.encode("utf-8"))
     try:
         msg = s.recv(1024)  # Espera receber o serial number da base de dados.
+        if msg.decode("utf-8") == "DENIED": # Significa que não foi dada permissão pelo SP o acesso à base de dados.
+            log.ez(time.time(), addr, "SS foi negado o acesso.", dom)
+            return
         db_serialnumber = int(msg.decode("utf-8"))
         # Significa que a versão atual da base de dados do SS ainda não precisa de atualização.
         if db_serialnumber == my_serialnumber:
@@ -124,10 +127,6 @@ def ask_zone_transfer(dom, soarefresh=-1):
         s.send(dom.encode("utf-8"))
 
         msg = s.recv(1024)  # Espera receber o nº de entradas da base de dados que vão ser enviadas.
-
-        if msg.decode("utf-8") == "erro": # Significa que não foi dada permissão pelo SP o acesso à base de dados.
-            log.ez(time.time(), addr, "SP", dom)
-            return
 
         lines_to_receive = int(msg.decode("utf-8"))
         s.send(msg)  # reenvia o nº de linhas como maneira de indicar que quer que se começe a transferencia.
@@ -197,8 +196,8 @@ def resp_zone_transfer(dbs, port):
             ss_addresses_l = confs.get_ss(dom)  # ["endereço" ou "endereço:porta"]
             if dom not in confs.get_sp_domains() or not check_addr(addr, ss_addresses_l):
                 # O nome do domínio, não é um dominio principal neste servidor.
-                conn.send("erro".encode("utf-8"))
-                log.ez(time.time(), str(addr), "SP", dom)
+                conn.send("DENIED".encode("utf-8"))
+                log.ez(time.time(), addr, "SP negou o acesso.", dom)
                 continue
             serial_number = str(cache.get_soa(dom, "SOASERIAL"))
             conn.send(serial_number.encode("utf-8")) # envia o seu serial number.
