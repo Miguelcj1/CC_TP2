@@ -89,6 +89,13 @@ class Logs:
                 self.locks[domain] = threading.Lock()
 
 
+    def check_dom(self, name):
+        for k in self.log_files.keys():
+            if name.endswith(k):
+                return k
+        return None
+
+
     def qr(self, timestamp, adress, dados, domain = "all"):
         """
         Esta função escreve no log a receção de uma query de um certo domínio.
@@ -102,7 +109,8 @@ class Logs:
         :param domain: String
         :return: Void
         """
-        if self.log_files.get(domain) is None:
+        domain = self.check_dom(domain)
+        if domain is None:
             domain = "all" # caso não haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log.
         self.locks[domain].acquire()
         try:
@@ -129,7 +137,8 @@ class Logs:
         :param domain: String
         :return: Void
         """
-        if self.log_files.get(domain) is None:
+        domain = self.check_dom(domain)
+        if domain is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         self.locks[domain].acquire()
         try:
@@ -158,7 +167,8 @@ class Logs:
         :param domain: String
         :return: Void
         """
-        if self.log_files.get(domain) is None:
+        domain = self.check_dom(domain)
+        if domain is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         self.locks[domain].acquire()
         try:
@@ -187,7 +197,8 @@ class Logs:
         :param domain: String
         :return: Void
         """
-        if self.log_files.get(domain) is None:
+        domain = self.check_dom(domain)
+        if domain is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         self.locks[domain].acquire()
         try:
@@ -217,7 +228,8 @@ class Logs:
         :param domain: String
         :return: Void
         """
-        if self.log_files.get(domain) is None:
+        domain = self.check_dom(domain)
+        if domain is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         self.locks[domain].acquire()
         try:
@@ -252,7 +264,8 @@ class Logs:
         """
         if info is None:
             return
-        if self.log_files.get(domain) is None:
+        domain = self.check_dom(domain)
+        if domain is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         self.locks[domain].acquire()
         try:
@@ -281,7 +294,8 @@ class Logs:
         :param domain: String
         :return: Void
         """
-        if self.log_files.get(domain) is None:
+        domain = self.check_dom(domain)
+        if domain is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         self.locks[domain].acquire()
         try:
@@ -310,7 +324,8 @@ class Logs:
         :param domain: String
         :return: Void
         """
-        if self.log_files.get(domain) is None:
+        domain = self.check_dom(domain)
+        if domain is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         self.locks[domain].acquire()
         try:
@@ -337,7 +352,8 @@ class Logs:
         :param domain: String
         :return: Void
         """
-        if self.log_files.get(domain) is None:
+        domain = self.check_dom(domain)
+        if domain is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         self.locks[domain].acquire()
         try:
@@ -365,7 +381,8 @@ class Logs:
         :param domain: String
         :return: Void
         """
-        if self.log_files.get(domain) is None:
+        domain = self.check_dom(domain)
+        if domain is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         self.locks[domain].acquire()
         try:
@@ -393,7 +410,8 @@ class Logs:
         :param domain: String
         :return: Void
         """
-        if self.log_files.get(domain) is None:
+        domain = self.check_dom(domain)
+        if domain is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         self.locks[domain].acquire()
         try:
@@ -422,7 +440,8 @@ class Logs:
         :param domain: String
         :return: Void
         """
-        if self.log_files.get(domain) is None:
+        domain = self.check_dom(domain)
+        if domain is None:
             domain = "all" # caso n haja nenhuma especificação de log para este domínio, vai para o ficheiro all_log
         self.locks[domain].acquire()
         try:
