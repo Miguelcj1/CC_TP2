@@ -246,7 +246,7 @@ class Cache:
         :return: Void
         """
         for line in self.table:
-            if line[0] == domain:
+            if line[0] != 0 and line[0].endswith(domain):
                 line[8] = "FREE"
 
 

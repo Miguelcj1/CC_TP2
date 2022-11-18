@@ -118,6 +118,7 @@ def ask_zone_transfer(dom, soarefresh=-1):
             soarefresh = cache.get_soarefresh(dom)
             threading.Thread(target=ask_zone_transfer, args=(dom, soarefresh)).start()
             return
+        cache.free_domain(dom)
 
         # Envia o nome do dominio cuja base de dados requisita como maneira de iniciar o pedido.
         s.send(dom.encode("utf-8"))
