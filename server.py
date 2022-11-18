@@ -28,8 +28,8 @@ def check_addr(addr, lstradd):
     :param lstradd: list(String) ["endereço:porta" ou "endereco"]
     :return: Boolean
     """
-    for s in lstradd:
-        arr = s.split(":")
+    for single in lstradd:
+        arr = single.split(":")
         if arr[0] == addr[0]:
             if len(arr) == 2:
                 if arr[1] == addr[1]:
@@ -86,9 +86,11 @@ def ask_zone_transfer(dom, soarefresh=-1):
     :return: Void
     """
 
+    my_serialnumber = -1
     # Para que haja uma verificação de atualização da base de dados, é passada esta variavel.
     if soarefresh > 0:
         time.sleep(soarefresh)
+        my_serialnumber = cache.get_soa(dom, "SOASERIAL")
 
     # Guarda a timestamp do início do processo.
     t_start = time.time()
@@ -103,15 +105,27 @@ def ask_zone_transfer(dom, soarefresh=-1):
     # Tenta conectar-se ao endereço do servidor principal especificado em addr.
     s.connect(addr)
 
-    # Envia o nome do dominio cuja base de dados requisita como maneira de iniciar o pedido.
-    s.send(dom.encode("utf-8"))
-
+    # Requisita o serial number da base de dados ao mandar "{dom}, SOASERIAL".
+    req = f"{dom},SOASERIAL"
+    s.send(req.encode("utf-8"))
     try:
+        msg = s.recv(1024)  # Espera receber o serial number da base de dados.
+        db_serialnumber = int(msg.decode("utf-8"))
+        # Significa que a versão atual da base de dados do SS ainda não precisa de atualização.
+        if db_serialnumber == my_serialnumber:
+            s.send("NOZT".encode("utf-8"))
+            s.close()
+            soarefresh = cache.get_soarefresh(dom)
+            threading.Thread(target=ask_zone_transfer, args=(dom, soarefresh)).start()
+            return
+
+        # Envia o nome do dominio cuja base de dados requisita como maneira de iniciar o pedido.
+        s.send(dom.encode("utf-8"))
+
         msg = s.recv(1024)  # Espera receber o nº de entradas da base de dados que vão ser enviadas.
 
-        ### TALVEZ SIMPLESMENTE N DEVA ESPERAR QUE RETORNA ERRO DESISTINDO ATRAVES DO TIMEOUT
         if msg.decode("utf-8") == "erro": # Significa que não foi dada permissão pelo SP o acesso à base de dados.
-            log.ez(time.time(), str(addr), "SP", dom)
+            log.ez(time.time(), addr, "SP", dom)
             return
 
         lines_to_receive = int(msg.decode("utf-8"))
@@ -124,6 +138,8 @@ def ask_zone_transfer(dom, soarefresh=-1):
             buf += msg
             if is_final_msg(msg, lines_to_receive):
                 break
+
+        s.close()
 
         lines = buf.split("\n")  # 'lines' é um array das linhas enviadas pelo SP.
         lines = sorted(lines, key=get_line_number)  # Ordena as linhas recebidas caso tenham vindo desordenadas.
@@ -139,20 +155,11 @@ def ask_zone_transfer(dom, soarefresh=-1):
             data = arr[1]
             cache.update_with_line(log, data, "SP")
 
-        # Envia para o SP a confirmação de conclusão da zona de transferência bem sucedida.
-        if n_line == lines_to_receive:
-            s.send("1".encode("utf-8"))
-        else:
-            log.ez(time.time(), addr, "SS", dom)
-            return
-
-        s.close()
         t_end = time.time()
-        duracao = t_end - t_start
-        duracao *= 1000
+        duracao = (t_end - t_start) * 1000
         log.zt(time.time(), addr, "SS", duracao=duracao, domain=dom)
 
-        # Começo o processo de espera para fazer refresh às suas informações.
+        # Começo o processo de SOAREFRESH para fazer refresh aos seus dados.
         soarefresh = cache.get_soarefresh(dom)
         threading.Thread(target=ask_zone_transfer, args=(dom, soarefresh)).start()
 
@@ -166,7 +173,7 @@ def resp_zone_transfer(dbs, port):
     """
     Esta função faz a parte do SP na transferencia de zona recebendo conexões de SS.
     O SP so responderá a SS autorizados e apenas responde a transferencias sobre o dominio ao qual é SP.
-    Os ficheiros de logs são atualizados com o que acontece nestes processo.
+    Os ficheiros de logs são atualizados com o que acontece neste processo.
 
     Autor: Miguel Pinto e Pedro Martins.
 
@@ -176,28 +183,32 @@ def resp_zone_transfer(dbs, port):
     """
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind(("", port))  # Recebe conexoes de todos (nao aplica restriçoes)
+    s.bind(("", port))
     s.listen()
     while True:
         conn, addr = s.accept() # rececão de uma conexão.
         t_start = time.time()
         with conn:
-            msg = conn.recv(1024)
+            msg = conn.recv(1024) # espera receber um soaserial request
             msg = msg.decode("utf-8")
-            if msg not in confs.get_sp_domains():
+            arr = msg.split(",")
+            dom = arr[0]
+            ss_addresses_l = confs.get_ss(dom)  # ["endereço" ou "endereço:porta"]
+            if dom not in confs.get_sp_domains() or not check_addr(addr, ss_addresses_l):
                 # O nome do domínio, não é um dominio principal neste servidor.
-                conn.send("erro".encode("utf-8")) ### TALVEZ SIMPLESMENTE N DEVA RESPONDER DE VOLTA
+                conn.send("erro".encode("utf-8"))
                 log.ez(time.time(), str(addr), "SP", dom)
                 continue
-            dom = msg
-            ss_addresses_l = confs.get_ss(dom) # ["endereço" ou "endereço:porta"]
-            if not check_addr(addr, ss_addresses_l): # significa que este endereço não é um endereço de um SS conhecido, negando a conexao.
-                conn.send("erro".encode("utf-8")) ### TALVEZ SIMPLESMENTE N DEVA RESPONDER DE VOLTA
-                log.ez(time.time(), str(addr), "SP", dom)
-                continue
+            serial_number = str(cache.get_soa(dom, "SOASERIAL"))
+            conn.send(serial_number.encode("utf-8")) # envia o seu serial number.
+
+            msg = conn.recv(1024) # espera receber o nome do domínio.
+            msg = msg.decode("utf-8")
+            if msg == "NOZT":
+                continue # o outro servidor não necessita da transferência.
 
             # envia o nº de entradas das bases de dados
-            db = dbs.get(dom)  # isto nunca deve retornar null uma vez que é feita uma verificação similar atras.
+            db = dbs.get(dom)
             entry_lines = db.all_db_lines()
             numb_lines = len(entry_lines)
             n_lines = str(numb_lines)
@@ -207,7 +218,7 @@ def resp_zone_transfer(dbs, port):
             # Se o número recebido for o mesmo que o enviado, todas as entradas do ficheiro de base de dados numerados sem comentarios.
             if msg != n_lines:
                 # O SS não aceitou o nº de linhas para enviar.
-                log.ez(time.time(), str(addr), "SP", dom)
+                log.ez(time.time(), addr, "SP", dom)
                 continue
             i = 1
             for l in entry_lines:
@@ -216,13 +227,6 @@ def resp_zone_transfer(dbs, port):
                     msg += "\n"
                 conn.send(msg.encode('utf-8'))
                 i += 1
-            ###print("Ha espera de confirmaçao [Debug]")
-            #conn.settimeout(10) # Espera 10 segundos pela confirmacao.
-            msg = conn.recv(1024) # Confirmação de conclusão da transferencia de zona pelo outro lado.
-            ###print("Passei da confirmaçao [Debug]") ###
-            if msg.decode("utf-8") != "1":
-                log.ez(time.time(), str(addr), "SP", dom)
-                continue
 
             t_end = time.time()
             duracao = t_end - t_start
@@ -294,13 +298,13 @@ cache = Cache()
 databases = {}
 for name in sp_domains:
     try:
-        db = Database(confs.get_db_path(name), cache, "FILE", log)
+        db1 = Database(confs.get_db_path(name), cache, "FILE", log)
     except Exception as exc:
         log.fl(time.time(), str(exc), name)
         log.sp(time.time(), str(exc))
         traceback.print_exc()
         sys.exit("Ocorreu um erro no parsing da base de dados!")
-    databases[name] = db
+    databases[name] = db1
 
 
 # Inicia o atendimento a pedidos de transferencia de zona de servidores secundários.
@@ -318,11 +322,10 @@ s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.bind((endereco, porta))
 
 while True:
-    msg, address = s.recvfrom(1024)
-    msg = msg.decode('utf-8')
+    msg0, address = s.recvfrom(1024)
+    msg0 = msg0.decode('utf-8')
     # Irá criar uma nova thread para atender a query recebida.
-    #threading.Thread(target=query.respond_query, args=(msg, s, address, confs, log, cache)).start()
-    threading.Thread(target=query.respond_query, args=(msg, s, address, confs, log, cache)).start()
+    threading.Thread(target=query.respond_query, args=(msg0, s, address, confs, log, cache)).start()
 
 s.close()
 

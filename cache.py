@@ -250,14 +250,32 @@ class Cache:
                 line[8] = "FREE"
 
 
-    def get_soarefresh(self, domain):
+    def get_soa(self, domain, tipo):
         """
-        Esta função é usada para obter o valor de soarefresh de um determinado domínio para ser usado pelo ask_zone_transfer.
+        Esta função é usada para obter o valor fornecido em 'tipo' que retornem valores numéricos, de um determinado domínio.
 
         Autor: Pedro Martins.
 
         :param domain: String
-        :return: Void
+        :param tipo: String
+        :return: Int
+        """
+        if tipo not in ["SOASERIAL", "SOAREFRESH", "SOARETRY", "SOAEXPIRE"]:
+            return None
+        ind = self.search(domain, tipo)
+        if ind is None:
+            return None
+        res = self.table[ind][2]
+        return int(res)
+
+    def get_soarefresh(self, domain):
+        """
+        Esta função é usada para obter o valor de soarefresh de um determinado domínio.
+
+        Autor: Pedro Martins.
+
+        :param domain: String
+        :return: Int
         """
         ind = self.search(domain, "SOAREFRESH")
         if ind is None:
