@@ -1,0 +1,4 @@
+# DNS file with the ST
+
+root ST 10.0.0.10
+root ST 10.0.1.10

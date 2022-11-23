@@ -1,0 +1,8 @@
+# Configuration file for ST
+
+parede DD 10.0.3.10
+muro DD 10.0.6.12
+gesso.parede DD 10.0.4.10
+tijolo.muro DD 10.0.5.12
+all LG /var/dns/all.log
+root ST /var/dns/rootservers.db
