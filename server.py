@@ -169,7 +169,7 @@ def ask_zone_transfer(dom, soarefresh=-1):
         log.ez(time.time(), addr, "SS", dom)
 
 
-def resp_zone_transfer(dbs, sockTcp):
+def resp_zone_transfer(dbs, port):
     """
     Esta função faz a parte do SP na transferencia de zona recebendo conexões de SS.
     O SP so responderá a SS autorizados e apenas responde a transferencias sobre o dominio ao qual é SP.
@@ -178,14 +178,17 @@ def resp_zone_transfer(dbs, sockTcp):
     Autor: Miguel Pinto e Pedro Martins.
 
     :param dbs: Database
-    :param sockTcp: Socket
+    :param port: Int
     :return: Void
     """
 
-    sockTcp.listen()
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    s.bind(("", port))
+    s.listen()
 
     while True:
-        conn, addr = sockTcp.accept() # rececão de uma conexão.
+        conn, addr = s.accept() # rececão de uma conexão.
         t_start = time.time()
         with conn:
             msg = conn.recv(1024) # espera receber um soaserial request
@@ -308,14 +311,8 @@ for name in sp_domains:
 
 # Inicia o atendimento a pedidos de transferencia de zona de servidores secundários.
 if sp_domains:
-    try:
-        sockTcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sockTcp.bind(("", porta))
-        # Abre uma thread para que possa atender a transferencias de zona.
-        threading.Thread(target=resp_zone_transfer, args=(databases, sockTcp)).start()
-    except KeyboardInterrupt:
-        print("FECHEI SOCKET TCP!!")
-        sockTcp.close()
+    # Abre uma thread para que possa atender a transferencias de zona.
+    threading.Thread(target=resp_zone_transfer, args=(databases, porta)).start()
 
 # Para cada dominio secundário, pede ao respetivo servidor principal a sua base de dados.
 for ss in ss_domains:
@@ -324,15 +321,12 @@ for ss in ss_domains:
 # Abertura do socket UDP.
 endereco = ''
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,1)
 s.bind((endereco, porta))
 
-try:
-    while True:
-        msg0, address = s.recvfrom(1024)
-        msg0 = msg0.decode('utf-8')
-        # Irá criar uma nova thread para atender a query recebida.
-        query.respond_query(msg0, s, address, confs, log, cache)
-except KeyboardInterrupt:
-    print("fechei udp")
-    s.close()
+while True:
+    msg0, address = s.recvfrom(1024)
+    msg0 = msg0.decode('utf-8')
+    # Irá criar uma nova thread para atender a query recebida.
+    query.respond_query(msg0, s, address, confs, log, cache)
 
