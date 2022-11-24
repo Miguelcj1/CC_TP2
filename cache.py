@@ -103,7 +103,7 @@ class Cache:
             line = self.table[i]
             if line[8] == "VALID" and line[5] == "OTHERS" and now - line[6] > line[3]:
                 self.table[i][8] = "FREE" # Libertação de espaços
-                log.ev(now, f"Expirou uma entrada na cache com os seguintes valores: {line[0]} {line[1]} {line[2]} {line[3]}", dom=line[0])
+                log.ev(now, f"Expirou uma entrada na cache com os seguintes valores: {line[0]} {line[1]} {line[2]} {line[3]}", domain=line[0])
 
             if line[8] == "VALID" and line[0] == q_name: ### talvez não seja necessaria esta verificação.
                 name_exists = True
@@ -123,7 +123,7 @@ class Cache:
             # Libertação de espaços
             if line[8] == "VALID" and line[5] == "OTHERS" and time.time() - line[6] > line[3]:
                 self.table[i][8] = "FREE"
-                log.ev(now, f"Expirou uma entrada na cache com os seguintes valores: {line[0]} {line[1]} {line[2]} {line[3]}",dom=line[0])
+                log.ev(now, f"Expirou uma entrada na cache com os seguintes valores: {line[0]} {line[1]} {line[2]} {line[3]}",domain=line[0])
             if line[8] == "VALID" and line[0] == q_name and line[1] == "NS":
                 if line[5] == "FILE":
                     flags.add("A") # significa que obteve a informação pelo servidor primário.
@@ -143,7 +143,7 @@ class Cache:
             # Libertação de espaços
             if line[8] == "VALID" and line[5] == "OTHERS" and time.time() - line[6] > line[3]:
                 self.table[i][8] = "FREE"
-                log.ev(now, f"Expirou uma entrada na cache com os seguintes valores: {line[0]} {line[1]} {line[2]} {line[3]}", dom=line[0])
+                log.ev(now, f"Expirou uma entrada na cache com os seguintes valores: {line[0]} {line[1]} {line[2]} {line[3]}", domain=line[0])
             if line[8] == "VALID" and line[0] in all_values and line[1] == "A":
                 arr_extras.append(line_to_string(line))
                 n_extras += 1
@@ -247,7 +247,7 @@ class Cache:
         """
         for line in self.table:
             if line[0] != 0 and line[0].endswith(domain) and line[5] == "SP":
-                #log.ev(time.time(), f"Expirou uma entrada na cache com os seguintes valores: {line[0]} {line[1]} {line[2]} {line[3]}",dom=line[0]) ###
+                #log.ev(time.time(), f"Expirou uma entrada na cache com os seguintes valores: {line[0]} {line[1]} {line[2]} {line[3]}",domain=line[0]) ###
                 line[8] = "FREE"
 
 
