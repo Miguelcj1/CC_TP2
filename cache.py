@@ -235,10 +235,10 @@ class Cache:
             prio = int(arr[4])
         self.update(log, name, type_of_value, value, ttl, prio=prio, origin=origin)
 
-    def free_domain(self, domain):
+    def free_domain(self, domain, log):
         """
         Esta função atualiza todas as entradas da cache com o Name igual ao dominio recebido para o status "FREE".
-        Esta função é usada por um SS quando o temporizador associado à base de dados atinge o valor de SOAEXPIRE.
+        Esta função é usada por um SS quando o temporizador associado à base de dados atinge o valor de SOARETRY.
 
         Autor: Pedro Martins.
 
@@ -246,7 +246,8 @@ class Cache:
         :return: Void
         """
         for line in self.table:
-            if line[0] != 0 and line[0].endswith(domain):
+            if line[0] != 0 and line[0].endswith(domain) and line[5] == "SP":
+                #log.ev(time.time(), f"Expirou uma entrada na cache com os seguintes valores: {line[0]} {line[1]} {line[2]} {line[3]}",dom=line[0]) ###
                 line[8] = "FREE"
 
 
