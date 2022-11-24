@@ -183,6 +183,7 @@ def resp_zone_transfer(dbs, port):
     """
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind(("", port))
     s.listen()
 
@@ -323,6 +324,7 @@ for ss in ss_domains:
 # Abertura do socket UDP.
 endereco = ''
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,1)
 s.bind((endereco, porta))
 
 try:
