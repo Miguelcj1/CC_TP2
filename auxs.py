@@ -1,5 +1,3 @@
-import time
-from datetime import datetime
 
 # Verifica se tem um ponto final no fim da string.
 def ends_with_dot(string):

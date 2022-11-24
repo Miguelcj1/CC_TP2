@@ -15,7 +15,7 @@ from cache import Cache
 Server.py:
     Módulo de implementação dos servidores do sistema DNS.
     Data de criação: 27/10/2022
-    Data da última atualização: 18/11/2022
+    Data da última atualização: 24/11/2022
 """
 
 def check_addr(addr, lstradd):
@@ -327,6 +327,6 @@ s.bind((endereco, porta))
 while True:
     msg0, address = s.recvfrom(1024)
     msg0 = msg0.decode('utf-8')
-    # Irá criar uma nova thread para atender a query recebida.
+    # Trata do processamento da query recebida.
     query.respond_query(msg0, s, address, confs, log, cache)
 

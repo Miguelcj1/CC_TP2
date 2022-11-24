@@ -105,7 +105,7 @@ class Cache:
                 self.table[i][8] = "FREE" # Libertação de espaços
                 log.ev(now, f"Expirou uma entrada na cache com os seguintes valores: {line[0]} {line[1]} {line[2]} {line[3]}", domain=line[0])
 
-            if line[8] == "VALID" and line[0] == q_name: ### talvez não seja necessaria esta verificação.
+            if line[8] == "VALID" and line[0] == q_name:
                 name_exists = True
 
             if line[8] == "VALID" and line[0] == q_name and line[1] == q_type:
@@ -243,6 +243,7 @@ class Cache:
         Autor: Pedro Martins.
 
         :param domain: String
+        :param log: Logs
         :return: Void
         """
         for line in self.table:

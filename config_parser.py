@@ -436,7 +436,7 @@ class Configs:
         """
         return self.all_log
 
-    # talvez isto fosse verificar as entradas DD se for um SP ou SS, para ver quais os dominios que pode responder. ##
+    ##
     def get_domain_names(self):
         """
         Esta função retorna uma lista com todos os nomes dos dominios no ficheiro de configuração.

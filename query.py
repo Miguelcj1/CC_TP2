@@ -114,7 +114,6 @@ def respond_query(query, s, address, confs, log, cache):
     result = cache.get_answers(log, message_id, q_name, q_type)
 
     # Envio da mensagem para o respetivo endereço
-    ### time.sleep(11) ### DEBUG
     s.sendto(result.encode("utf-8"), address)
     log.rp(time.time(), address, result, domain=q_name)
 

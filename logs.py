@@ -26,14 +26,9 @@ def check_dir(path_arg):
         os.makedirs(joined_str)
         f = open(path_arg, "w")  # cria ficheiro
         f.close()
-        #print(f"[DEBUG] Diretoria e ficheiro criado {path_arg}.") ##
     elif not exists_file:
         f = open(path_arg, "w")  # cria ficheiro
         f.close()
-        #print(f"[DEBUG] Ficheiro criado {path_arg}.")  ##
-    else:
-        #print(f"[DEBUG] Diretoria {path_arg} já estava criada.") ##
-        pass
 
 
 def get_timestamp(timestamp = time.time()):
