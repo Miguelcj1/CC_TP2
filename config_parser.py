@@ -255,7 +255,7 @@ class Configs:
         #self.sp = [] # nomes do dominios em que o servidor atua como servidor principal
         #self.ss = [] # nomes do dominios em que o servidor atua como servidor secundario
 
-        ## Leitura e análise do ficheiro inicial de configuração.
+        # Leitura e análise do ficheiro inicial de configuração.
         try:
             fp = open(conf_file, "r")
         except FileNotFoundError:
@@ -436,7 +436,7 @@ class Configs:
         """
         return self.all_log
 
-    # talvez isto fosse verificar as entradas DD se for um SP ou SS, para ver quais os dominios que pode responder. ### TALVEZ A FUNCAO DE BAIXO INUTILIZE ESTA
+    # talvez isto fosse verificar as entradas DD se for um SP ou SS, para ver quais os dominios que pode responder. ##
     def get_domain_names(self):
         """
         Esta função retorna uma lista com todos os nomes dos dominios no ficheiro de configuração.

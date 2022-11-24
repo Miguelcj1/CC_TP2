@@ -230,7 +230,7 @@ def resp_zone_transfer(dbs, port):
 
             t_end = time.time()
             duracao = t_end - t_start
-            duracao *= 1000 ## PASSA DURACAO PARA MILISEGUNDOS.
+            duracao *= 1000 # Passa duração para milisegundos.
             log.zt(time.time(), addr, "SP", duracao=duracao, domain=dom)
 
     s.close()
