@@ -185,59 +185,55 @@ def resp_zone_transfer(dbs, port):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind(("", port))
     s.listen()
+    while True:
+        conn, addr = s.accept() # rececão de uma conexão.
+        t_start = time.time()
+        with conn:
+            msg = conn.recv(1024) # espera receber um soaserial request
+            msg = msg.decode("utf-8")
+            arr = msg.split(",")
+            dom = arr[0]
+            ss_addresses_l = confs.get_ss(dom)  # ["endereço" ou "endereço:porta"]
+            if dom not in confs.get_sp_domains() or not check_addr(addr, ss_addresses_l):
+                # O nome do domínio, não é um dominio principal neste servidor.
+                conn.send("DENIED".encode("utf-8"))
+                log.ez(time.time(), addr, "SP negou o acesso.", dom)
+                continue
+            serial_number = str(cache.get_soa(dom, "SOASERIAL"))
+            conn.send(serial_number.encode("utf-8")) # envia o seu serial number.
 
-    try:
-        while True:
-            conn, addr = s.accept() # rececão de uma conexão.
-            t_start = time.time()
-            with conn:
-                msg = conn.recv(1024) # espera receber um soaserial request
-                msg = msg.decode("utf-8")
-                arr = msg.split(",")
-                dom = arr[0]
-                ss_addresses_l = confs.get_ss(dom)  # ["endereço" ou "endereço:porta"]
-                if dom not in confs.get_sp_domains() or not check_addr(addr, ss_addresses_l):
-                    # O nome do domínio, não é um dominio principal neste servidor.
-                    conn.send("DENIED".encode("utf-8"))
-                    log.ez(time.time(), addr, "SP negou o acesso.", dom)
-                    continue
-                serial_number = str(cache.get_soa(dom, "SOASERIAL"))
-                conn.send(serial_number.encode("utf-8")) # envia o seu serial number.
+            msg = conn.recv(1024) # espera receber o nome do domínio.
+            msg = msg.decode("utf-8")
+            if msg == "NOZT":
+                continue # o outro servidor não necessita da transferência.
 
-                msg = conn.recv(1024) # espera receber o nome do domínio.
-                msg = msg.decode("utf-8")
-                if msg == "NOZT":
-                    continue # o outro servidor não necessita da transferência.
+            # envia o nº de entradas das bases de dados
+            db = dbs.get(dom)
+            entry_lines = db.all_db_lines()
+            numb_lines = len(entry_lines)
+            n_lines = str(numb_lines)
+            conn.send(n_lines.encode("utf-8"))
+            msg = conn.recv(1024)  # nº de entradas que o SS quer receber
+            msg = msg.decode("utf-8")
+            # Se o número recebido for o mesmo que o enviado, todas as entradas do ficheiro de base de dados numerados sem comentarios.
+            if msg != n_lines:
+                # O SS não aceitou o nº de linhas para enviar.
+                log.ez(time.time(), addr, "SP", dom)
+                continue
+            i = 1
+            for l in entry_lines:
+                msg = f"{i};{l}"
+                if i != numb_lines:
+                    msg += "\n"
+                conn.send(msg.encode('utf-8'))
+                i += 1
 
-                # envia o nº de entradas das bases de dados
-                db = dbs.get(dom)
-                entry_lines = db.all_db_lines()
-                numb_lines = len(entry_lines)
-                n_lines = str(numb_lines)
-                conn.send(n_lines.encode("utf-8"))
-                msg = conn.recv(1024)  # nº de entradas que o SS quer receber
-                msg = msg.decode("utf-8")
-                # Se o número recebido for o mesmo que o enviado, todas as entradas do ficheiro de base de dados numerados sem comentarios.
-                if msg != n_lines:
-                    # O SS não aceitou o nº de linhas para enviar.
-                    log.ez(time.time(), addr, "SP", dom)
-                    continue
-                i = 1
-                for l in entry_lines:
-                    msg = f"{i};{l}"
-                    if i != numb_lines:
-                        msg += "\n"
-                    conn.send(msg.encode('utf-8'))
-                    i += 1
+            t_end = time.time()
+            duracao = t_end - t_start
+            duracao *= 1000 # Passa duração para milisegundos.
+            log.zt(time.time(), addr, "SP", duracao=duracao, domain=dom)
 
-                t_end = time.time()
-                duracao = t_end - t_start
-                duracao *= 1000 ## PASSA DURACAO PARA MILISEGUNDOS.
-                log.zt(time.time(), addr, "SP", duracao=duracao, domain=dom)
-
-    except KeyboardInterrupt:
-        print("fechei tcp")
-        s.close()
+    s.close()
 
 
 
@@ -310,6 +306,7 @@ for name in sp_domains:
         sys.exit("Ocorreu um erro no parsing da base de dados!")
     databases[name] = db1
 
+
 # Inicia o atendimento a pedidos de transferencia de zona de servidores secundários.
 if sp_domains:
     # Abre uma thread para que possa atender a transferencias de zona.
@@ -324,15 +321,11 @@ endereco = ''
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.bind((endereco, porta))
 
-try:
-    while True:
-        msg0, address = s.recvfrom(1024)
-        msg0 = msg0.decode('utf-8')
-        # Irá criar uma nova thread para atender a query recebida.
-        query.respond_query(msg0, s, address, confs, log, cache)
-except KeyboardInterrupt:
-    print("fechei udp")
-    s.close()
+while True:
+    msg0, address = s.recvfrom(1024)
+    msg0 = msg0.decode('utf-8')
+    # Irá criar uma nova thread para atender a query recebida.
+    threading.Thread(target=query.respond_query, args=(msg0, s, address, confs, log, cache)).start()
 
 s.close()
 
