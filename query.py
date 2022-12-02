@@ -4,6 +4,13 @@ from db_parser import Database
 from logs import Logs
 from cache import Cache
 
+def belongs_to_domain(q_name, domains):
+    for d in domains:
+        if q_name.endswith(d):
+            return True
+    return False
+
+
 def pop_end_dot(string):
     """
     Esta função remove o "." do fim da string ou devolve a string inalterada no caso de não existir "." no fim da string.
@@ -105,7 +112,7 @@ def respond_query(query, s, address, confs, log, cache):
 
     # Verifica se deve responder a queries sobre o dominio mencioando, relativo aos DD's.
     respondable_domains = confs.get_all_dd()
-    if respondable_domains and q_name not in respondable_domains:
+    if respondable_domains and not belongs_to_domain(q_name, respondable_domains):
         # A query é ignorada se o servidor não for responsável pelo domínio mencionado na query.
         log.ev(time.time(), f"Foi ignorada a seguinte query, uma vez que este servidor não é responsável pelo domínio da query: {query}")
         return
