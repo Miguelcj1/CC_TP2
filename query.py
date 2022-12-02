@@ -105,7 +105,7 @@ def respond_query(query, s, address, confs, log, cache):
 
     # Verifica se deve responder a queries sobre o dominio mencioando, relativo aos DD's.
     respondable_domains = confs.get_all_dd()
-    if q_name not in respondable_domains:
+    if respondable_domains and q_name not in respondable_domains:
         # A query é ignorada se o servidor não for responsável pelo domínio mencionado na query.
         log.ev(time.time(), f"Foi ignorada a seguinte query, uma vez que este servidor não é responsável pelo domínio da query: {query}")
         return
