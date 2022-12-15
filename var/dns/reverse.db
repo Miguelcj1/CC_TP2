@@ -18,12 +18,3 @@ SP-Parede A 10.0.3.10 TTL
 SS-Parede1 A 10.0.6.10 TTL
 SS-Parede2 A 10.0.4.11 TTL
 SP-Gesso-Parede A 10.0.4.10 TTL
-cliente A 10.0.2.20 TTL
-reverse A 10.0.5.13 TTL
-www A 193.136.130.80 TTL 200
-www A 193.136.130.81 TTL 200
-ftp A 193.136.130.20 TTL
-sp CNAME SP-Parede TTL
-ss1 CNAME SS-Parede1 TTL
-ss2 CNAME SS-Parede2 TTL
-mail1 CNAME cliente TTL
