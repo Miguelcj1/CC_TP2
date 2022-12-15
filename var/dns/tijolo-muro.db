@@ -16,9 +16,9 @@ SP-Tijolo-Muro A 10.0.5.12 TTL
 SS-Tijolo.Muro1 A 10.0.6.11 TTL
 SS-Tijolo-Muro2 A 10.0.4.12 TTL
 cliente A 10.0.2.20 TTL
-www A 193.136.130.80 TTL 200
-www A 193.136.130.81 TTL 200
-ftp A 193.136.130.20 TTL
+www A 10.0.15.4 TTL 200
+www A 10.0.15.5 TTL 200
+ftp A 10.0.15.6 TTL
 sp CNAME SP-Tijolo-Muro TTL
 ss1 CNAME SS-Tijolo-Muro1 TTL
 ss2 CNAME SS-Tijolo-Muro2 TTL

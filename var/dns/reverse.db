@@ -4,7 +4,7 @@
 
 @ DEFAULT reverse.
 TTL DEFAULT 86400
-@ SOASP SP-Parede.reverse. TTL
+@ SOASP Reverse.reverse. TTL
 @ SOAADMIN dns\.admin.reverse. TTL
 @ SOASERIAL 1 TTL
 @ SOAREFRESH 14400 TTL
@@ -12,9 +12,4 @@ TTL DEFAULT 86400
 @ SOAEXPIRE 604800 TTL
 @ NS Reverse.reverse. TTL
 in-addr.@ NS Reverse.in-addr.reverse.
-@ MX cliente.reverse. TTL 10
-reverse PTR reverse.reverse. TTL
-SP-Parede A 10.0.3.10 TTL
-SS-Parede1 A 10.0.6.10 TTL
-SS-Parede2 A 10.0.4.11 TTL
-SP-Gesso-Parede A 10.0.4.10 TTL
+Reverse A 10.0.5.13 TTL

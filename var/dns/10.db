@@ -1,0 +1,15 @@
+# DNS database file for domain 10
+
+@ DEFAULT 10.in-addr.reverse.
+TTL DEFAULT 86400
+@ SOASP Reverse.10.in-addr.reverse. TTL
+@ SOAADMIN dns\.admin.10.in-addr.reverse. TTL
+@ SOASERIAL 1 TTL
+@ SOAREFRESH 14400 TTL
+@ SOARETRY 3600 TTL
+@ SOAEXPIRE 604800 TTL
+@ NS Reverse.10.in-addr.reverse. TTL
+Reverse A 10.0.5.13 TTL
+www.gesso.parede PTR 1.15.0.10
+www.tijolo.muro PTR 4.15.0.10
+ftp.gesso.parede PTR 3.15.0.10

@@ -16,9 +16,9 @@ SP-Gesso-Parede A 10.0.4.10 TTL
 SS-Gesso.Parede1 A 10.0.3.12 TTL
 SS-Gesso-Parede2 A 10.0.5.11 TTL
 cliente A 10.0.2.20 TTL
-www A 193.136.130.80 TTL 200
-www A 193.136.130.81 TTL 200
-ftp A 193.136.130.20 TTL
+www A 10.0.15.1 TTL 200
+www A 10.0.15.2 TTL 200
+ftp A 10.0.15.3 TTL
 sp CNAME SP-Gesso-Parede TTL
 ss1 CNAME SS-Gesso-Parede1 TTL
 ss2 CNAME SS-Gesso-Parede2 TTL
