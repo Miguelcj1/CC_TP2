@@ -1,0 +1,29 @@
+# DNS database file for domain reverse
+# It also includes a pointer to the primary server
+# of the in-addr subdomain
+
+@ DEFAULT reverse.
+TTL DEFAULT 86400
+@ SOASP SP-Parede.reverse. TTL
+@ SOAADMIN dns\.admin.reverse. TTL
+@ SOASERIAL 1 TTL
+@ SOAREFRESH 14400 TTL
+@ SOARETRY 3600 TTL
+@ SOAEXPIRE 604800 TTL
+@ NS Reverse.reverse. TTL
+in-addr.@ NS Reverse.in-addr.reverse.
+@ MX cliente.reverse. TTL 10
+reverse PTR reverse.reverse. TTL
+SP-Parede A 10.0.3.10 TTL
+SS-Parede1 A 10.0.6.10 TTL
+SS-Parede2 A 10.0.4.11 TTL
+SP-Gesso-Parede A 10.0.4.10 TTL
+cliente A 10.0.2.20 TTL
+reverse A 10.0.5.13 TTL
+www A 193.136.130.80 TTL 200
+www A 193.136.130.81 TTL 200
+ftp A 193.136.130.20 TTL
+sp CNAME SP-Parede TTL
+ss1 CNAME SS-Parede1 TTL
+ss2 CNAME SS-Parede2 TTL
+mail1 CNAME cliente TTL

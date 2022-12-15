@@ -1,0 +1,16 @@
+# DNS database file for domain root
+
+@ DEFAULT root.
+TTL DEFAULT 86400
+@ SOASP ST.root. TTL
+@ SOAADMIN dns\.admin.root. TTL
+@ SOASERIAL 1 TTL
+@ SOAREFRESH 14400 TTL
+@ SOARETRY 3600 TTL
+@ SOAEXPIRE 604800 TTL
+@ NS SDT-Parede.parede. TTL
+@ NS SDT-Muro.muro. TTL
+@ NS Reverse.reverse. TTL
+SDT-Parede A 10.0.3.10 TTL
+SDT-Muro A 10.0.6.12 TTL
+Reverse A 10.0.5.13 TTL

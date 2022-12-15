@@ -1,0 +1,7 @@
+# Configuration file for Reverse
+
+root DB /var/dns/in-addr.db
+root DD 127.0.0.1
+root LG /var/dns/in-addr.log
+all LG /var/dns/all.log
+root ST /var/dns/rootservers.db
