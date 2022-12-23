@@ -293,6 +293,9 @@ except Exception as exc:
 
 sp_domains = confs.get_sp_domains()
 ss_domains = confs.get_ss_domains()
+is_sr: bool = False
+if not sp_domains and not ss_domains:
+    is_sr = True
 
 # Obtenção de um objeto que tem informação sobre a escrita nos ficheiros de log e stdout.
 log = Logs(confs, mode)
@@ -335,5 +338,8 @@ while True:
     msg0, address = s.recvfrom(1024)
     msg0 = msg0.decode('utf-8')
     # Trata do processamento da query recebida.
-    query.respond_query(msg0, s, address, confs, log, cache)
+    if is_sr:
+        query.respond_query_sr(msg0, s, address, confs, log, cache)
+    else:
+        query.respond_query(msg0, s, address, confs, log, cache)
 

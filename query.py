@@ -178,6 +178,7 @@ def respond_query_sr(query, s, address, confs, log, cache):
     ###################### VERIFICAÇÃO DA CACHE ######################
 
     result = cache.get_answers(log, message_id, q_name, q_type)
+    #TODO - GUARDAR INFO EM CACHE.
 
     # Se foi encontrada resposta na cache, não precisa de fazer o resto das verificações e envia a resposta.
     if get_response_code(result) == 0: # significa que foi encontrada resposta na cache.
@@ -198,10 +199,22 @@ def respond_query_sr(query, s, address, confs, log, cache):
     direct_domains = confs.get_dd(q_name)
     for dd in direct_domains:
         newsocket.sendto(query.encode("utf-8"), dd)
-        msg, serv_addr = s.recvfrom(1024)
+        result, serv_addr = newsocket.recvfrom(1024)
+        result = result.decode("utf-8")
+        #TODO - GUARDAR INFO EM CACHE.
+        if get_response_code(result) == 0:
+            break
 
 
-    lista_de_st = confs.get_st_adresses()
+    if get_response_code(result) != 0:
+        lista_de_st = confs.get_st_adresses()
+        for st in lista_de_st:
+            newsocket.sendto(query.encode("utf-8"), st)
+            result, serv_addr = newsocket.recvfrom(1024)
+            result = result.decode("utf-8")
+            #TODO - GUARDAR INFO EM CACHE.
+            if get_response_code(result) == 0:
+                break
 
 
     ###################### FIM DA PROCURA ALTERNATIVA ######################
