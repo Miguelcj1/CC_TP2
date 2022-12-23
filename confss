@@ -2,6 +2,6 @@
 
 example.com SP 127.0.0.1:5000
 example.com DD 127.0.0.1
-example.com LG /var/dns/exampless-com.log
-all LG /var/dns/allss.log
-root ST /var/dns/rootservers.db
+example.com LG /log/exampless-com.log
+all LG /log/allss.log
+root ST /stservers.db

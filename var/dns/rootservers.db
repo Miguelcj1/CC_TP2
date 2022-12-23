@@ -1,4 +1,4 @@
-# DNS file with the ST
+# DNS file with the adresses of STs
 
-root ST 10.0.0.10
-root ST 10.0.1.10
+10.0.0.10
+10.0.1.10

@@ -80,6 +80,7 @@ def main():
         if inp == "1":
             q_dom = input("Query domain: ")
             q_type = input("Query type: ")
+            q_type = q_type.upper()
             #q_flags = input("Query flags: ")
             q_flags = "Q"
 

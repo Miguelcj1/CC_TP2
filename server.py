@@ -268,8 +268,9 @@ if len(sys.argv) < 2:  # nº de argumentos obrigatorios
 # Path do ficheiro de configuração do servidor.
 conf = sys.argv[1]
 
+# Verificação de parametros opcionais
 porta = 5000
-timeout = 10
+timeout = 100
 mode = "DEBUG"
 if len(sys.argv) > 2:
     porta = int(sys.argv[2])
@@ -283,6 +284,12 @@ except Exception as exc:
     print(str(exc))
     #print("Inicialização do servidor interrompida devido a falha no ficheiro de configuração!")
     sys.exit("Ocorreu um erro na leitura do ficheiro de configuração!")
+
+######################## FIXME - TESTE DE CONFS ########################
+
+#test = confs.get_dd("example.com.")
+
+########################################################################
 
 sp_domains = confs.get_sp_domains()
 ss_domains = confs.get_ss_domains()

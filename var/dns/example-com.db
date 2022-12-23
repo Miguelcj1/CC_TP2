@@ -1,6 +1,7 @@
 # DNS database file for domain example.com
 # It also includes a pointer to the primary server
 # of the smaller.example.com subdomain
+
 @ DEFAULT example.com.
 TTL DEFAULT 86400
 @ SOASP ns1.example.com. TTL

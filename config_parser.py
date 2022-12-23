@@ -38,18 +38,21 @@ def co_dir(path, mode):
         f = open(path, mode)
     return f
 
-# Dado um "endereço" ou "endereço:porta" retorna o tuplo (endereco, porta)
+
 def str_adress_to_tuple(string, default_port = 5000):
     """
     Esta função recebe um endereço e opcionalmente uma porta e cria um tuplo (endereço, porta).
-
     Autor: Pedro Martins.
-
     :param string: String
     :param default_port: Int
     :return: Tuple (endereço, porta)
     """
     arr = string.split(":")
+    """
+    ## Confirmação que a string tem o formato de um endereço.
+    if len(arr[0].split(".")) != 4: # Se for diferente do formato "255.255.255.255"
+        return None        
+    """
     if len(arr) < 2:
         res = (arr[0], default_port)
         return res
@@ -213,7 +216,7 @@ class DomainInfo:
 
     def add_dd(self, dd):
         """
-        Função de que adiciona um SR à lista de SR deste dominio.
+        Função de que adiciona um DD à lista de DD deste dominio.
 
         Autor: Pedro Martins.
 
@@ -224,10 +227,8 @@ class DomainInfo:
 
     def get_dd(self):
         """
-        Função que retorna a lista de SR deste dominio.
-
+        Função que retorna a lista de DDs deste dominio.
         Autor: Pedro Martins.
-
         :return: list(String)
         """
         if self.dd:
@@ -250,6 +251,7 @@ class Configs:
         :param conf_file: String
         """
         self.st_file_path = None
+        self.st_adresses = []
         self.all_log = None
         self.domains = {}
         #self.sp = [] # nomes do dominios em que o servidor atua como servidor principal
@@ -302,8 +304,10 @@ class Configs:
                 dd = arr[2]
                 if self.domains.get(domain) is None:
                     self.domains[domain] = DomainInfo()
-                self.domains[domain].set_name(domain)
-                self.domains[domain].add_dd(dd)
+                    self.domains[domain].set_name(domain)
+                # Transforma num tuplo ao qual se deve conectar.
+                addr = str_adress_to_tuple(dd)
+                self.domains[domain].add_dd(addr)
 
             elif arr[1] == "ST" and len(arr) == 3:
                 if arr[0] != "root":
@@ -311,6 +315,8 @@ class Configs:
                     raise Exception("ERRO, o parametro de ST deve ser igual a root!!")
                 elif self.st_file_path is None:
                     self.st_file_path = pop_slash(arr[2])
+                    self.__init_st_adresses(self.st_file_path)
+
                 else:
                     # mensagem de erro, pois há mais que uma indicação de ST filepaths.
                     raise Exception("ERRO!! Pois há mais que uma indicação de ST filepaths!")
@@ -335,11 +341,24 @@ class Configs:
 
         fp.close()
 
-        '''
-        # Restrição de haver log file para todos os dominios.
-        for key in self.domains:
-            if self.domains[key].get_log_file is None:
-                raise Exception(f"O domínio {key} não tem log file!!")'''
+
+    def __init_st_adresses(self, file_path: str):
+        """
+        Lê o ficheiro com a lista dos ST (passado como parametro) e coloca os seus valores na forma de tuplo (endereço, porta) na lista dos endereços dos ST.
+        :param file_path: Ficheiro com a lista dos ST.
+        """
+        try:
+            fp = open(file_path, "r")
+        except FileNotFoundError:
+            raise Exception("ST file not found!")
+
+        for line in fp:
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            addr: tuple = str_adress_to_tuple(line)
+            self.st_adresses.append(addr)
+
 
     def is_sp(self, domain):
         """
@@ -382,22 +401,20 @@ class Configs:
         if self.domains[domain].get_ss():
             return self.domains[domain].get_ss()
         else:
-            print("!get_ss não obteve nenhum ss!")
+            print("[DEBUG] get_ss não obteve nenhum ss!")
             return None
 
     def get_dd(self, domain):
         """
-        Esta função retorna os endereços dos servidores resolver de um determinado dominio, caso não seja ele próprio.
-
+        Esta função retorna os endereços dos servidores DD de um determinado dominio na forma de tuplo. Ex: (127.0.0.1, 5000).
         Autor: Miguel Pinto e Pedro Martins.
-
         :param domain: String
-        :return: list(String)
+        :return: list(Tuple)
         """
         if self.domains[domain].get_dd():
             return self.domains[domain].get_dd()
         else:
-            print("!get_dd não obteve nenhum dd!")
+            print("[DEBUG] get_dd não obteve nenhum dd!")
             return None
 
     def get_db_path(self, domain):
@@ -465,12 +482,13 @@ class Configs:
                 ret.append(key)
         return ret
 
+    def get_st_adresses(self):
+        return self.st_adresses
+
     def get_st_file(self):
         """
-        Esta função retorna a path do ficheirod e servidores de topo.
-
+        Esta função retorna a path do ficheiros com a lista dos ST.
         Autor: Miguel Pinto e Pedro Martins.
-
         :return: String
         """
         return self.st_file_path
@@ -478,15 +496,12 @@ class Configs:
     def get_sp_domains(self):
         """
         Esta função retorna uma lista com os nomes dos dominios que não têm um servidor Principal no DomainInfo.
-        O servidor toma o comportamento de SP.
-
         Autor: Pedro Martins.
-
         :return: list(String)
         """
         result = []
         for value in self.domains.values():
-            if value.get_sp() is None:
+            if value.get_db() is not None:
                 dom = value.get_name()
                 result.append(dom)
         return result
@@ -495,10 +510,7 @@ class Configs:
     def get_ss_domains(self):
         """
         Esta função retorna uma lista com os nomes dos dominios que têm um servidor Principal no DomainInfo.
-        O servidor toma o comportamento de SS.
-
         Autor: Pedro Martins.
-
         :return: list(String)
         """
         result = []
@@ -507,6 +519,4 @@ class Configs:
                 dom = value.get_name()
                 result.append(dom)
         return result
-
-
 
