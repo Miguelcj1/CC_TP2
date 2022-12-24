@@ -16,7 +16,7 @@ TTL DEFAULT 86400
 @ MX cliente.tijolo.muro. TTL 10
 
 SP-Tijolo-Muro A 10.0.5.12 TTL
-SS-Tijolo.Muro1 A 10.0.6.11 TTL
+SS-Tijolo-Muro1 A 10.0.6.11 TTL
 SS-Tijolo-Muro2 A 10.0.4.12 TTL
 cliente A 10.0.2.20 TTL
 www A 10.0.15.4 TTL 200
