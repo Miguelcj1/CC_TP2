@@ -179,6 +179,7 @@ def respond_query_sr(query, s, address, confs, log, cache):
 
     result = cache.get_answers(log, message_id, q_name, q_type)
     #TODO - GUARDAR INFO EM CACHE.
+    cache.update_with_query_response(log, result)
 
     # Se foi encontrada resposta na cache, não precisa de fazer o resto das verificações e envia a resposta.
     if get_response_code(result) == 0: # significa que foi encontrada resposta na cache.
@@ -193,7 +194,6 @@ def respond_query_sr(query, s, address, confs, log, cache):
 
     # Cria um novo socket para enviar perguntas e receber as suas respostas.
     newsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    #print(newsocket) #### DEBUG
 
     # Verifica se tem algum endereço para o qual deva mandar diretamente a query.
     direct_domains = confs.get_dd(q_name)
@@ -202,10 +202,12 @@ def respond_query_sr(query, s, address, confs, log, cache):
         result, serv_addr = newsocket.recvfrom(1024)
         result = result.decode("utf-8")
         #TODO - GUARDAR INFO EM CACHE.
+        cache.update_with_query_response(log, result)
         if get_response_code(result) == 0:
             break
 
 
+    # Ignora o envio de mensagem ao ST no caso de ja obter resposta por parte do DD.
     if get_response_code(result) != 0:
         lista_de_st = confs.get_st_adresses()
         for st in lista_de_st:
@@ -213,6 +215,7 @@ def respond_query_sr(query, s, address, confs, log, cache):
             result, serv_addr = newsocket.recvfrom(1024)
             result = result.decode("utf-8")
             #TODO - GUARDAR INFO EM CACHE.
+            cache.update_with_query_response(log, result)
             if get_response_code(result) == 0:
                 break
 

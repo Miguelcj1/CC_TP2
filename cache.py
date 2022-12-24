@@ -192,7 +192,7 @@ class Cache:
                 # se o registo já existir e o campo Origin da entrada existente for igual a FILE ou SP, ignorasse o pedido de registo.
                 return None
 
-            if origin != "OTHERS" and line[8] == "FREE":
+            if origin != "OTHERS" and line[8] == "FREE": #Isto acho que nunca acontece.
                 now = time.time()
                 self.table[i] = [name, type_of_value, value, ttl, prio, origin, now, i, "VALID"]
                 log.ev(now, f"Foi criada uma entrada na cache dos seguintes valores: {name} {type_of_value} {value} {ttl} origem:{origin}", name)
@@ -213,9 +213,7 @@ class Cache:
     def update_with_line(self, log, line, origin):
         """
         Esta função faz update a cache mas recebe como argumento uma linha do ficheiro de base de dados.
-
         Autor: Pedro Martins.
-
         :param log: Logs
         :param line: String
         :param origin: String
@@ -234,6 +232,26 @@ class Cache:
         if len(arr) > 4:
             prio = int(arr[4])
         self.update(log, name, type_of_value, value, ttl, prio=prio, origin=origin)
+
+    def update_with_query_response(self, log, q_response):
+        """
+        Esta função recebe uma resposta a uma query e mete os seus valores na cache
+        :param log: Objeto Logs
+        :param q_response: String que equivale a uma resposta (deve ser a resposta inteira).
+        """
+        tokens = q_response.split(";")
+        response_code = tokens[0].split(",")[2]
+        if response_code == 3:
+            print("Response code de falha, logo mensagem é indecifravel")
+            return
+        responses = []
+
+        for token in tokens[2:]:
+            rs = token.split(",")
+            responses.extend(rs)
+
+        for r in responses:
+            self.update_with_line(log, r, "OTHERS")
 
     def free_domain(self, domain, log):
         """

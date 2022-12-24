@@ -71,7 +71,6 @@ class DomainInfo:
         Possui também os endereços relativos ao SP, SS, e SR pertencentes a esse dominio.
 
         Autor: Miguel Pinto e Pedro Martins.
-
         """
         self.name = None
         self.database_path = None
@@ -84,9 +83,7 @@ class DomainInfo:
     def set_name(self, name):
         """
         Função de set do nome do dominio.
-
         Autor: Pedro Martins.
-
         :param name: String
         :return: Void
         """
@@ -95,9 +92,7 @@ class DomainInfo:
     def get_name(self):
         """
         Função de get do nome do dominio.
-
         Autor: Pedro Martins
-
         :return: String
         """
         return self.name
@@ -106,10 +101,7 @@ class DomainInfo:
         """
         Função de set da path da base de dados do dominio.
         Retorna falso caso já exista uma path para uma base de dados deste dominio.
-
         Autor: Pedro Martins.
-
-
         :param db_path: String
         :return: Boolean
         """
@@ -234,7 +226,7 @@ class DomainInfo:
         if self.dd:
             return self.dd
         else:
-            return None
+            return []
 
 
 class Configs:
@@ -411,11 +403,11 @@ class Configs:
         :param domain: String
         :return: list(Tuple)
         """
-        if self.domains[domain].get_dd():
+        if self.domains.get(domain):
             return self.domains[domain].get_dd()
         else:
-            print("[DEBUG] get_dd não obteve nenhum dd!")
-            return None
+            #print("[DEBUG] get_dd não obteve nenhum dd!")
+            return []
 
     def get_db_path(self, domain):
         """
