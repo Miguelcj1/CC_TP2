@@ -8,10 +8,13 @@ TTL DEFAULT 86400
 @ SOAREFRESH 14400 TTL
 @ SOARETRY 3600 TTL
 @ SOAEXPIRE 604800 TTL
+
 @ NS SP-Gesso-Parede.gesso.parede. TTL
 @ NS SS-Gesso-Parede1.gesso.parede. TTL
 @ NS SS-Gesso-Parede2.gesso.parede. TTL
+
 @ MX cliente.gesso.parede. TTL 10
+
 SP-Gesso-Parede A 10.0.4.10 TTL
 SS-Gesso.Parede1 A 10.0.3.12 TTL
 SS-Gesso-Parede2 A 10.0.5.11 TTL

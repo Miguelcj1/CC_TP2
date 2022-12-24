@@ -8,10 +8,13 @@ TTL DEFAULT 86400
 @ SOAREFRESH 14400 TTL
 @ SOARETRY 3600 TTL
 @ SOAEXPIRE 604800 TTL
+
 @ NS SP-Tijolo-Muro.tijolo.muro. TTL
-@ NS SS-Tijolo-Muro.tijolo.muro. TTL
+@ NS SS-Tijolo-Muro1.tijolo.muro. TTL
 @ NS SS-Tijolo-Muro2.tijolo.muro. TTL
+
 @ MX cliente.tijolo.muro. TTL 10
+
 SP-Tijolo-Muro A 10.0.5.12 TTL
 SS-Tijolo.Muro1 A 10.0.6.11 TTL
 SS-Tijolo-Muro2 A 10.0.4.12 TTL

@@ -17,25 +17,22 @@ TTL DEFAULT 86400
 @ NS SS-muro2.muro TTL
 
 # My adresses
-SP-muro.muro. A 10.0.6.12 TTL
-SS-muro1.muro. A 10.0.3.11 TTL
-SS-muro2.muro. A 10.0.4.12 TTL
+SP-muro A 10.0.6.12 TTL
+SS-muro1 A 10.0.3.11 TTL
+SS-muro2 A 10.0.5.10 TTL
 
 # My subdomains
-# unfinished...
-@ NS SP-Muro.muro. TTL
-@ NS SS-Muro1.muro. TTL
-@ NS SS-Muro2.muro. TTL
 tijolo.@ NS SP-Tijolo-Muro.tijolo.muro.
+tijolo.@ NS SS-Tijolo-Muro1.tijolo.muro.
+tijolo.@ NS SS-Tijolo-Muro2.tijolo.muro.
 
+# My sub adresses
+SP-Tijolo-Muro.tijolo A 10.0.5.12 TTL
+SS-Tijolo-Muro1.tijolo A 10.0.6.11 TTL
+SS-Tijolo-Muro2.tijolo A 10.0.4.12 TTL
 
 @ MX cliente.muro. TTL 10
 
-
-SP-Muro A 10.0.6.12 TTL
-SS-Muro1 A 10.0.3.11 TTL
-SS-Muro2 A 10.0.5.10 TTL
-SP-Tijolo-Muro A 10.0.5.12 TTL
 cliente A 10.0.2.20 TTL
 
 # nomes canonicos

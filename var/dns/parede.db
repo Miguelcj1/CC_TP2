@@ -10,10 +10,34 @@ TTL DEFAULT 86400
 @ SOAREFRESH 14400 TTL
 @ SOARETRY 3600 TTL
 @ SOAEXPIRE 604800 TTL
-@ NS SP-Parede.parede. TTL
-@ NS SS-Parede1.parede. TTL
-@ NS SS-Parede2.parede. TTL
+
+# MY DOMAINS
+@ NS SP-parede.parede. TTL
+@ NS SS-parede1.parede. TTL
+@ NS SS-parede2.parede. TTL
+
+# MY ADRESSES
+SP-parede A 10.0.3.11 TTL
+SS-parede1 A 10.0.6.10 TTL
+SS-parede2 A 10.0.4.11 TTL
+
+# MY SUBDOMAINS
+gesso.@ NS SP-Gesso-Parede.parede. TTL
+gesso.@ NS SS-Gesso-Parede1.parede. TTL
+gesso.@ NS SS-Gesso-Parede2.parede. TTL
+
+# MY SUB ADRESSES
+SP-Gesso-Parede.parede. A
+SS-Gesso-Parede1.parede. A
+SS-Gesso-Parede2.parede. A
+
+SP-Tijolo-Muro.tijolo.muro. A 10.0.5.12 TTL
+SS-Tijolo-Muro1.tijolo.muro. A 10.0.6.11 TTL
+SS-Tijolo-Muro2.tijolo.muro. A 10.0.4.12 TTL
+
 gesso.@ NS SP-Gesso-Parede.gesso.parede.
+
+
 @ MX cliente.parede. TTL 10
 SP-Parede A 10.0.3.10 TTL
 SS-Parede1 A 10.0.6.10 TTL
