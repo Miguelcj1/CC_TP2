@@ -1,16 +1,43 @@
-# DNS database file for domain root
+# DNS database file for root
 
-@ DEFAULT root.
+@ DEFAULT .
 TTL DEFAULT 86400
+
 @ SOASP ST.root. TTL
 @ SOAADMIN dns\.admin.root. TTL
 @ SOASERIAL 1 TTL
 @ SOAREFRESH 14400 TTL
 @ SOARETRY 3600 TTL
 @ SOAEXPIRE 604800 TTL
-@ NS SDT-Parede.parede. TTL
-@ NS SDT-Muro.muro. TTL
-@ NS Reverse.reverse. TTL
-SDT-Parede A 10.0.3.10 TTL
-SDT-Muro A 10.0.6.12 TTL
-Reverse A 10.0.5.13 TTL
+
+# My domain
+. NS sta. TTL
+. NS stb. TTL
+
+# My subdomains
+parede. NS SP-parede.parede TTL
+parede. NS SS-parede1.parede TTL
+parede. NS SS-parede2.parede TTL
+muro. NS SP-muro.muro TTL
+muro. NS SS-muro1.muro TTL
+muro. NS SS-muro2.muro TTL
+
+# My adresses
+sta. A 10.0.0.10 TLL
+stb. A 10.0.1.10 TLL
+
+# My subdomain adresses
+SP-parede.parede. A 10.0.3.10 TTL
+SS-parede1.parede. A 10.0.6.10 TTL
+SS-parede2.parede. A 10.0.4.11 TTL
+SP-muro.muro. A 10.0.6.12 TTL
+SS-muro1.muro. A 10.0.3.11 TTL
+SS-muro2.muro. A 10.0.4.12 TTL
+
+
+# Valores de antes
+# @ NS SDT-Parede.parede. TTL
+# @ NS SDT-Muro.muro. TTL
+# @ NS Reverse.reverse. TTL
+
+# Reverse A 10.0.5.13 TTL
