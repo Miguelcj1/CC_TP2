@@ -123,7 +123,7 @@ class Cache:
             # Libertação de espaços
             if line[8] == "VALID" and line[5] == "OTHERS" and time.time() - line[6] > line[3]:
                 self.table[i][8] = "FREE"
-                log.ev(now, f"Expirou uma entrada na cache com os seguintes valores: {line[0]} {line[1]} {line[2]} {line[3]}",domain=line[0])
+                #log.ev(now, f"Expirou uma entrada na cache com os seguintes valores: {line[0]} {line[1]} {line[2]} {line[3]}",domain=line[0])
             if line[8] == "VALID" and q_name.endswith(line[0]) and line[1] == "NS":
                 if line[5] == "FILE":
                     flags.add("A") # significa que obteve a informação pelo servidor primário.
