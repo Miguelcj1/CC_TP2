@@ -126,6 +126,55 @@ def respond_query(query, s, address, confs, log, cache):
     log.rp(time.time(), address, result, domain=q_name)
 
 
+def get_closest_adresses(q_response):
+    """
+    Dada uma query response, analisa e obtém uma lista de endereços mais proximos do objetivo para contactar.
+    :param q_response: Query response
+    :return: lista de endereços mais proximos do objetivo para contactar
+    """
+    tokens = q_response.split(";")
+    head = tokens[0]
+    header_fields = head.split(",")
+    response_code = header_fields[2]
+    n_authorities = header_fields[4]
+    n_extras = header_fields[5]
+    query_name = tokens[1].split(",")[0]
+    authorities_field = tokens[3]
+    list_of_authorities = authorities_field.split(",")
+    if n_authorities == 0 or n_extras == 0:
+        return []
+
+    # Organização da informação num dicionario(domain->lista_ns) (parsing)
+    domain_to_ns = {}
+    for a in list_of_authorities:
+        arrr = a.split(" ")
+        domain = arrr[0]
+        ns = arrr[2]
+        if domain_to_ns.get(domain) is None:
+            domain_to_ns[domain] = []
+        domain_to_ns[domain].append(ns)
+
+    # Determinar qual o dominio mais próximo do q_name
+    closest_domain = ""
+    for d in domain_to_ns.keys():
+        if query_name.endswith(d) and len(d) > len(closest_domain):
+            closest_domain = d
+
+    # Nomes dos dominios mais proximos do q_name
+    ns_values = domain_to_ns[closest_domain]
+    list_extras = tokens[4].split(",")
+    ret = []
+    for name in ns_values:
+        for e in list_extras:
+            e_fields = e.split(" ")
+            e_name = e_fields[0]
+            e_adress = e_fields[2]
+            if e_name == name:
+                ret.append(e_adress)
+                break
+
+    return ret
+
 
 def respond_query_sr(query, s, address, confs, log, cache):
     """
@@ -226,15 +275,17 @@ def respond_query_sr(query, s, address, confs, log, cache):
             if get_response_code(result) != 3:
                 break
 
+        closest_adresses = get_closest_adresses(result)
+
+        result = cache.get_answers(log, message_id, q_name, q_type)
+        print(f"--------------- [DEBUG]:\n{result}\n---------------------------------------------------------------------------")
+
 
     ###################### FIM DA PROCURA ALTERNATIVA ######################
 
     # Envio da mensagem final para o respetivo endereço
     s.sendto(result.encode("utf-8"), address)
     log.rp(time.time(), address, result, domain=q_name)
-
-
-
 
 
 

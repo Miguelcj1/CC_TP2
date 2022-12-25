@@ -38,12 +38,10 @@ class Cache:
 
 
     #info_line = [Name(0), Type(1), Value(2), TTL(3), Prio(4), origin(5), TimeStamp(6), Index(7), STATUS(8)]
-    def search(self, name, type_of_value, ind=0):
+    def search(self, name, type_of_value, ind=0) -> int:
         """
         Esta função recebe o nome e um tipo de valor e procura na cache o primeiro indice que faz match com esses valores.
-
         Autor: Miguel Pinto e Pedro Martins.
-
         :param name: String
         :param type_of_value: String
         :param ind: Int (indice pelo qual começa a procura)
@@ -62,13 +60,31 @@ class Cache:
         return res # retorna o primeiro indice que faz match com (name, type)
 
 
-    #def get_answers(self, log, message_id, q_name, q_type):
+
+    # TODO UNFINISHED BECAUSE OF NEW GET_CLOSEST_NAMES
+    def get_closest_adresses_from_cache(self, q_name):
+        # Procura por aliases do tipo CNAME em primeiro lugar.
+        for i in range(self.MAX):
+            line = self.table[i]
+            if line[8] == "VALID" and line[1] == "CNAME" and line[0] == q_name:
+                q_name = line[2]
+                break
+
+        arr_authorities = []
+        # init_line = [Name(0), Type(1), Value(2), TTL(3), Prio(4), origin(5), TimeStamp(6), Index(7), STATUS(8)]
+        now = time.time()
+        # Obtencao de authority_values
+        for i in range(self.MAX):
+            line = self.table[i]
+            if line[8] == "VALID" and q_name.endswith(line[0]) and line[1] == "NS":
+                arr_authorities.append(line_to_string(line))
+        authorities_f = ",".join(arr_authorities)
+
+
     def get_answers(self, log, message_id, q_name, q_type):
         """
         Esta função faz a procura na cache para obter os valores necessários e cria a resposta.
-
         Autor: Miguel Pinto e Pedro Martins.
-
         :param log: Logs
         :param message_id: Int
         :param q_name: String
@@ -102,15 +118,15 @@ class Cache:
         for i in range(self.MAX):
             line = self.table[i]
             if line[8] == "VALID" and line[5] == "OTHERS" and now - line[6] > line[3]:
-                self.table[i][8] = "FREE" # Libertação de espaços
-                log.ev(now, f"Expirou uma entrada na cache com os seguintes valores: {line[0]} {line[1]} {line[2]} {line[3]}", domain=line[0])
+                self.table[i][8] = "FREE"
+                #log.ev(now, f"Expirou uma entrada na cache com os seguintes valores: {line[0]} {line[1]} {line[2]} {line[3]}", domain=line[0])
 
             if line[8] == "VALID" and line[0] == q_name:
                 name_exists = True
 
             if line[8] == "VALID" and line[0] == q_name and line[1] == q_type:
                 if line[5] == "FILE" or line[5] == "SP":
-                    flags.add("A") # significa que obteve a informação pelo servidor primário.
+                    flags.add("A")
                 arr_resp.append(line_to_string(line))
                 n_resp += 1
                 all_values.append(line[2])
@@ -125,8 +141,8 @@ class Cache:
                 self.table[i][8] = "FREE"
                 #log.ev(now, f"Expirou uma entrada na cache com os seguintes valores: {line[0]} {line[1]} {line[2]} {line[3]}",domain=line[0])
             if line[8] == "VALID" and q_name.endswith(line[0]) and line[1] == "NS":
-                if line[5] == "FILE":
-                    flags.add("A") # significa que obteve a informação pelo servidor primário.
+                if line[5] == "FILE" or line[5] == "SP":
+                    flags.add("A")
                 arr_authorities.append(line_to_string(line))
                 n_authorities += 1
                 all_values.append(line[2])
@@ -143,7 +159,7 @@ class Cache:
             # Libertação de espaços
             if line[8] == "VALID" and line[5] == "OTHERS" and time.time() - line[6] > line[3]:
                 self.table[i][8] = "FREE"
-                log.ev(now, f"Expirou uma entrada na cache com os seguintes valores: {line[0]} {line[1]} {line[2]} {line[3]}", domain=line[0])
+                #log.ev(now, f"Expirou uma entrada na cache com os seguintes valores: {line[0]} {line[1]} {line[2]} {line[3]}", domain=line[0])
             if line[8] == "VALID" and line[0] in all_values and line[1] == "A":
                 arr_extras.append(line_to_string(line))
                 n_extras += 1
