@@ -1,7 +1,7 @@
 # Configuration file for ST
 
 root DB /var/dns/root.db
-root DD 127.0.0.1
-root LG /var/dns/root.log
-all LG /var/dns/all.log
+# root DD 127.0.0.1
+# root LG /var/dns/root.log
+all LG /var/log/all.log
 root ST /var/dns/rootservers.db

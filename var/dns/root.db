@@ -15,16 +15,16 @@ TTL DEFAULT 86400
 . NS stb. TTL
 
 # My adresses
-sta. A 10.0.0.10 TLL
-stb. A 10.0.1.10 TLL
+sta. A 10.0.0.10 TTL
+stb. A 10.0.1.10 TTL
 
 # My subdomains
-parede. NS SP-parede.parede TTL
-parede. NS SS-parede1.parede TTL
-parede. NS SS-parede2.parede TTL
-muro. NS SP-muro.muro TTL
-muro. NS SS-muro1.muro TTL
-muro. NS SS-muro2.muro TTL
+parede. NS SP-parede.parede. TTL
+parede. NS SS-parede1.parede. TTL
+parede. NS SS-parede2.parede. TTL
+muro. NS SP-muro.muro. TTL
+muro. NS SS-muro1.muro. TTL
+muro. NS SS-muro2.muro. TTL
 
 # My subdomain adresses
 SP-parede.parede. A 10.0.3.10 TTL

@@ -27,15 +27,15 @@ def add_default(name, default):
     """
     Esta função junta as strings name e default com um "." no meio.
     A função é usada para a implementaçao de dominios default onde não é direto a obtenção do dominio.
-
     Autor: Pedro Martins.
-
     :param name: String
     :param default: String
     :return: String
     """
     if default is None:
         raise Exception(f"There is no DEFAULT value to add to this name: {name}!")
+    if default is ".":
+        return name + "."
     return name + "." + default
 
 
@@ -149,7 +149,7 @@ class Database:
                 raise Exception(f"O campo prioridade da seguinte linha não representa um inteiro: {line}")
 
         # Adição dos valores à base de dados.
-        if arr[1] == "DEFAULT":  ### talvez devesse percorrer o ficheiro, primeiro por DEFAULTs e depois é que percorria tudo o resto, para valores default que estejam depois de uma utilização serem validos.
+        if arr[1] == "DEFAULT":
             if self.DEFAULT.get(dom):
                 raise Exception(f"DEFAULT VALUE {dom} ALREADY SET!")
             self.DEFAULT[dom] = name
@@ -158,7 +158,6 @@ class Database:
             self.SOASP[dom] = (name, ttl)
 
         elif arr[1] == "SOAADMIN":
-            #self.SOAADMIN[dom] = (email_translator(name), ttl)  # faço a tal traduçao de email.
             self.SOAADMIN[dom] = (name, ttl)
 
         elif arr[1] == "SOASERIAL":
