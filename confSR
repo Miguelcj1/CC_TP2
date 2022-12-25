@@ -1,5 +1,5 @@
 # Configuration file for resolve server - test
 
 example.com DD 127.0.0.1:5000
-all LG /log/allSR.log
+all LG /var/log/allSR.log
 root ST /stservers.db
