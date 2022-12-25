@@ -238,7 +238,6 @@ def resp_zone_transfer(dbs, port):
 
 
 
-
 """
 Esta função implementa o comportamento dos servidores principais/secundários no sistema DNS.
 A função recebe um ficheiro de configuração como argumento onde obtém toda a informação que necessita.
@@ -281,6 +280,7 @@ if len(sys.argv) > 2:
 try:
     confs = Configs(conf)
 except Exception as exc:
+    traceback.print_exc()
     sys.exit(f"Erro na leitura do ficheiro de configuração - {exc}")
 
 # FIXME - TO ELIMINATE
