@@ -200,12 +200,14 @@ def respond_query_sr(query, s, address, confs, log, cache):
     direct_domains = confs.get_dd(q_name)
     for dd in direct_domains:
         newsocket.sendto(query.encode("utf-8"), dd)
+        log.qe(time.time(), dd, query, domain=q_name)
         result, serv_addr = newsocket.recvfrom(1024)
         result = result.decode("utf-8")
-        print(f"[DEBUG] -> Resposta recebida pelo DD:\n{result}")
+        log.rr(time.time(), serv_addr, result, domain=q_name)
+        #print(f"--------------- [DEBUG] -> Resposta recebida pelo DD:\n{result}\n---------------")
         # GUARDA INFO EM CACHE.
         cache.update_with_query_response(log, result)
-        if get_response_code(result) == 0:
+        if get_response_code(result) != 3:
             break
 
 
@@ -214,12 +216,14 @@ def respond_query_sr(query, s, address, confs, log, cache):
         lista_de_st = confs.get_st_adresses()
         for st in lista_de_st:
             newsocket.sendto(query.encode("utf-8"), st)
+            log.qe(time.time(), st, query, domain=q_name)
             result, serv_addr = newsocket.recvfrom(1024)
             result = result.decode("utf-8")
-            print(f"[DEBUG] -> Resposta recebida pelo ST:\n{result}")
+            log.rr(time.time(), serv_addr, result, domain=q_name)
+            #print(f"--------------- [DEBUG] -> Resposta recebida pelo ST:\n{result}\n---------------")
             # GUARDA INFO EM CACHE.
             cache.update_with_query_response(log, result)
-            if get_response_code(result) == 0:
+            if get_response_code(result) != 3:
                 break
 
 
