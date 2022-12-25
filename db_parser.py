@@ -34,7 +34,7 @@ def add_default(name, default):
     """
     if default is None:
         raise Exception(f"There is no DEFAULT value to add to this name: {name}!")
-    if default is ".":
+    if default == ".":
         return name + "."
     return name + "." + default
 

@@ -281,15 +281,15 @@ if len(sys.argv) > 2:
 try:
     confs = Configs(conf)
 except Exception as exc:
-    print(str(exc))
-    #print("Inicialização do servidor interrompida devido a falha no ficheiro de configuração!")
-    sys.exit("Ocorreu um erro na leitura do ficheiro de configuração!")
+    sys.exit(f"Erro na leitura do ficheiro de configuração - {exc}")
 
-######################## FIXME - TESTE DE CONFS ########################
+# FIXME - TO ELIMINATE
+######################## TESTE DE CONFS ########################
 
 #test = confs.get_dd("example.com.")
 
-########################################################################
+################################################################
+# FIXME - TO ELIMINATE
 
 sp_domains = confs.get_sp_domains()
 ss_domains = confs.get_ss_domains()

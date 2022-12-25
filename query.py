@@ -202,6 +202,7 @@ def respond_query_sr(query, s, address, confs, log, cache):
         newsocket.sendto(query.encode("utf-8"), dd)
         result, serv_addr = newsocket.recvfrom(1024)
         result = result.decode("utf-8")
+        print(f"[DEBUG] -> Resposta recebida pelo DD:\n{result}")
         # GUARDA INFO EM CACHE.
         cache.update_with_query_response(log, result)
         if get_response_code(result) == 0:
@@ -215,6 +216,7 @@ def respond_query_sr(query, s, address, confs, log, cache):
             newsocket.sendto(query.encode("utf-8"), st)
             result, serv_addr = newsocket.recvfrom(1024)
             result = result.decode("utf-8")
+            print(f"[DEBUG] -> Resposta recebida pelo ST:\n{result}")
             # GUARDA INFO EM CACHE.
             cache.update_with_query_response(log, result)
             if get_response_code(result) == 0:
