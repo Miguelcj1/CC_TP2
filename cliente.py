@@ -73,12 +73,12 @@ def main():
     inp = "1"
     while inp != "0":
         """
+        inp = "1" ### DEBUG
         """
         print("--------------------")
         print("0: Sair do programa")
         print("1: Enviar query")
         inp = input("Opção: ")
-        #inp = "1" ### DEBUG
 
         if inp == "1":
             q_dom = input("Query domain: ")

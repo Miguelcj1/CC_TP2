@@ -288,23 +288,31 @@ def respond_query_sr(query, s, address, confs, log, cache):
             if get_response_code(result) != 3:
                 break
 
+        unreachable: bool = False # to detect cases in which the domain doesnt exist
         asked_the_domain: bool = False
         closest_domain , closest_adresses = get_closest_adresses(result)
-        while get_response_code(result) != 0 and not asked_the_domain:
+        while not unreachable and get_response_code(result) != 0 and not asked_the_domain:
             asked_the_domain = closest_domain == q_name
-            for addr in closest_adresses:
+            for i, addr in enumerate(closest_adresses):
                 newsocket.sendto(query.encode("utf-8"), addr)
                 log.qe(time.time(), addr, query, domain=q_name)
-                result, serv_addr = newsocket.recvfrom(1024)
+                try:
+                    result, serv_addr = newsocket.recvfrom(1024)
+                except ConnectionError:
+                    unreachable = True
+                    continue
                 result = result.decode("utf-8")
                 log.rr(time.time(), serv_addr, result, domain=q_name)
                 # GUARDA INFO EM CACHE.
                 cache.update_with_query_response(log, result)
                 closest_domain_new , closest_adresses_new = get_closest_adresses(result)
+                unreachable = i == len(closest_adresses)-1
                 if q_name == closest_domain_new or len(closest_domain_new) > len(closest_domain):
+                    unreachable = False
                     closest_adresses = closest_adresses_new
                     closest_domain = closest_domain_new
                     break
+
 
     ###################### FIM DA PROCURA ALTERNATIVA ######################
 
