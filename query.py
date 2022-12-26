@@ -126,12 +126,26 @@ def respond_query(query, s, address, confs, log, cache):
     s.sendto(result.encode("utf-8"), address)
     log.rp(time.time(), address, result, domain=q_name)
 
+def get_line_prio(line: str) -> int:
+    """
+    Retornam a prioridade de uma linha, tendo em conta casos em que nao existe prioridade.
+    :param line: Linha : str
+    :return: Prioridade : int
+    """
+    arr = line.split(" ")
+    if len(arr) < 5:
+        return 1000000 # não tem prioridade logo, por questoes de ordenação, será maior do que os que têm.
+    try:
+        prio = int(arr[4])
+    except ValueError:
+        prio = 1000000
+    return prio
 
 def get_closest_adresses(q_response):
     """
     Dada uma query response, analisa e obtém uma lista de endereços mais proximos do objetivo para contactar.
     :param q_response: Query response
-    :return: lista de endereços(tuplos) mais proximos do objetivo para contactar
+    :return: um tuplo (domínio mais proximo, lista de endereços(tuplos) mais proximos do objetivo para contactar)
     """
     tokens = q_response.split(";")
     head = tokens[0]
@@ -143,7 +157,7 @@ def get_closest_adresses(q_response):
     authorities_field = tokens[3]
     list_of_authorities = authorities_field.split(",")
     if n_authorities == 0 or n_extras == 0:
-        return []
+        return "", []
 
     # Organização da informação num dicionario(domain->lista_ns) (parsing)
     domain_to_ns = {}
@@ -171,10 +185,13 @@ def get_closest_adresses(q_response):
             e_name = e_fields[0]
             e_adress = e_fields[2]
             if e_name == name:
-                ret.append(e_adress)
+                ret.append((e_adress, get_line_prio(e)))
                 break
-    ret = map(auxs.str_adress_to_tuple, ret)
-    return list(ret)
+    ret.sort(key= lambda t: t[1]) # Ordena por prioridade
+    ret = map(lambda t: t[0], ret) # Remove as prioridades
+    ret = map(auxs.str_adress_to_tuple, ret) # Transforma em tuplos de conexao
+    ret = list(ret)
+    return closest_domain, ret
 
 
 def respond_query_sr(query, s, address, confs, log, cache):
@@ -271,20 +288,23 @@ def respond_query_sr(query, s, address, confs, log, cache):
             if get_response_code(result) != 3:
                 break
 
-        closest_adresses = get_closest_adresses(result)
-        for addr in closest_adresses:
-            newsocket.sendto(query.encode("utf-8"), addr)
-            log.qe(time.time(), addr, query, domain=q_name)
-            result, serv_addr = newsocket.recvfrom(1024)
-            result = result.decode("utf-8")
-            log.rr(time.time(), serv_addr, result, domain=q_name)
-            # GUARDA INFO EM CACHE.
-            cache.update_with_query_response(log, result)
-
-
-        result = cache.get_answers(log, message_id, q_name, q_type)
-        print(f"--------------- [DEBUG]:\n{result}\n---------------------------------------------------------------------------")
-
+        asked_the_domain: bool = False
+        closest_domain , closest_adresses = get_closest_adresses(result)
+        while get_response_code(result) != 0 and not asked_the_domain:
+            asked_the_domain = closest_domain == q_name
+            for addr in closest_adresses:
+                newsocket.sendto(query.encode("utf-8"), addr)
+                log.qe(time.time(), addr, query, domain=q_name)
+                result, serv_addr = newsocket.recvfrom(1024)
+                result = result.decode("utf-8")
+                log.rr(time.time(), serv_addr, result, domain=q_name)
+                # GUARDA INFO EM CACHE.
+                cache.update_with_query_response(log, result)
+                closest_domain_new , closest_adresses_new = get_closest_adresses(result)
+                if q_name == closest_domain_new or len(closest_domain_new) > len(closest_domain):
+                    closest_adresses = closest_adresses_new
+                    closest_domain = closest_domain_new
+                    break
 
     ###################### FIM DA PROCURA ALTERNATIVA ######################
 
