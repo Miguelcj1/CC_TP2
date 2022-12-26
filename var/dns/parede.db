@@ -22,27 +22,17 @@ SS-parede1 A 10.0.6.10 TTL
 SS-parede2 A 10.0.4.11 TTL
 
 # MY SUBDOMAINS
-gesso.@ NS SP-Gesso-Parede.parede. TTL
-gesso.@ NS SS-Gesso-Parede1.parede. TTL
-gesso.@ NS SS-Gesso-Parede2.parede. TTL
+gesso.@ NS SP-Gesso-Parede.gesso.parede. TTL
+gesso.@ NS SS-Gesso-Parede1.gesso.parede. TTL
+gesso.@ NS SS-Gesso-Parede2.gesso.parede. TTL
 
 # MY SUB ADRESSES
-SP-Gesso-Parede.parede. A
-SS-Gesso-Parede1.parede. A
-SS-Gesso-Parede2.parede. A
-
-SP-Tijolo-Muro.tijolo.muro. A 10.0.5.12 TTL
-SS-Tijolo-Muro1.tijolo.muro. A 10.0.6.11 TTL
-SS-Tijolo-Muro2.tijolo.muro. A 10.0.4.12 TTL
-
-gesso.@ NS SP-Gesso-Parede.gesso.parede.
+SP-Gesso-Parede.gesso A 10.0.4.10 TTL
+SS-Gesso-Parede1.gesso A 10.0.3.12 TTL
+SS-Gesso-Parede2.gesso A 10.0.5.11 TTL
 
 
 @ MX cliente.parede. TTL 10
-SP-Parede A 10.0.3.10 TTL
-SS-Parede1 A 10.0.6.10 TTL
-SS-Parede2 A 10.0.4.11 TTL
-SP-Gesso-Parede A 10.0.4.10 TTL
 cliente A 10.0.2.20 TTL
 sp CNAME SP-Parede TTL
 ss1 CNAME SS-Parede1 TTL

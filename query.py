@@ -3,6 +3,7 @@ import random
 from db_parser import Database
 from logs import Logs
 from cache import Cache
+import auxs
 import socket
 
 def belongs_to_domain(q_name, domains):
@@ -130,7 +131,7 @@ def get_closest_adresses(q_response):
     """
     Dada uma query response, analisa e obtém uma lista de endereços mais proximos do objetivo para contactar.
     :param q_response: Query response
-    :return: lista de endereços mais proximos do objetivo para contactar
+    :return: lista de endereços(tuplos) mais proximos do objetivo para contactar
     """
     tokens = q_response.split(";")
     head = tokens[0]
@@ -172,8 +173,8 @@ def get_closest_adresses(q_response):
             if e_name == name:
                 ret.append(e_adress)
                 break
-
-    return ret
+    ret = map(auxs.str_adress_to_tuple, ret)
+    return list(ret)
 
 
 def respond_query_sr(query, s, address, confs, log, cache):
@@ -222,8 +223,6 @@ def respond_query_sr(query, s, address, confs, log, cache):
         s.sendto(result.encode("utf-8"), address)
         return
 
-    ###################### FIM DO PARSING DA QUERY ######################
-
     ###################### VERIFICAÇÃO DA CACHE ######################
 
     result = cache.get_answers(log, message_id, q_name, q_type)
@@ -237,8 +236,6 @@ def respond_query_sr(query, s, address, confs, log, cache):
         s.sendto(result.encode("utf-8"), address)
         log.rp(time.time(), address, result, domain=q_name)
         return
-
-    ###################### FIM DA VERIFICAÇÃO DA CACHE ######################
 
     ###################### PROCURA ALTERNATIVA PERGUNTANDO A OUTROS SERVIDORES ######################
 
@@ -269,13 +266,21 @@ def respond_query_sr(query, s, address, confs, log, cache):
             result, serv_addr = newsocket.recvfrom(1024)
             result = result.decode("utf-8")
             log.rr(time.time(), serv_addr, result, domain=q_name)
-            #print(f"--------------- [DEBUG] -> Resposta recebida pelo ST:\n{result}\n---------------")
             # GUARDA INFO EM CACHE.
             cache.update_with_query_response(log, result)
             if get_response_code(result) != 3:
                 break
 
         closest_adresses = get_closest_adresses(result)
+        for addr in closest_adresses:
+            newsocket.sendto(query.encode("utf-8"), addr)
+            log.qe(time.time(), addr, query, domain=q_name)
+            result, serv_addr = newsocket.recvfrom(1024)
+            result = result.decode("utf-8")
+            log.rr(time.time(), serv_addr, result, domain=q_name)
+            # GUARDA INFO EM CACHE.
+            cache.update_with_query_response(log, result)
+
 
         result = cache.get_answers(log, message_id, q_name, q_type)
         print(f"--------------- [DEBUG]:\n{result}\n---------------------------------------------------------------------------")
