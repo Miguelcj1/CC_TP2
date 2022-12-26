@@ -73,18 +73,18 @@ def main():
     inp = "1"
     while inp != "0":
         """
+        """
         print("--------------------")
         print("0: Sair do programa")
         print("1: Enviar query")
         inp = input("Opção: ")
-        """
-        inp = "1" ### DEBUG TODO RETRACT COMMENTS
+        #inp = "1" ### DEBUG
 
         if inp == "1":
-            #q_dom = input("Query domain: ")
-            q_dom = "gesso.parede."
-            #q_type = input("Query type: ")
-            q_type = "MX"
+            q_dom = input("Query domain: ")
+            #q_dom = "gesso.parede."
+            q_type = input("Query type: ")
+            #q_type = "MX"
             q_type = q_type.upper()
             #q_flags = input("Query flags: ")
             q_flags = "Q"
