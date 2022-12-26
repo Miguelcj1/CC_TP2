@@ -3,7 +3,6 @@
 parede DB /var/dns/parede.db
 parede SS 10.0.6.10
 parede SS 10.0.4.11
-parede DD 127.0.0.1
-parede LG /var/dns/parede.log
-all LG /var/dns/all.log
+#parede DD 127.0.0.1
+all LG /var/dns/allparede.log
 root ST /var/dns/rootservers.db

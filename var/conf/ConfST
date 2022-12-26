@@ -1,5 +1,5 @@
 # Configuration file for ST
 
 . DB /var/dns/root.db
-all LG /var/log/all.log
+all LG /var/log/allroot.log
 root ST /var/dns/rootservers.db

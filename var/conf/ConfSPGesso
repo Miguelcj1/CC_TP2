@@ -3,7 +3,5 @@
 gesso.parede DB /var/dns/gesso-parede.db
 gesso.parede SS 10.0.3.12
 gesso.parede SS 10.0.5.11
-gesso.parede DD 10.0.4.13
-gesso.parede LG /var/dns/gesso-parede.log
-all LG /var/dns/all.log
+all LG /var/dns/allgesso.log
 root ST /var/dns/rootservers.db

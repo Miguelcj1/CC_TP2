@@ -3,7 +3,6 @@
 tijolo.muro DB /var/dns/tijolo-muro.db
 tijolo.muro SS 10.0.6.11
 tijolo.muro SS 10.0.4.12
-tijolo.muro DD 127.0.0.1
-tijolo.muro LG /var/dns/tijolo-muro.log
-all LG /var/dns/all.log
+# tijolo.muro DD 127.0.0.1
+all LG /var/log/tijolo.log
 root ST /var/dns/rootservers.db

@@ -1,7 +1,6 @@
 # Configuration file for secundary server for tijolo.muro
 
 tijolo.muro SP 10.0.5.12
-tijolo.muro DD 127.0.0.1
-tijolo.muro LG /var/dns/tijolo-muro.log
-all LG /var/dns/all.log
+# tijolo.muro DD 127.0.0.1
+all LG /var/dns/alltijoloss.log
 root ST /var/dns/rootservers.db

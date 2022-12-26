@@ -1,7 +1,6 @@
 # Configuration file for secundary server for muro
 
 muro SP 10.0.6.12
-muro DD 127.0.0.1
-muro LG /var/dns/muro.log
-all LG /var/dns/all.log
+# muro DD 127.0.0.1
+all LG /var/dns/allmuro.log
 root ST /var/dns/rootservers.db
