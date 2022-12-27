@@ -26,4 +26,3 @@ ftp A 10.0.15.6 TTL
 sp CNAME SP-Tijolo-Muro TTL
 ss1 CNAME SS-Tijolo-Muro1 TTL
 ss2 CNAME SS-Tijolo-Muro2 TTL
-mail1 CNAME cliente TTL

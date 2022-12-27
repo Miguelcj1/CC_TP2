@@ -31,7 +31,7 @@ class Cache:
         Autor: Miguel Pinto e Pedro Martins.
         """
         self.COL = 9 # nº de colunas
-        self.MAX = 100 # nº maximo de entradas # TODO aumentar valor final
+        self.MAX = 200 # nº maximo de entradas
 
         # Inicializa todas as entradas da cache com valores FREE.
         self.table = [[0, 0, 0, 0, 0, 0, 0.0, y, "FREE"] for y in range(self.MAX)]
@@ -58,27 +58,6 @@ class Cache:
                 res = i
                 break
         return res # retorna o primeiro indice que faz match com (name, type)
-
-
-
-    # TODO UNFINISHED BECAUSE OF NEW GET_CLOSEST_NAMES
-    def get_closest_adresses_from_cache(self, q_name):
-        # Procura por aliases do tipo CNAME em primeiro lugar.
-        for i in range(self.MAX):
-            line = self.table[i]
-            if line[8] == "VALID" and line[1] == "CNAME" and line[0] == q_name:
-                q_name = line[2]
-                break
-
-        arr_authorities = []
-        # init_line = [Name(0), Type(1), Value(2), TTL(3), Prio(4), origin(5), TimeStamp(6), Index(7), STATUS(8)]
-        now = time.time()
-        # Obtencao de authority_values
-        for i in range(self.MAX):
-            line = self.table[i]
-            if line[8] == "VALID" and q_name.endswith(line[0]) and line[1] == "NS":
-                arr_authorities.append(line_to_string(line))
-        authorities_f = ",".join(arr_authorities)
 
 
     def get_answers(self, log, message_id, q_name, q_type):

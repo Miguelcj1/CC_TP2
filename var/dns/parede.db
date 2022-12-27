@@ -31,10 +31,9 @@ SP-Gesso-Parede.gesso A 10.0.4.10 TTL
 SS-Gesso-Parede1.gesso A 10.0.3.12 TTL
 SS-Gesso-Parede2.gesso A 10.0.5.11 TTL
 
-
 @ MX cliente.parede. TTL 10
 cliente A 10.0.2.20 TTL
+
 sp CNAME SP-Parede TTL
 ss1 CNAME SS-Parede1 TTL
 ss2 CNAME SS-Parede2 TTL
-mail1 CNAME cliente TTL

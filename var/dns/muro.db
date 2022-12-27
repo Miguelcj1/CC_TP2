@@ -39,4 +39,3 @@ cliente A 10.0.2.20 TTL
 sp CNAME SP-Muro TTL
 ss1 CNAME SS-Muro1 TTL
 ss2 CNAME SS-Muro2 TTL
-mail1 CNAME cliente TTL

@@ -111,7 +111,7 @@ def main():
         elif inp != "0":
             print("Input inválido!")
 
-        input("Press Enter to continue!")
+        input("Press Enter to continue!\n")
 
     s.close()
 
