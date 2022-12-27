@@ -81,8 +81,8 @@ def main():
         """
 
         if inp == "1":
-            #q_dom = input("Query domain: ")
-            q_dom = "gesso.parede."
+            q_dom = input("Query domain: ")
+            #q_dom = "gesso.parede."
             q_type = input("Query type: ")
             #q_type = "MX"
             q_type = q_type.upper()

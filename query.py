@@ -315,7 +315,7 @@ def respond_query_sr(query, s, address, confs, log, cache):
             cache.update_with_query_response(log, result)
             closest_domain_new , closest_adresses_new = get_closest_adresses(result)
             unreachable = i == len(closest_adresses)-1
-            if q_name == closest_domain_new or len(closest_domain_new) > len(closest_domain):
+            if get_response_code(result) == 0 or q_name == closest_domain_new or len(closest_domain_new) > len(closest_domain):
                 unreachable = False
                 closest_adresses = closest_adresses_new
                 closest_domain = closest_domain_new

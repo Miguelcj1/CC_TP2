@@ -11,6 +11,11 @@ TTL DEFAULT 86400
 @ SOARETRY 3600 TTL
 @ SOAEXPIRE 604800 TTL
 
+# Próprio nome
 @ NS Reverse.reverse. TTL
-in-addr.@ NS Reverse.in-addr.reverse.
+
+# Sub-domínio
+in-addr.@ NS ns.in-addr.reverse.
+
 Reverse A 10.0.5.13 TTL
+ns.in-addr A 10.?.?.? TTL

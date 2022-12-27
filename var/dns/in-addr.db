@@ -11,7 +11,10 @@ TTL DEFAULT 86400
 @ SOARETRY 3600 TTL
 @ SOAEXPIRE 604800 TTL
 
+# Próprio endereço.
 @ NS ns.in-addr.reverse. TTL
+
+# Sub-domain
 10.@ NS ns.10.in-addr.reverse. TTL
 
 ns A 10.0.5.13 TTL
