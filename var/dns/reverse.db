@@ -15,7 +15,7 @@ TTL DEFAULT 86400
 @ NS Reverse.reverse. TTL
 
 # Sub-domínio
-in-addr.@ NS ns.in-addr.reverse.
+in-addr.@ NS ns.in-addr.reverse. TTL
 
 Reverse A 10.0.5.13 TTL
 ns.in-addr A 10.?.?.? TTL

@@ -14,8 +14,8 @@ TTL DEFAULT 86400
 ns A 10.0.5.13 TTL
 
 # Entradas PTR
-10.0.0 PTR sta.
-10.1.0 PTR stb.
+10.0.0 PTR sta. TTL
+10.1.0 PTR stb. TTL
 
 10.3.0 PTR SP-parede.parede. TTL
 10.6.0 PTR SS-parede1.parede. TTL
