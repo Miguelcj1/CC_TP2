@@ -1,5 +1,5 @@
 # Configuration file for Reverse
 
-root DB /var/dns/10.db
+10.in-addr.reverse DB /var/dns/10.db
 all LG /var/log/10all.log
 root ST /var/dns/rootservers.db
