@@ -1,7 +1,5 @@
 # Configuration file for Reverse
 
-root DB /var/dns/reverse.db
-root DD 127.0.0.1
-root LG /var/dns/reverse.log
-all LG /var/dns/all.log
+reverse DB /var/dns/reverse.db
+all LG /var/log/reverseall.log
 root ST /var/dns/rootservers.db

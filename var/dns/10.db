@@ -8,8 +8,47 @@ TTL DEFAULT 86400
 @ SOAREFRESH 14400 TTL
 @ SOARETRY 3600 TTL
 @ SOAEXPIRE 604800 TTL
-@ NS Reverse.10.in-addr.reverse. TTL
-Reverse A 10.0.5.13 TTL
-www.gesso.parede PTR 1.15.0.10
-www.tijolo.muro PTR 4.15.0.10
-ftp.gesso.parede PTR 3.15.0.10
+
+# Indica o próprio endereço
+@ NS ns.10.in-addr.reverse. TTL
+ns A 10.0.5.13 TTL
+
+# Entradas PTR
+10.0.0 PTR sta.
+10.1.0 PTR stb.
+
+10.3.0 PTR SP-parede.parede. TTL
+10.6.0 PTR SS-parede1.parede. TTL
+11.4.0 PTR SS-parede2.parede. TTL
+12.6.0 PTR SP-muro.muro. TTL
+11.3.0 PTR SS-muro1.muro. TTL
+12.4.0 PTR SS-muro2.muro. TTL
+
+10.4.0 PTR SP-Gesso-Parede.gesso.parede. TTL
+12.3.0 PTR SS-Gesso-Parede1.gesso.parede. TTL
+11.5.0 PTR SS-Gesso-Parede2.gesso.parede. TTL
+12.5.0 PTR SP-Tijolo-Muro.tijolo.muro. TTL
+11.6.0 PTR SS-Tijolo-Muro1.tijolo.muro. TTL
+12.4.0 PTR SS-Tijolo-Muro2.tijolo.muro. TTL
+
+
+
+
+
+# Entradas PTR talvez tenham de se inverter os endereços
+#10.0.0.10 PTR sta.
+#10.0.1.10 PTR stb.
+#
+#10.0.3.10 PTR SP-parede.parede. TTL
+#10.0.6.10 PTR SS-parede1.parede. TTL
+#10.0.4.11 PTR SS-parede2.parede. TTL
+#10.0.6.12 PTR SP-muro.muro. TTL
+#10.0.3.11 PTR SS-muro1.muro. TTL
+#10.0.4.12 PTR SS-muro2.muro. TTL
+#
+#10.0.4.10 PTR SP-Gesso-Parede.gesso.parede. TTL
+#10.0.3.12 PTR SS-Gesso-Parede1.gesso.parede. TTL
+#10.0.5.11 PTR SS-Gesso-Parede2.gesso.parede. TTL
+#10.0.5.12 PTR SP-Tijolo-Muro.tijolo.muro. TTL
+#10.0.6.11 PTR SS-Tijolo-Muro1.tijolo.muro. TTL
+#10.0.4.12 PTR SS-Tijolo-Muro2.tijolo.muro. TTL

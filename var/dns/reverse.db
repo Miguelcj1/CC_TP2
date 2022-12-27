@@ -1,15 +1,16 @@
 # DNS database file for domain reverse
-# It also includes a pointer to the primary server
-# of the in-addr subdomain
+# It also includes a pointer to the primary server of the in-addr.reverse. subdomain
 
 @ DEFAULT reverse.
 TTL DEFAULT 86400
+
 @ SOASP Reverse.reverse. TTL
 @ SOAADMIN dns\.admin.reverse. TTL
 @ SOASERIAL 1 TTL
 @ SOAREFRESH 14400 TTL
 @ SOARETRY 3600 TTL
 @ SOAEXPIRE 604800 TTL
+
 @ NS Reverse.reverse. TTL
 in-addr.@ NS Reverse.in-addr.reverse.
 Reverse A 10.0.5.13 TTL
