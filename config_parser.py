@@ -244,6 +244,7 @@ class Configs:
         """
         self.st_file_path = None
         self.st_adresses = []
+        self.st_reverse = None
         self.all_log = None
         self.domains = {}
         #self.sp = [] # nomes do dominios em que o servidor atua como servidor principal
@@ -348,8 +349,14 @@ class Configs:
             line = line.strip()
             if not line or line.startswith("#"):
                 continue
-            addr: tuple = str_adress_to_tuple(line)
-            self.st_adresses.append(addr)
+            arr = line.split()
+            endereco = arr[1]
+            addr: tuple = str_adress_to_tuple(endereco)
+            if arr[0] == "reverse":
+                self.st_reverse = addr
+            else:
+                self.st_adresses.append(addr)
+
 
 
     def is_sp(self, domain):
@@ -476,6 +483,9 @@ class Configs:
 
     def get_st_adresses(self):
         return self.st_adresses
+
+    def get_st_reverse(self):
+        return self.st_reverse
 
     def get_st_file(self):
         """

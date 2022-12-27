@@ -280,21 +280,33 @@ def respond_query_sr(query, s, address, confs, log, cache):
 
     # Verifica se tem informação sobre um domínio mais próximo, caso tenha, não pergunta aos ST.
     closest_domain, closest_adresses = get_closest_adresses(result)
-    if get_response_code(result) != 0 and not closest_adresses:
-        lista_de_st = confs.get_st_adresses()
-        for st in lista_de_st:
-            newsocket.sendto(query.encode("utf-8"), st)
-            log.qe(time.time(), st, query, domain=q_name)
-            try:
-                result, serv_addr = newsocket.recvfrom(1024)
-            except ConnectionError:
-                continue
-            result = result.decode("utf-8")
-            log.rr(time.time(), serv_addr, result, domain=q_name)
-            # GUARDA INFO EM CACHE.
-            cache.update_with_query_response(log, result)
-            if get_response_code(result) != 3:
-                break
+
+    if q_type == "PTR" and not closest_adresses:
+        reverse_st = confs.get_st_reverse()
+        newsocket.sendto(query.encode("utf-8"), reverse_st)
+        log.qe(time.time(), reverse_st, query, domain=q_name)
+        result, serv_addr = newsocket.recvfrom(1024)
+        result = result.decode("utf-8")
+        log.rr(time.time(), serv_addr, result, domain=q_name)
+        # GUARDA INFO EM CACHE.
+        cache.update_with_query_response(log, result)
+
+    else:
+        if get_response_code(result) != 0 and not closest_adresses:
+            lista_de_st = confs.get_st_adresses()
+            for st in lista_de_st:
+                newsocket.sendto(query.encode("utf-8"), st)
+                log.qe(time.time(), st, query, domain=q_name)
+                try:
+                    result, serv_addr = newsocket.recvfrom(1024)
+                except ConnectionError:
+                    continue
+                result = result.decode("utf-8")
+                log.rr(time.time(), serv_addr, result, domain=q_name)
+                # GUARDA INFO EM CACHE.
+                cache.update_with_query_response(log, result)
+                if get_response_code(result) != 3:
+                    break
 
     unreachable: bool = False # to detect cases in which the domain doesnt exist
     asked_the_domain: bool = False

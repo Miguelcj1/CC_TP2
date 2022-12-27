@@ -83,6 +83,8 @@ def main():
         if inp == "1":
             q_dom = input("Query domain: ")
             #q_dom = "gesso.parede."
+            #q_dom = "11.5.0.10.in-addr.reverse."
+            #q_dom = "12.3.0.10.in-addr.reverse."
             q_type = input("Query type: ")
             #q_type = "MX"
             q_type = q_type.upper()
