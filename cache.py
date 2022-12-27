@@ -31,7 +31,7 @@ class Cache:
         Autor: Miguel Pinto e Pedro Martins.
         """
         self.COL = 9 # nº de colunas
-        self.MAX = 50 # nº maximo de entradas # TODO aumentar valor final
+        self.MAX = 100 # nº maximo de entradas # TODO aumentar valor final
 
         # Inicializa todas as entradas da cache com valores FREE.
         self.table = [[0, 0, 0, 0, 0, 0, 0.0, y, "FREE"] for y in range(self.MAX)]

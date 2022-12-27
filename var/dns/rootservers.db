@@ -1,6 +1,5 @@
 # DNS file with the adresses of STs
 
-#
-
-#10.0.0.10
-#10.0.1.10
+root 10.0.0.10
+root 10.0.1.10
+reverse 10.0.5.13

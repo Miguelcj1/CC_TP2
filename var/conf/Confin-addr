@@ -1,5 +1,5 @@
 # Configuration file for Reverse
 
 in-addr.reverse DB /var/dns/in-addr.db
-all LG /var/log/addrall.log
+all LG /var/log/inaddrall.log
 root ST /var/dns/rootservers.db

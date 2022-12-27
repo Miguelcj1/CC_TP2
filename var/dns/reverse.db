@@ -18,4 +18,4 @@ TTL DEFAULT 86400
 in-addr.@ NS ns.in-addr.reverse. TTL
 
 Reverse A 10.0.5.13 TTL
-ns.in-addr A 10.?.?.? TTL
+ns.in-addr A 10.0.5.14 TTL

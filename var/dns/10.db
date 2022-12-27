@@ -11,7 +11,7 @@ TTL DEFAULT 86400
 
 # Indica o próprio endereço
 @ NS ns.10.in-addr.reverse. TTL
-ns A 10.0.5.13 TTL
+ns A 10.0.5.15 TTL
 
 # Entradas PTR
 10.0.0 PTR sta. TTL
