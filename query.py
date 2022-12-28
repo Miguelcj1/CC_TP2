@@ -270,7 +270,6 @@ def respond_query_sr(query, s, address, confs, log, cache):
             continue
         result = result.decode("utf-8")
         log.rr(time.time(), serv_addr, result, domain=q_name)
-        #print(f"--------------- [DEBUG] -> Resposta recebida pelo DD:\n{result}\n---------------")
         # GUARDA INFO EM CACHE.
         cache.update_with_query_response(log, result)
         if get_response_code(result) == 0:

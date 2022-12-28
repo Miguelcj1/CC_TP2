@@ -400,7 +400,7 @@ class Configs:
         if self.domains[domain].get_ss():
             return self.domains[domain].get_ss()
         else:
-            print("[DEBUG] get_ss não obteve nenhum ss!")
+            #print("[DEBUG] get_ss não obteve nenhum ss!")
             return None
 
     def get_dd(self, domain):

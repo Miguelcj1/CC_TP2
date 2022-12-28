@@ -15,7 +15,7 @@ from cache import Cache
 Server.py:
     Módulo de implementação dos servidores do sistema DNS.
     Data de criação: 27/10/2022
-    Data da última atualização: 24/11/2022
+    Data da última atualização: 28/12/2022
 """
 
 def check_addr(addr, lstradd):
