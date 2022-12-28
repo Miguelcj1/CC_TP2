@@ -1,4 +1,4 @@
-# Configuration file for Reverse
+# Configuration file for 10.in-addr.reverse.
 
 10.in-addr.reverse DB /var/dns/10.db
 all LG /var/log/10all.log
