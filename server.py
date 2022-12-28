@@ -283,13 +283,6 @@ except Exception as exc:
     traceback.print_exc()
     sys.exit(f"Erro na leitura do ficheiro de configuração - {exc}")
 
-# FIXME - TO ELIMINATE
-######################## TESTE DE CONFS ########################
-
-#test = confs.get_dd("example.com.")
-
-################################################################
-# FIXME - TO ELIMINATE
 
 sp_domains = confs.get_sp_domains()
 ss_domains = confs.get_ss_domains()
