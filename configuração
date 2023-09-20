@@ -1,4 +1,4 @@
-# Configuration file for primary server for example.com -
+# Configuration file for primary server for example.com
 
 example.com DB /var/dns/example-com.db
 example.com SS 193.123.5.189
